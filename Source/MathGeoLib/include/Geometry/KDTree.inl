@@ -218,7 +218,7 @@ int KdTree<T>::TreeHeight(int nodeIndex) const
 	const KdTreeNode &node = nodes[nodeIndex];
 	if (node.IsLeaf())
 		return 1;
-	//return 1 + std::max(TreeHeight(node.LeftChildIndex()), TreeHeight(node.RightChildIndex())); MATHGEOLIB ERROR
+	//return 1 + (std::max)(TreeHeight(node.LeftChildIndex()), TreeHeight(node.RightChildIndex())); //MATHGEOLIB ERROR
 	return 1 + (TreeHeight(node.LeftChildIndex()) > TreeHeight(node.RightChildIndex()) ? TreeHeight(node.LeftChildIndex()) : TreeHeight(node.RightChildIndex()));
 }
 

@@ -20,4 +20,3 @@ private:
 
 	float4x4 model;
 };
-
