@@ -13,5 +13,5 @@ public:
 	update_status PostUpdate();
 
 private:
-	bool showAboutWindow;
+	bool showInfoWindow;
 };

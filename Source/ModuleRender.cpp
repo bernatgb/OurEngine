@@ -8,6 +8,10 @@
 #include "GL/glew.h"
 #include <MathGeoLib.h>
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
 	const char* tmp_source = "", * tmp_type = "", * tmp_severity = "";
@@ -119,10 +123,6 @@ bool ModuleRender::Init()
 	float3 eye = float3(0.0f, 4.0f, 8.0f);
 	float3 target = float3(0.0f, 0.0f, 0.0f);
 
-	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
-		float4x4::RotateZ(pi / 4.0f),
-		float3(2.0f, 1.0f, 0.0f));
-
 	view = ViewMatrix(target, eye);
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 
@@ -169,6 +169,9 @@ update_status ModuleRender::Update()
 update_status ModuleRender::PostUpdate()
 {
 	App->debugDraw->Draw(view, proj, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(App->window->window);
 

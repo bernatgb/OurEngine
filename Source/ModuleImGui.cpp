@@ -3,6 +3,7 @@
 #include "ModuleImGui.h"
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
+#include "SDL/include/SDL.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -29,7 +30,7 @@ bool ModuleImGui::Init()
 
 	ImGui::StyleColorsDark();
 
-	showAboutWindow = false;
+	showInfoWindow = false;
 
 	return true;
 }
@@ -55,9 +56,9 @@ update_status ModuleImGui::Update()
 			{
 				//Do something
 			}
-			if (ImGui::MenuItem("About"))
+			if (ImGui::MenuItem("Info"))
 			{
-				showAboutWindow = !showAboutWindow;
+				showInfoWindow = !showInfoWindow;
 			}
 			if (ImGui::MenuItem("Quit"))
 			{
@@ -68,22 +69,26 @@ update_status ModuleImGui::Update()
 		ImGui::EndMainMenuBar();
 	}
 
-	if (showAboutWindow) 
+	if (showInfoWindow)
 	{
-		ImGui::Begin("About...");
+		ImGui::Begin("About...", &showInfoWindow);
 		ImGui::Text(" > Engine name: ");
 		ImGui::SameLine();
 		ImGui::Text(TITLE);
 		ImGui::Text(" > Author: miquelmiro3");
-		ImGui::Text(" > Description:");
-		ImGui::Text(" > Libraries:");
-		ImGui::Text(" > License:");
+		ImGui::Text(" > Description: This is MyEngine");
+		ImGui::Text(" > Libraries: SDL, glew, ImGui, MathGeoLab, ...");
+		ImGui::Text(" > License: MIT License");
+
+		if (ImGui::BeginTabBar("Performance")) 
+		{
+			ImGui::Text(" > Performance:");
+			ImGui::Text(" Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::EndTabBar();
+		}
+
 		ImGui::End();
 	}
-
-	// Should be in the post but it cant go after the post of the renderer
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	return UPDATE_CONTINUE;
 }

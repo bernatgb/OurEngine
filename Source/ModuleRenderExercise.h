@@ -16,5 +16,8 @@ public:
 private:
 	unsigned int program;
 	unsigned int vBuffer;
+	unsigned int texture;
+
+	float4x4 model;
 };
 

@@ -21,5 +21,5 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 
 	void* context;
-	float4x4 model, view, proj;
+	float4x4 view, proj;
 };
