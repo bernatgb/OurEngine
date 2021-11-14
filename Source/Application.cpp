@@ -21,7 +21,7 @@ Application::Application()
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(rendererExercise = new ModuleRenderExercise());
 	modules.push_back(debugDraw = new ModuleDebugDraw());
-	modules.push_back(new ModuleImGui());
+	modules.push_back(imGui = new ModuleImGui());
 }
 
 Application::~Application()
@@ -30,6 +30,11 @@ Application::~Application()
     {
         delete *it;
     }
+
+	for (list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
+	{
+		delete[] *it;
+	}
 }
 
 bool Application::Init()

@@ -1,6 +1,5 @@
 #pragma once
 #include "Module.h"
-#include "Globals.h"
 
 // Module -> static (utils)
 class ModuleProgram : public Module

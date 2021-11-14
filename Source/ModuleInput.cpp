@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
-#include "SDL/include/SDL.h"
+
 
 ModuleInput::ModuleInput()
 {}
@@ -23,6 +23,8 @@ bool ModuleInput::Init()
 		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
+    
+    keyboard = SDL_GetKeyboardState(NULL);
 
 	return ret;
 }
@@ -30,6 +32,8 @@ bool ModuleInput::Init()
 // Called every draw update
 update_status ModuleInput::Update()
 {
+    SDL_PumpEvents();
+
     SDL_Event sdlEvent;
 
     while (SDL_PollEvent(&sdlEvent) != 0)
@@ -45,7 +49,6 @@ update_status ModuleInput::Update()
         }
     }
 
-    keyboard = SDL_GetKeyboardState(NULL);
 
     return UPDATE_CONTINUE;
 }
@@ -56,4 +59,9 @@ bool ModuleInput::CleanUp()
 	LOG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
+}
+
+const Uint8 ModuleInput::GetKey(SDL_Scancode key) const
+{
+    return keyboard[key];
 }

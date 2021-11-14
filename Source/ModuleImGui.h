@@ -14,4 +14,8 @@ public:
 
 private:
 	bool showInfoWindow;
+	bool showConsoleWindow;
+	bool showTextureWindow;
+
+	bool autoScroll;
 };

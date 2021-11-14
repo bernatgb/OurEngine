@@ -1,6 +1,7 @@
 #include "ModuleTexture.h"
 
 #include "IL/il.h"
+#include "IL/ilu.h"
 
 ModuleTexture::ModuleTexture()
 {
@@ -14,23 +15,40 @@ bool ModuleTexture::Init()
 {
 	ilInit();
 
-	ilGenImages(1, &lenna);
-	ilBindImage(lenna);
-	ilLoadImage("..\\Source\\resources\\Lenna.png");
+	return true;
+}
+
+
+void ModuleTexture::GetTextureData(unsigned int& texture, const char* source, int& width, int& height, byte*& data)
+{
+	ilGenImages(1, &texture);
+	ilBindImage(texture);
+	ilLoadImage(source);
 	width = ilGetInteger(IL_IMAGE_WIDTH);
 	height = ilGetInteger(IL_IMAGE_HEIGHT);
 	data = ilGetData();
 
-	/*ILvoid iluGetImageInfo(
-		ILinfo * Info
-	);*/
-
-	return true;
+	ILinfo textureInfo;
+	iluGetImageInfo(&textureInfo);
+	if (textureInfo.Origin == IL_ORIGIN_UPPER_LEFT)
+		iluFlipImage();
+	
+	this->width = textureInfo.Width;
+	this->height = textureInfo.Height;
+	this->depth = textureInfo.Depth;
+	this->format = textureInfo.Format;
+	//IL_COLOUR_INDEX, IL_RGB, IL_RGBA, IL_BGR, IL_BGRA, IL_LUMINANCE
 }
 
-bool ModuleTexture::CleanUp()
+void ModuleTexture::CleanTexture(unsigned int& texture)
 {
-	ilDeleteImages(1, &lenna);
+	ilDeleteImages(1, &texture);
+}
 
-	return true;
+void ModuleTexture::GetLastTextureInfo(unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format) const
+{
+	width = this->width;
+	height = this->height;
+	depth = this->depth;
+	format = this->format;
 }

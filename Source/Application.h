@@ -12,6 +12,7 @@ class ModuleProgram;
 class ModuleRenderExercise;
 class ModuleDebugDraw;
 class ModuleTexture;
+class ModuleImGui;
 
 class Application
 {
@@ -32,6 +33,9 @@ public:
 	ModuleRenderExercise* rendererExercise = nullptr;
 	ModuleDebugDraw* debugDraw = nullptr;
 	ModuleTexture* texture = nullptr;
+	ModuleImGui* imGui = nullptr;
+
+	std::list<char*> Items;
 
 private:
 

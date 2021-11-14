@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
+#include "ModuleInput.h"
 #include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
 #include "SDL.h"
@@ -40,7 +41,8 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 	case GL_DEBUG_SEVERITY_LOW: tmp_severity = "low"; break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION: tmp_severity = "notification"; break;
 	};
-	LOG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
+	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+		LOG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 ModuleRender::ModuleRender()
@@ -60,7 +62,6 @@ float4x4 ViewMatrix(float3 target, float3 eye)
 	right.Normalize();
 	float3 up = Cross(right, forward);
 	up.Normalize();
-	float3 position = eye;
 
 	float4x4 rotationMatrix = {
 		{right.x, up.x, -forward.x, 0},
@@ -73,7 +74,7 @@ float4x4 ViewMatrix(float3 target, float3 eye)
 		{1, 0, 0, 0},
 		{0, 1, 0, 0},
 		{0, 0, 1, 0},
-		{-position.x, -position.y, -position.z, 1}
+		{-eye.x, -eye.y, -eye.z, 1}
 	};
 
 	return rotationMatrix * translationMatrix;
@@ -117,15 +118,14 @@ bool ModuleRender::Init()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 
-	// Creation of model, view and proj
-	int aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-	float3 eye = float3(0.0f, 4.0f, 8.0f);
-	float3 target = float3(0.0f, 0.0f, 0.0f);
+	// Creation of view and proj
+	eye = float3(0.0f, 4.0f, 8.0f);
+	target = float3(0.0f, 0.0f, 0.0f);
 
 	view = ViewMatrix(target, eye);
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 
+	int aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 	Frustum frustum;
 	frustum.type = FrustumType::PerspectiveFrustum;
 
@@ -163,6 +163,54 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
+	bool change = false;
+
+	if (App->input->GetKey(SDL_SCANCODE_W)) 
+	{
+		eye += float3(0.0f, 0.0f, -0.1f);
+		target += float3(0.0f, 0.0f, -0.1f);
+		change = true;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_S))
+	{
+		eye += float3(0.0f, 0.0f, 0.1f);
+		target += float3(0.0f, 0.0f, 0.1f);
+		change = true;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_A))
+	{
+		eye += float3(-0.1f, 0.0f, 0.0f);
+		target += float3(-0.1f, 0.0f, 0.0f);
+		change = true;
+	}
+	if (App->input->GetKey(SDL_SCANCODE_D))
+	{
+		eye += float3(0.1f, 0.0f, 0.0f);
+		target += float3(0.1f, 0.0f, 0.0f);
+		change = true;
+	}
+
+	if (change)
+	{
+		view = ViewMatrix(target, eye);
+
+		int aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+		Frustum frustum;
+		frustum.type = FrustumType::PerspectiveFrustum;
+
+		frustum.pos = eye;
+		frustum.front = target - eye;
+		frustum.front.Normalize();
+		frustum.up = float3::unitY;
+
+		frustum.nearPlaneDistance = 0.1f;
+		frustum.farPlaneDistance = 100.0f;
+		frustum.verticalFov = math::pi / 3.0f;
+		frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * aspect);
+
+		proj = frustum.ProjectionMatrix();
+	}
+
 	return UPDATE_CONTINUE;
 }
 

@@ -2,7 +2,9 @@
 #include "Application.h"
 #include "ModuleImGui.h"
 #include "ModuleRender.h"
+#include "ModuleRenderExercise.h"
 #include "ModuleWindow.h"
+#include "ModuleTexture.h"
 #include "SDL/include/SDL.h"
 
 #include "imgui.h"
@@ -31,6 +33,10 @@ bool ModuleImGui::Init()
 	ImGui::StyleColorsDark();
 
 	showInfoWindow = false;
+	showConsoleWindow = false;
+	showTextureWindow = false;
+
+	autoScroll = true;
 
 	return true;
 }
@@ -60,6 +66,14 @@ update_status ModuleImGui::Update()
 			{
 				showInfoWindow = !showInfoWindow;
 			}
+			if (ImGui::MenuItem("Console"))
+			{
+				showConsoleWindow = !showConsoleWindow;
+			}
+			if (ImGui::MenuItem("Texture info"))
+			{
+				showTextureWindow = !showTextureWindow;
+			}
 			if (ImGui::MenuItem("Quit"))
 			{
 				return UPDATE_STOP;
@@ -72,22 +86,64 @@ update_status ModuleImGui::Update()
 	if (showInfoWindow)
 	{
 		ImGui::Begin("About...", &showInfoWindow);
-		ImGui::Text(" > Engine name: ");
+
+		ImGui::Text("> Engine name: ");
 		ImGui::SameLine();
 		ImGui::Text(TITLE);
-		ImGui::Text(" > Author: miquelmiro3");
-		ImGui::Text(" > Description: This is MyEngine");
-		ImGui::Text(" > Libraries: SDL, glew, ImGui, MathGeoLab, ...");
-		ImGui::Text(" > License: MIT License");
+		ImGui::Text("> Author: miquelmiro3");
+		ImGui::Text("> Description: This is MyEngine");
+		ImGui::Text("> Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, ...");
+		ImGui::Text("> License: MIT License");
 
-		if (ImGui::BeginTabBar("Performance")) 
-		{
-			ImGui::Text(" > Performance:");
-			ImGui::Text(" Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::EndTabBar();
-		}
+		ImGui::Separator();
+
+		ImGui::Text("> Performance:");
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		ImGui::End();
+	}
+
+	if (showTextureWindow)
+	{
+		App->rendererExercise->DrawTextureImGui(showTextureWindow);
+	}
+
+	if (showConsoleWindow)
+	{
+		ImGui::SetNextWindowSize(ImVec2(400, 200));
+		if (ImGui::Begin("Console", &showConsoleWindow))
+		{
+			if (ImGui::SmallButton("Clear")) 
+			{
+				for (std::list<char*>::iterator it = App->Items.begin(); it != App->Items.end(); ++it)
+					free(*it);
+				App->Items.clear();
+			}
+			ImGui::SameLine();
+			ImGui::Checkbox("Auto-scroll", &autoScroll);
+
+			ImGui::Separator();
+
+			ImGui::BeginChild("ScrollingRegion", ImVec2(0, -10), false, ImGuiWindowFlags_HorizontalScrollbar);
+			for (std::list<char*>::iterator it = App->Items.begin(); it != App->Items.end(); ++it)
+			{
+				ImVec4 color;
+				bool has_color = false;
+				if (strstr((*it), "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
+				if (has_color)
+					ImGui::PushStyleColor(ImGuiCol_Text, color);
+				ImGui::TextUnformatted((*it));
+				if (has_color)
+					ImGui::PopStyleColor();
+			}
+
+			if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+				ImGui::SetScrollHereY(0.0f);
+
+			ImGui::EndChild();
+
+			ImGui::End();
+		}
 	}
 
 	return UPDATE_CONTINUE;

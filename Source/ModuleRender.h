@@ -22,4 +22,6 @@ public:
 
 	void* context;
 	float4x4 view, proj;
+
+	float3 eye, target;
 };

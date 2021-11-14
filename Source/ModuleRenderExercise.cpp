@@ -5,16 +5,39 @@
 #include "ModuleTexture.h"
 #include "GL/glew.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 ModuleRenderExercise::ModuleRenderExercise()
 {
+	/*minFilter = new unsigned int[6]{
+		GL_NEAREST, GL_LINEAR,
+		GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST,
+		GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
+	};
+	magFilter = new unsigned int[2]{
+		GL_NEAREST, GL_LINEAR
+	};
+	wrap = new unsigned int[2]{
+		GL_CLAMP, GL_REPEAT
+	};
+
+	minPar = 1;
+	magPar = 1;
+	wrapPar = 0;*/
 }
 
 ModuleRenderExercise::~ModuleRenderExercise()
-{
+{	
+	/*delete[] minFilter;
+	delete[] magFilter;
+	delete[] wrap;*/
 }
 
 bool ModuleRenderExercise::Init()
 {
+	LOG("Buffer: Creating vertex buffer");
 	GLfloat vertex[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
@@ -29,17 +52,25 @@ bool ModuleRenderExercise::Init()
 	glGenBuffers(1, &vBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
-
+	
+	LOG("Textures: Generating texture and setting its parameters");
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, App->texture->width, App->texture->height, 0, GL_RGB, GL_UNSIGNED_BYTE, App->texture->data);
-	
-	//glGenereateMipMap
 
+	LOG("Textures: Reading the texture file and setting its data");
+	unsigned int devILTexture;
+	int width, height;
+	byte* data = nullptr;
+	App->texture->GetTextureData(devILTexture, "..\\Source\\resources\\Lenna.png", width, height, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	App->texture->CleanTexture(devILTexture);
+	glGenerateTextureMipmap(texture);
+
+	LOG("Shaders: Creating program");
 	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
@@ -90,7 +121,92 @@ bool ModuleRenderExercise::CleanUp()
 {
 	glDeleteBuffers(1, &vBuffer);
 
+	glDeleteProgram(program);
+
 	glDeleteTextures(1, &texture);
 
 	return true;
+}
+
+void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
+{
+	ImGui::Begin("Texture info", &showWindow);
+	unsigned int width, height, depth, format;
+	App->texture->GetLastTextureInfo(width, height, depth, format);
+	ImGui::Text("Witdh: %i", width);
+	ImGui::Text("Height: %i", height);
+	ImGui::Text("Depth: %i", depth);
+	ImGui::Text("Format: %i", format);
+
+	if (ImGui::BeginTabBar("Options"))
+	{
+		bool change = false;
+
+		/*if (ImGui::Button("Select Min filter.."))
+			ImGui::OpenPopup("min_filter_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(minPar == -1 ? "<None>" : minFilterName[minPar]);
+		if (ImGui::BeginPopup("min_filter_popup"))
+		{
+			ImGui::Text("Min Filter");
+			ImGui::Separator();
+			for (int i = 0; i < 6; i++)
+				if (ImGui::Selectable(minFilterName[i]))
+				{
+					minPar = i;
+					change = true;
+				}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Select Mag filter.."))
+			ImGui::OpenPopup("mag_filter_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(magPar == -1 ? "<None>" : minFilterName[magPar]);
+		if (ImGui::BeginPopup("mag_filter_popup"))
+		{
+			ImGui::Text("Mag Filter");
+			ImGui::Separator();
+			for (int i = 0; i < 2; i++)
+				if (ImGui::Selectable(magFilterName[i]))
+				{
+					magPar = i;
+					change = true;
+				}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Select Wrap.."))
+			ImGui::OpenPopup("wrap_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(wrapPar == -1 ? "<None>" : wrapName[wrapPar]);
+		if (ImGui::BeginPopup("wrap_popup"))
+		{
+			ImGui::Text("Wrap");
+			ImGui::Separator();
+			for (int i = 0; i < 2; i++)
+				if (ImGui::Selectable(wrapName[i]))
+				{
+					wrapPar = i;
+					change = true;
+				}
+			ImGui::EndPopup();
+		}
+
+		if (change)
+			SetTextureParameters();*/
+
+		ImGui::EndTabBar();
+	}
+
+	ImGui::End();
+}
+
+void ModuleRenderExercise::SetTextureParameters()
+{
+	/*glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter[minPar]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter[magPar]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap[wrapPar]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap[wrapPar]);*/
 }
