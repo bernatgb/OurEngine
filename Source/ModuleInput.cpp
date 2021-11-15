@@ -3,7 +3,6 @@
 #include "ModuleInput.h"
 #include "ModuleRender.h"
 
-
 ModuleInput::ModuleInput()
 {}
 
@@ -26,6 +25,9 @@ bool ModuleInput::Init()
     
     keyboard = SDL_GetKeyboardState(NULL);
 
+    for (int i = 0; i < NUM_MOUSE_BUTTONS; i++)
+        mouse_buttons[i] = false;
+
 	return ret;
 }
 
@@ -35,6 +37,9 @@ update_status ModuleInput::Update()
     SDL_PumpEvents();
 
     SDL_Event sdlEvent;
+
+    mouse_motion_x = 0;
+    mouse_motion_y = 0;
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
@@ -46,6 +51,15 @@ update_status ModuleInput::Update()
                 if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                     App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 break;
+            case SDL_MOUSEBUTTONDOWN:
+                mouse_buttons[sdlEvent.button.button - 1] = true;
+                break;
+            case SDL_MOUSEBUTTONUP:
+                mouse_buttons[sdlEvent.button.button - 1] = false;
+                break;
+            case SDL_MOUSEMOTION:
+                mouse_motion_x = sdlEvent.motion.xrel;
+                mouse_motion_y = sdlEvent.motion.yrel;
         }
     }
 

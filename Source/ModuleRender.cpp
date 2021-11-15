@@ -80,6 +80,20 @@ float4x4 ViewMatrix(float3 target, float3 eye)
 	return rotationMatrix * translationMatrix;
 }
 
+void ModuleRender::ViewProjectionMatrix()
+{
+	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+	frustum.SetViewPlaneDistances(0.1f, 200.0f);
+	frustum.SetVerticalFovAndAspectRatio(DEGTORAD * 45.0f, aspect);
+
+	frustum.SetPos(eye);
+	frustum.SetFront(rotationMatrix.WorldZ());
+	frustum.SetUp(rotationMatrix.WorldY());
+
+	view = float4x4(frustum.ViewMatrix());
+	proj = frustum.ProjectionMatrix();
+}
+
 // Called before render is available
 bool ModuleRender::Init()
 {
@@ -117,33 +131,17 @@ bool ModuleRender::Init()
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
-
 	// Creation of view and proj
 	eye = float3(0.0f, 4.0f, 8.0f);
 	target = float3(0.0f, 0.0f, 0.0f);
+	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * -30.0f, DEGTORAD * 180.0f, 0.0f);
 
-	view = ViewMatrix(target, eye);
+	//view = ViewMatrix(target, eye);
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 
-	int aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-	Frustum frustum;
-	frustum.type = FrustumType::PerspectiveFrustum;
+	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-	frustum.pos = eye;
-	frustum.front = target - eye;
-	frustum.front.Normalize();
-	frustum.up = float3::unitY;
-	//frustum.pos = float3::zero;
-	//frustum.front = -float3::unitZ;
-	//frustum.up = float3::unitY;
-
-	frustum.nearPlaneDistance = 0.1f;
-	frustum.farPlaneDistance = 100.0f;
-	frustum.verticalFov = math::pi / 3.0f;
-	//frustum.verticalFov = math::pi / 4.0f;
-	frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * aspect);
-
-	proj = frustum.ProjectionMatrix();
+	ViewProjectionMatrix();
 
 	return true;
 }
@@ -190,25 +188,17 @@ update_status ModuleRender::Update()
 		change = true;
 	}
 
+	/*float3x3 rotationDeltaMatrix; // = some rotation delta value
+	vec oldFront = frustum.Front().Normalized();
+	frustum.SetFront(rotationDeltaMatrix.MultDir(oldFront);
+	vec oldUp = frustum.Up().Normalized();
+	frustum.SetUp(rotationDeltaMatrix.MultDir(oldUp);*/
+
 	if (change)
 	{
-		view = ViewMatrix(target, eye);
+		//view = ViewMatrix(target, eye);
 
-		int aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-		Frustum frustum;
-		frustum.type = FrustumType::PerspectiveFrustum;
-
-		frustum.pos = eye;
-		frustum.front = target - eye;
-		frustum.front.Normalize();
-		frustum.up = float3::unitY;
-
-		frustum.nearPlaneDistance = 0.1f;
-		frustum.farPlaneDistance = 100.0f;
-		frustum.verticalFov = math::pi / 3.0f;
-		frustum.horizontalFov = 2.f * atanf(tanf(frustum.verticalFov * 0.5f) * aspect);
-
-		proj = frustum.ProjectionMatrix();
+		ViewProjectionMatrix();
 	}
 
 	return UPDATE_CONTINUE;
@@ -239,5 +229,8 @@ bool ModuleRender::CleanUp()
 
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
+	aspect = width / height;
+
+	ViewProjectionMatrix();
 }
 

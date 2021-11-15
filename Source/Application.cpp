@@ -30,11 +30,6 @@ Application::~Application()
     {
         delete *it;
     }
-
-	for (list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
-	{
-		delete[] *it;
-	}
 }
 
 bool Application::Init()

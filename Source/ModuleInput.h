@@ -5,6 +5,8 @@
 
 typedef unsigned __int8 Uint8;
 
+#define NUM_MOUSE_BUTTONS 5
+
 class ModuleInput : public Module
 {
 public:
@@ -20,4 +22,7 @@ public:
 
 private:
 	const Uint8 *keyboard = NULL;
+	bool mouse_buttons[NUM_MOUSE_BUTTONS];
+	int mouse_motion_x;
+	int mouse_motion_y;
 };

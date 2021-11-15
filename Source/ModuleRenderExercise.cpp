@@ -53,6 +53,25 @@ bool ModuleRenderExercise::Init()
 	glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex), vertex, GL_STATIC_DRAW);
 	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)(sizeof(float) * 3 * 4) // buffer offset
+	);
+
 	LOG("Textures: Generating texture and setting its parameters");
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -82,26 +101,9 @@ bool ModuleRenderExercise::Init()
 
 update_status ModuleRenderExercise::Update()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vBuffer);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(
-		0,
-		3,
-		GL_FLOAT,
-		GL_FALSE,
-		0,
-		(void*)0
-	);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(
-		1,
-		2,
-		GL_FLOAT, 
-		GL_FALSE, 
-		0,
-		(void*)(sizeof(float) * 3 * 4) // buffer offset
-	);
-	
+
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->renderer->view[0][0]);
@@ -140,8 +142,6 @@ void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 
 	if (ImGui::BeginTabBar("Options"))
 	{
-		bool change = false;
-
 		/*if (ImGui::Button("Select Min filter.."))
 			ImGui::OpenPopup("min_filter_popup");
 		ImGui::SameLine();
@@ -154,7 +154,7 @@ void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 				if (ImGui::Selectable(minFilterName[i]))
 				{
 					minPar = i;
-					change = true;
+					SetTextureParameters();
 				}
 			ImGui::EndPopup();
 		}
@@ -171,7 +171,7 @@ void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 				if (ImGui::Selectable(magFilterName[i]))
 				{
 					magPar = i;
-					change = true;
+					SetTextureParameters();
 				}
 			ImGui::EndPopup();
 		}
@@ -188,13 +188,10 @@ void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 				if (ImGui::Selectable(wrapName[i]))
 				{
 					wrapPar = i;
-					change = true;
+					SetTextureParameters();
 				}
 			ImGui::EndPopup();
-		}
-
-		if (change)
-			SetTextureParameters();*/
+		}*/
 
 		ImGui::EndTabBar();
 	}

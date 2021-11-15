@@ -2,6 +2,8 @@
 #include "Module.h"
 
 #include "Math/float4x4.h"
+#include "Math/float3x3.h"
+#include "Geometry/Frustum.h"
 
 struct SDL_Texture;
 struct SDL_Renderer;
@@ -23,5 +25,11 @@ public:
 	void* context;
 	float4x4 view, proj;
 
+private:
+	void ViewProjectionMatrix();
+
+	Frustum frustum;
+	int aspect;
+	float3x3 rotationMatrix;
 	float3 eye, target;
 };

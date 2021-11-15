@@ -35,8 +35,6 @@ public:
 	ModuleTexture* texture = nullptr;
 	ModuleImGui* imGui = nullptr;
 
-	std::list<char*> Items;
-
 private:
 
 	std::list<Module*> modules;

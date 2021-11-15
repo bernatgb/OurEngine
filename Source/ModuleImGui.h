@@ -12,6 +12,8 @@ public:
 	update_status Update();
 	update_status PostUpdate();
 
+	std::list<char*> Items;
+
 private:
 	bool showInfoWindow;
 	bool showConsoleWindow;

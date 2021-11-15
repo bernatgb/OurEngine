@@ -14,6 +14,7 @@ enum update_status
 };
 
 // Configuration -----------
+#define DEGTORAD (math::pi / 180.0f)
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define FULLSCREEN false

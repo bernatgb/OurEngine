@@ -20,6 +20,11 @@ ModuleImGui::~ModuleImGui()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
+
+	for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
+	{
+		delete[] * it;
+	}
 }
 
 bool ModuleImGui::Init()
@@ -115,9 +120,9 @@ update_status ModuleImGui::Update()
 		{
 			if (ImGui::SmallButton("Clear")) 
 			{
-				for (std::list<char*>::iterator it = App->Items.begin(); it != App->Items.end(); ++it)
+				for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
 					free(*it);
-				App->Items.clear();
+				Items.clear();
 			}
 			ImGui::SameLine();
 			ImGui::Checkbox("Auto-scroll", &autoScroll);
@@ -125,7 +130,7 @@ update_status ModuleImGui::Update()
 			ImGui::Separator();
 
 			ImGui::BeginChild("ScrollingRegion", ImVec2(0, -10), false, ImGuiWindowFlags_HorizontalScrollbar);
-			for (std::list<char*>::iterator it = App->Items.begin(); it != App->Items.end(); ++it)
+			for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
 			{
 				ImVec4 color;
 				bool has_color = false;
