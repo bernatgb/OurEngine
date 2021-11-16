@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "Application.h"
 #include "ModuleInput.h"
-#include "ModuleRender.h"
+#include "ModuleCamera.h"
 
 ModuleInput::ModuleInput()
 {}
@@ -13,13 +13,13 @@ ModuleInput::~ModuleInput()
 // Called before render is available
 bool ModuleInput::Init()
 {
-	LOG("Init SDL input event system");
+	MY_LOG("Init SDL input event system");
 	bool ret = true;
 	SDL_Init(0);
 
 	if(SDL_InitSubSystem(SDL_INIT_EVENTS) < 0)
 	{
-		LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
+		MY_LOG("SDL_EVENTS could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
 	}
     
@@ -49,7 +49,7 @@ update_status ModuleInput::Update()
                 return UPDATE_STOP;
             case SDL_WINDOWEVENT:
                 if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                    App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
+                    App->camera->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 mouse_buttons[sdlEvent.button.button - 1] = true;
@@ -70,7 +70,7 @@ update_status ModuleInput::Update()
 // Called before quitting
 bool ModuleInput::CleanUp()
 {
-	LOG("Quitting SDL input event subsystem");
+	MY_LOG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
 }
@@ -78,4 +78,15 @@ bool ModuleInput::CleanUp()
 const Uint8 ModuleInput::GetKey(SDL_Scancode key) const
 {
     return keyboard[key];
+}
+
+const bool ModuleInput::GetMouseButton(unsigned int key) const
+{
+    return mouse_buttons[key - 1];
+}
+
+const void ModuleInput::GetMouseMotion(int& x, int& y) const
+{
+    x = mouse_motion_x;
+    y = mouse_motion_y;
 }

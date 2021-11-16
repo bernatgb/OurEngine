@@ -1,6 +1,6 @@
 #include "Application.h"
 #include "ModuleRenderExercise.h"
-#include "ModuleRender.h"
+#include "ModuleCamera.h"
 #include "ModuleProgram.h"
 #include "ModuleTexture.h"
 #include "GL/glew.h"
@@ -37,7 +37,7 @@ ModuleRenderExercise::~ModuleRenderExercise()
 
 bool ModuleRenderExercise::Init()
 {
-	LOG("Buffer: Creating vertex buffer");
+	MY_LOG("Buffer: Creating vertex buffer");
 	GLfloat vertex[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
@@ -72,7 +72,7 @@ bool ModuleRenderExercise::Init()
 		(void*)(sizeof(float) * 3 * 4) // buffer offset
 	);
 
-	LOG("Textures: Generating texture and setting its parameters");
+	MY_LOG("Textures: Generating texture and setting its parameters");
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -80,7 +80,7 @@ bool ModuleRenderExercise::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	LOG("Textures: Reading the texture file and setting its data");
+	MY_LOG("Textures: Reading the texture file and setting its data");
 	unsigned int devILTexture;
 	int width, height;
 	byte* data = nullptr;
@@ -89,7 +89,7 @@ bool ModuleRenderExercise::Init()
 	App->texture->CleanTexture(devILTexture);
 	glGenerateTextureMipmap(texture);
 
-	LOG("Shaders: Creating program");
+	MY_LOG("Shaders: Creating program");
 	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
@@ -106,8 +106,8 @@ update_status ModuleRenderExercise::Update()
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->renderer->view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->renderer->proj[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);

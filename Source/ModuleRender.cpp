@@ -5,6 +5,7 @@
 #include "ModuleInput.h"
 #include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleCamera.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include <MathGeoLib.h>
@@ -42,7 +43,7 @@ void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLe
 	case GL_DEBUG_SEVERITY_NOTIFICATION: tmp_severity = "notification"; break;
 	};
 	if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
-		LOG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
+		MY_LOG("<Source:%s> <Type:%s> <Severity:%s> <ID:%d> <Message:%s>\n", tmp_source, tmp_type, tmp_severity, id, message);
 }
 
 ModuleRender::ModuleRender()
@@ -54,7 +55,7 @@ ModuleRender::~ModuleRender()
 {
 }
 
-float4x4 ViewMatrix(float3 target, float3 eye) 
+/*float4x4 ViewMatrix(float3 target, float3 eye)
 {
 	float3 forward = target - eye;
 	forward.Normalize();
@@ -78,26 +79,12 @@ float4x4 ViewMatrix(float3 target, float3 eye)
 	};
 
 	return rotationMatrix * translationMatrix;
-}
-
-void ModuleRender::ViewProjectionMatrix()
-{
-	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-	frustum.SetViewPlaneDistances(0.1f, 200.0f);
-	frustum.SetVerticalFovAndAspectRatio(DEGTORAD * 45.0f, aspect);
-
-	frustum.SetPos(eye);
-	frustum.SetFront(rotationMatrix.WorldZ());
-	frustum.SetUp(rotationMatrix.WorldY());
-
-	view = float4x4(frustum.ViewMatrix());
-	proj = frustum.ProjectionMatrix();
-}
+}*/
 
 // Called before render is available
 bool ModuleRender::Init()
 {
-	LOG("Creating Renderer context");
+	MY_LOG("Creating Renderer context");
 
 	//glewInit();
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
@@ -112,11 +99,11 @@ bool ModuleRender::Init()
 
 	GLenum err = glewInit();
 	// … check for errors
-	LOG("Using Glew %s", glewGetString(GLEW_VERSION));
-	LOG("Vendor: %s", glGetString(GL_VENDOR));
-	LOG("Renderer: %s", glGetString(GL_RENDERER));
-	LOG("OpenGL version supported %s", glGetString(GL_VERSION));
-	LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+	MY_LOG("Using Glew %s", glewGetString(GLEW_VERSION));
+	MY_LOG("Vendor: %s", glGetString(GL_VENDOR));
+	MY_LOG("Renderer: %s", glGetString(GL_RENDERER));
+	MY_LOG("OpenGL version supported %s", glGetString(GL_VERSION));
+	MY_LOG("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH_TEST); // Enable depth test
 	glEnable(GL_CULL_FACE); // Enable cull backward faces
@@ -130,18 +117,6 @@ bool ModuleRender::Init()
 	glDebugMessageCallback(&OurOpenGLErrorFunction, nullptr);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-
-	// Creation of view and proj
-	eye = float3(0.0f, 4.0f, 8.0f);
-	target = float3(0.0f, 0.0f, 0.0f);
-	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * -30.0f, DEGTORAD * 180.0f, 0.0f);
-
-	//view = ViewMatrix(target, eye);
-	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
-
-	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
-
-	ViewProjectionMatrix();
 
 	return true;
 }
@@ -161,52 +136,12 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
-	bool change = false;
-
-	if (App->input->GetKey(SDL_SCANCODE_W)) 
-	{
-		eye += float3(0.0f, 0.0f, -0.1f);
-		target += float3(0.0f, 0.0f, -0.1f);
-		change = true;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_S))
-	{
-		eye += float3(0.0f, 0.0f, 0.1f);
-		target += float3(0.0f, 0.0f, 0.1f);
-		change = true;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_A))
-	{
-		eye += float3(-0.1f, 0.0f, 0.0f);
-		target += float3(-0.1f, 0.0f, 0.0f);
-		change = true;
-	}
-	if (App->input->GetKey(SDL_SCANCODE_D))
-	{
-		eye += float3(0.1f, 0.0f, 0.0f);
-		target += float3(0.1f, 0.0f, 0.0f);
-		change = true;
-	}
-
-	/*float3x3 rotationDeltaMatrix; // = some rotation delta value
-	vec oldFront = frustum.Front().Normalized();
-	frustum.SetFront(rotationDeltaMatrix.MultDir(oldFront);
-	vec oldUp = frustum.Up().Normalized();
-	frustum.SetUp(rotationDeltaMatrix.MultDir(oldUp);*/
-
-	if (change)
-	{
-		//view = ViewMatrix(target, eye);
-
-		ViewProjectionMatrix();
-	}
-
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleRender::PostUpdate()
 {
-	App->debugDraw->Draw(view, proj, SCREEN_WIDTH, SCREEN_HEIGHT);
+	App->debugDraw->Draw(App->camera->view, App->camera->proj, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -219,18 +154,11 @@ update_status ModuleRender::PostUpdate()
 // Called before quitting
 bool ModuleRender::CleanUp()
 {
-	LOG("Destroying renderer");
+	MY_LOG("Destroying renderer");
 
 	//Destroy window
 	SDL_GL_DeleteContext(context);
 
 	return true;
-}
-
-void ModuleRender::WindowResized(unsigned width, unsigned height)
-{
-	aspect = width / height;
-
-	ViewProjectionMatrix();
 }
 

@@ -19,6 +19,8 @@ public:
 	bool CleanUp();
 
 	const Uint8 GetKey(SDL_Scancode key) const;
+	const bool GetMouseButton(unsigned int key) const;
+	const void GetMouseMotion(int& x, int& y) const;
 
 private:
 	const Uint8 *keyboard = NULL;
