@@ -67,18 +67,31 @@ update_status ModuleCamera::Update()
 
 		MY_LOG("%i %i", deltaX, deltaY);
 
+		float speed = 0.1f;
+		if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
+			speed *= 2.0f;
+
 		if (App->input->GetKey(SDL_SCANCODE_W))
-			eye += rotationMatrix.WorldZ() * 0.1f;
+			eye += rotationMatrix.WorldZ() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_S))
-			eye += rotationMatrix.WorldZ() * -0.1f;
+			eye -= rotationMatrix.WorldZ() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_A))
-			eye += rotationMatrix.WorldX() * 0.1f;
+			eye += rotationMatrix.WorldX() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_D))
-			eye += rotationMatrix.WorldX() * -0.1f;
+			eye -= rotationMatrix.WorldX() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_Q))
-			eye += rotationMatrix.WorldY() * 0.1f;
+			eye += rotationMatrix.WorldY() * speed;
 		if (App->input->GetKey(SDL_SCANCODE_E))
-			eye += rotationMatrix.WorldY() * -0.1f;
+			eye -= rotationMatrix.WorldY() * speed;
+
+		change = true;
+	}
+	else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE))
+	{
+		int deltaX, deltaY;
+		App->input->GetMouseMotion(deltaX, deltaY);
+
+		eye += rotationMatrix.WorldX() * deltaX * 0.1f +  rotationMatrix.WorldY() * deltaY * 0.1f;
 
 		change = true;
 	}

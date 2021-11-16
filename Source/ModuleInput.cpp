@@ -50,6 +50,7 @@ update_status ModuleInput::Update()
             case SDL_WINDOWEVENT:
                 if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                     App->camera->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
+                //TODO: WINDOW FOR SIZE
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 mouse_buttons[sdlEvent.button.button - 1] = true;
@@ -60,6 +61,9 @@ update_status ModuleInput::Update()
             case SDL_MOUSEMOTION:
                 mouse_motion_x = sdlEvent.motion.xrel;
                 mouse_motion_y = sdlEvent.motion.yrel;
+                break;
+            case SDL_MOUSEWHEEL:
+            //TODO: https://wiki.libsdl.org/SDL_MouseWheelEvent
         }
     }
 
