@@ -72,6 +72,12 @@ bool ModuleWindow::CleanUp()
 	return true;
 }
 
+void ModuleWindow::WindowResized(unsigned _width, unsigned _height)
+{
+	width = _width;
+	height = _height;
+}
+
 // TODO
 /*void ModuleRender::WindowResized(unsigned width, unsigned height)
 {

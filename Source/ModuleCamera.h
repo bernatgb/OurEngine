@@ -14,6 +14,7 @@ public:
 	bool Init();
 	update_status Update();
 	void WindowResized(unsigned width, unsigned height);
+	void DrawImGui();
 
 	float4x4 view, proj;
 	float3x3 rotationMatrix;
@@ -24,4 +25,13 @@ private:
 	Frustum frustum;
 	int aspect;
 	float3 eye, target;
+	
+	float verticalFov = 45.0f;
+	float zNear = 0.1f;
+	float zFar = 200.0f;
+
+	float speed = 10.0f;
+	float mouseSpeedForRotation = 5.0f;
+	float mouseSpeedForMovement = 2.5f;
+
 };

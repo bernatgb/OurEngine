@@ -26,6 +26,8 @@ public:
 	update_status Update();
 	bool CleanUp();
 
+	float GetDeltaTime() { return deltaTime; };
+
 public:
 	ModuleRender* renderer = nullptr;
 	ModuleWindow* window = nullptr;
@@ -37,9 +39,12 @@ public:
 	ModuleImGui* imGui = nullptr;
 	ModuleCamera* camera = nullptr;
 
+
 private:
 
 	std::list<Module*> modules;
+	float deltaTime = 0.0f;
+	float lastTime = 0.0f;
 
 };
 

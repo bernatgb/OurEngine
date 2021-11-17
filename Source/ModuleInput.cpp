@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleCamera.h"
+#include "ModuleWindow.h"
 
 ModuleInput::ModuleInput()
 {}
@@ -38,8 +39,9 @@ update_status ModuleInput::Update()
 
     SDL_Event sdlEvent;
 
-    mouse_motion_x = 0;
-    mouse_motion_y = 0;
+    mouse_motion_x = mouse_motion_y = 0;
+    mouse_wheel = false;
+    mouse_wheel_x = mouse_wheel_y = 0;
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
@@ -48,8 +50,11 @@ update_status ModuleInput::Update()
             case SDL_QUIT:
                 return UPDATE_STOP;
             case SDL_WINDOWEVENT:
-                if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED || sdlEvent.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) 
+                {
+                    App->window->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                     App->camera->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
+                }
                 //TODO: WINDOW FOR SIZE
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -63,7 +68,10 @@ update_status ModuleInput::Update()
                 mouse_motion_y = sdlEvent.motion.yrel;
                 break;
             case SDL_MOUSEWHEEL:
-            //TODO: https://wiki.libsdl.org/SDL_MouseWheelEvent
+                mouse_wheel = true;
+                mouse_wheel_x = sdlEvent.wheel.x;
+                mouse_wheel_y = sdlEvent.wheel.y;
+                break;
         }
     }
 

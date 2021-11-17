@@ -46,6 +46,10 @@ bool Application::Init()
 
 update_status Application::Update()
 {
+	float currentTime = SDL_GetTicks();
+	deltaTime = (currentTime - lastTime) / 1000.0f;
+	lastTime = currentTime;
+
 	update_status ret = UPDATE_CONTINUE;
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it)

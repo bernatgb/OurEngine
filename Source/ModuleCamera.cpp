@@ -4,6 +4,10 @@
 #include "ModuleInput.h"
 #include "SDL.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 ModuleCamera::ModuleCamera()
 {
 }
@@ -15,8 +19,8 @@ ModuleCamera::~ModuleCamera()
 void ModuleCamera::ViewProjectionMatrix()
 {
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-	frustum.SetViewPlaneDistances(0.1f, 200.0f);
-	frustum.SetVerticalFovAndAspectRatio(DEGTORAD * 45.0f, aspect);
+	frustum.SetViewPlaneDistances(zNear, zFar);
+	frustum.SetVerticalFovAndAspectRatio(DEGTORAD * verticalFov, aspect);
 
 	frustum.SetPos(eye);
 	frustum.SetFront(rotationMatrix.WorldZ());
@@ -44,8 +48,6 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::Update()
 {
-	bool change = false;
-
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
 	{
 		int deltaX, deltaY;
@@ -59,68 +61,63 @@ update_status ModuleCamera::Update()
 			deltaY *= -1;
 		}*/
 
-		float3x3 rotationDeltaMatrix =
-			float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * 0.25f * DEGTORAD) *
-			float3x3::RotateAxisAngle(float3(0.0f, 1.0f, 0.0f), -deltaX * 0.25f * DEGTORAD);
+		if (App->input->GetKey(SDL_SCANCODE_LALT))
+		{
+			eye += rotationMatrix.WorldZ() * deltaY * App->GetDeltaTime() * mouseSpeedForRotation;
+		}
+		else
+		{
+			float3x3 rotationDeltaMatrix =
+				float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+				float3x3::RotateAxisAngle(float3(0.0f, 1.0f, 0.0f), -deltaX * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
 
-		rotationMatrix = rotationDeltaMatrix * rotationMatrix;
+			rotationMatrix = rotationDeltaMatrix * rotationMatrix;
 
-		MY_LOG("%i %i", deltaX, deltaY);
+			float multiplier = 1.0f;
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
+				multiplier = 2.0f;
 
-		float speed = 0.1f;
-		if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
-			speed *= 2.0f;
+			if (App->input->GetKey(SDL_SCANCODE_W))
+				eye += rotationMatrix.WorldZ() * App->GetDeltaTime() * speed * multiplier;
+			if (App->input->GetKey(SDL_SCANCODE_S))
+				eye -= rotationMatrix.WorldZ() * App->GetDeltaTime() * speed * multiplier;
+			if (App->input->GetKey(SDL_SCANCODE_A))
+				eye += rotationMatrix.WorldX() * App->GetDeltaTime() * speed * multiplier;
+			if (App->input->GetKey(SDL_SCANCODE_D))
+				eye -= rotationMatrix.WorldX() * App->GetDeltaTime() * speed * multiplier;
+			if (App->input->GetKey(SDL_SCANCODE_Q))
+				eye += rotationMatrix.WorldY() * App->GetDeltaTime() * speed * multiplier;
+			if (App->input->GetKey(SDL_SCANCODE_E))
+				eye -= rotationMatrix.WorldY() * App->GetDeltaTime() * speed * multiplier;
+		}
 
-		if (App->input->GetKey(SDL_SCANCODE_W))
-			eye += rotationMatrix.WorldZ() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_S))
-			eye -= rotationMatrix.WorldZ() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_A))
-			eye += rotationMatrix.WorldX() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_D))
-			eye -= rotationMatrix.WorldX() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_Q))
-			eye += rotationMatrix.WorldY() * speed;
-		if (App->input->GetKey(SDL_SCANCODE_E))
-			eye -= rotationMatrix.WorldY() * speed;
-
-		change = true;
+		ViewProjectionMatrix();
 	}
 	else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE))
 	{
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		eye += rotationMatrix.WorldX() * deltaX * 0.1f +  rotationMatrix.WorldY() * deltaY * 0.1f;
+		eye += rotationMatrix.WorldX() * deltaX * App->GetDeltaTime() * mouseSpeedForMovement +
+			rotationMatrix.WorldY() * deltaY * App->GetDeltaTime() * mouseSpeedForMovement;
 
-		change = true;
-	}
-	else
-	{
-		if (App->input->GetKey(SDL_SCANCODE_W))
-		{
-			eye += float3(0.0f, 0.0f, -0.1f);
-			change = true;
-		}
-		if (App->input->GetKey(SDL_SCANCODE_S))
-		{
-			eye += float3(0.0f, 0.0f, 0.1f);
-			change = true;
-		}
-		if (App->input->GetKey(SDL_SCANCODE_A))
-		{
-			eye += float3(-0.1f, 0.0f, 0.0f);
-			change = true;
-		}
-		if (App->input->GetKey(SDL_SCANCODE_D))
-		{
-			eye += float3(0.1f, 0.0f, 0.0f);
-			change = true;
-		}
-	}
-
-	if (change)
 		ViewProjectionMatrix();
+	}
+	else if (App->input->MouseWheel()) 
+	{
+		int wheelX, wheelY;
+		App->input->GetMouseWheel(wheelX, wheelY);
+
+		eye += rotationMatrix.WorldZ() * wheelY * App->GetDeltaTime() * speed;
+
+		ViewProjectionMatrix();
+	}
+	else if (App->input->GetKey(SDL_SCANCODE_O)) 
+	{
+		eye = float3::zero;
+
+		ViewProjectionMatrix();
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -128,6 +125,22 @@ update_status ModuleCamera::Update()
 void ModuleCamera::WindowResized(unsigned width, unsigned height)
 {
 	aspect = width / height;
+
+	ViewProjectionMatrix();
+}
+
+void ModuleCamera::DrawImGui()
+{
+	ImGui::Text("Variables");
+	ImGui::DragFloat("Vertical FOV", &verticalFov, 1.0f, 10.0f, 160.0f, "%.2f");
+	ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f");
+	ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 200.0f, "%.2f");
+	
+	ImGui::Text("Vectors");
+	ImGui::DragFloat("Eye-X", &eye.x, 1.0f, -25.0f, 25.0f, "%.2f");
+	ImGui::DragFloat("Eye-Y", &eye.y, 1.0f, -25.0f, 25.0f, "%.2f");
+	ImGui::DragFloat("Eye-Z", &eye.z, 1.0f, -25.0f, 25.0f, "%.2f");
+	ImGui::Separator();
 
 	ViewProjectionMatrix();
 }

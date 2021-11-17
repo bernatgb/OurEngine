@@ -5,6 +5,7 @@
 #include "ModuleRenderExercise.h"
 #include "ModuleWindow.h"
 #include "ModuleTexture.h"
+#include "ModuleCamera.h"
 #include "SDL/include/SDL.h"
 
 #include "imgui.h"
@@ -40,6 +41,7 @@ bool ModuleImGui::Init()
 	showInfoWindow = false;
 	showConsoleWindow = false;
 	showTextureWindow = false;
+	showCameraWindow = false;
 
 	autoScroll = true;
 
@@ -74,6 +76,10 @@ update_status ModuleImGui::Update()
 			if (ImGui::MenuItem("Console"))
 			{
 				showConsoleWindow = !showConsoleWindow;
+			}
+			if (ImGui::MenuItem("Camera"))
+			{
+				showCameraWindow = !showCameraWindow;
 			}
 			if (ImGui::MenuItem("Texture info"))
 			{
@@ -111,6 +117,16 @@ update_status ModuleImGui::Update()
 	if (showTextureWindow)
 	{
 		App->rendererExercise->DrawTextureImGui(showTextureWindow);
+	}
+
+	if (showCameraWindow)
+	{
+		if (ImGui::Begin("Camera", &showCameraWindow))
+		{
+			App->camera->DrawImGui();
+
+			ImGui::End();
+		}
 	}
 
 	if (showConsoleWindow)
