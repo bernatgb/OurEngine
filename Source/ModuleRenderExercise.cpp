@@ -96,6 +96,8 @@ bool ModuleRenderExercise::Init()
 		float4x4::RotateZ(pi / 4.0f),
 		float3(2.0f, 1.0f, 0.0f));
 
+	modelObj = new Model("..\\Source\\resources\\BakerHouse.fbx");
+
 	return true;
 }
 

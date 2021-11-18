@@ -2,6 +2,7 @@
 #include "Module.h"
 
 #include "MathGeoLib.h"
+#include "Model.h"
 
 class ModuleRenderExercise : public Module
 {
@@ -22,6 +23,8 @@ private:
 	unsigned int texture;
 	
 	float4x4 model;
+
+	Model* modelObj;
 
 	void SetTextureParameters();
 	/*unsigned int minPar;

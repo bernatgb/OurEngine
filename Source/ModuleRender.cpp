@@ -141,7 +141,7 @@ update_status ModuleRender::Update()
 
 update_status ModuleRender::PostUpdate()
 {
-	App->debugDraw->Draw(App->camera->view, App->camera->proj, SCREEN_WIDTH, SCREEN_HEIGHT);
+	App->debugDraw->Draw(App->camera->view, App->camera->proj, App->window->width, App->window->height);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
