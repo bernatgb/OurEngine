@@ -19,7 +19,7 @@ Model::Model(const char* _fileName)
 
 	m_Name = _fileName;
 
-	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality);
+	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
 	if (scene)
 	{
 		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
@@ -39,7 +39,7 @@ Model::Model(const char* _fileName)
 
 Model::~Model()
 {
-	delete[] m_Name;
+	//delete[] m_Name;
 }
 
 void Model::Draw(const unsigned int& _program) const
