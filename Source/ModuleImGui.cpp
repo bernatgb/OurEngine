@@ -65,11 +65,7 @@ update_status ModuleImGui::Update()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Load file"))
-			{
-				//Do something
-			}
-			if (ImGui::MenuItem("Info"))
+			if (ImGui::MenuItem("About"))
 			{
 				showInfoWindow = !showInfoWindow;
 			}
@@ -84,6 +80,10 @@ update_status ModuleImGui::Update()
 			if (ImGui::MenuItem("Texture info"))
 			{
 				showTextureWindow = !showTextureWindow;
+			}
+			if (ImGui::MenuItem("Model info"))
+			{
+				showModelWindow = !showModelWindow;
 			}
 			if (ImGui::MenuItem("Quit"))
 			{
@@ -124,6 +124,16 @@ update_status ModuleImGui::Update()
 		if (ImGui::Begin("Camera", &showCameraWindow))
 		{
 			App->camera->DrawImGui();
+
+			ImGui::End();
+		}
+	}
+
+	if (showModelWindow)
+	{
+		if (ImGui::Begin("Model", &showModelWindow))
+		{
+			App->rendererExercise->DrawModelImGui();
 
 			ImGui::End();
 		}

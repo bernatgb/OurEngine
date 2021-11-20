@@ -14,8 +14,10 @@ public:
 	update_status Update();
 	bool CleanUp();
 
-	void DrawTextureImGui(bool& showWindow);
+	void LoadModel(const char* _fileName);
 
+	void DrawModelImGui();
+	void DrawTextureImGui(bool& showWindow);
 
 private:
 	unsigned int program;
@@ -23,8 +25,9 @@ private:
 	unsigned int texture;
 	
 	float4x4 model;
+	float4x4 modelForHouse;
 
-	Model* modelObj;
+	Model* modelObj = nullptr;
 
 	void SetTextureParameters();
 	/*unsigned int minPar;

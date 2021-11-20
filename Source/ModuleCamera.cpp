@@ -20,7 +20,7 @@ void ModuleCamera::ViewProjectionMatrix()
 {
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
 	frustum.SetViewPlaneDistances(zNear, zFar);
-	frustum.SetVerticalFovAndAspectRatio(DEGTORAD * verticalFov, aspect);
+	frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
 
 	frustum.SetPos(eye);
 	frustum.SetFront(rotationMatrix.WorldZ());
@@ -124,7 +124,12 @@ update_status ModuleCamera::Update()
 
 void ModuleCamera::WindowResized(unsigned width, unsigned height)
 {
-	aspect = width / height;
+	aspect = (float)width / (float)height;
+
+	if (aspect >= 1.0f)
+		verticalFov = DEGTORAD * initialVerticalFov;
+	else
+		verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
 
 	ViewProjectionMatrix();
 }
@@ -132,9 +137,14 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 void ModuleCamera::DrawImGui()
 {
 	ImGui::Text("Variables");
-	ImGui::DragFloat("Vertical FOV", &verticalFov, 1.0f, 10.0f, 160.0f, "%.2f");
+	if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
+		if (aspect >= 1)
+			verticalFov = DEGTORAD * initialVerticalFov;
+		else
+			verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+	}
 	ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f");
-	ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 200.0f, "%.2f");
+	ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f");
 	
 	ImGui::Text("Vectors");
 	ImGui::DragFloat("Eye-X", &eye.x, 1.0f, -25.0f, 25.0f, "%.2f");

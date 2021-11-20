@@ -10,8 +10,7 @@ public:
 
 	bool Init();
 
-	void GetTextureData(unsigned int& texture, const char* source, int& width, int& height, byte*& data);
-	void CleanTexture(unsigned int& texture);
+	bool LoadTextureData(const char* source);
 
 	void GetLastTextureInfo(unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format) const;
 

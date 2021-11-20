@@ -7,10 +7,14 @@
 
 Mesh::Mesh(aiMesh* _mesh)
 {
+	//TODO: pass to interleaved
+
 	m_NumVertices = _mesh->mNumVertices;
 	m_NumIndices = _mesh->mNumFaces * 3;
+	m_MaterialIndex = _mesh->mMaterialIndex;
 
 	// CREATING THE VBO
+	MY_LOG("Assimp mesh: Creating the vbo");
 	glGenBuffers(1, &m_Vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
@@ -18,26 +22,27 @@ Mesh::Mesh(aiMesh* _mesh)
 	unsigned int buffer_size = vertex_size * m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
-	unsigned position_size = sizeof(float) * 3 * m_NumVertices;
-	glBufferSubData(GL_ARRAY_BUFFER, 0, position_size, _mesh->mVertices);
-
-	unsigned uv_offset = position_size;
-	unsigned uv_size = sizeof(float) * 2 * m_NumVertices;
-	float2* uvs = (float2*)(glMapBufferRange(GL_ARRAY_BUFFER, uv_offset, uv_size, GL_MAP_WRITE_BIT));
+	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, GL_MAP_WRITE_BIT));
 
 	for (unsigned int i = 0; i < m_NumVertices; ++i)
 	{
-		uvs[i] = float2(_mesh->mTextureCoords[0][i].x, _mesh->mTextureCoords[0][i].y);
+		*(pointer++) = _mesh->mVertices[i].x;
+		*(pointer++) = _mesh->mVertices[i].y;
+		*(pointer++) = _mesh->mVertices[i].z;
+
+		*(pointer++) = _mesh->mTextureCoords[0][i].x;
+		*(pointer++) = _mesh->mTextureCoords[0][i].y;
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	//CREATE THE EBO
+	MY_LOG("Assimp mesh: Creating the ebo");
 	glGenBuffers(1, &m_Ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 
 	unsigned index_size = sizeof(unsigned int) * m_NumIndices;
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, nullptr, GL_STATIC_DRAW);
-	unsigned int* indices = (unsigned int*)(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_MAP_WRITE_BIT));
+	unsigned* indices = (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, index_size, GL_MAP_WRITE_BIT));
 
 	for (unsigned int i = 0; i < _mesh->mNumFaces; ++i)
 	{
@@ -49,8 +54,8 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
-
 	//CREATE THE VAO
+	MY_LOG("Assimp mesh: Creating the vao");
 	glGenVertexArrays(1, &m_Vao);
 
 	glBindVertexArray(m_Vao);
@@ -58,17 +63,20 @@ Mesh::Mesh(aiMesh* _mesh)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * m_NumVertices));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3));
 }
 
 Mesh::~Mesh()
 {
+	glDeleteBuffers(1, &m_Vbo);
+	glDeleteBuffers(1, &m_Ebo);
+	glDeleteBuffers(1, &m_Vao);
 }
 
-void Mesh::Draw()
+void Mesh::Draw() const
 {
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, m_NumIndices, GL_UNSIGNED_INT, nullptr);

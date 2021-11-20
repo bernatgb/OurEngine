@@ -3,6 +3,7 @@
 #include "ModuleInput.h"
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
+#include "ModuleRenderExercise.h"
 
 ModuleInput::ModuleInput()
 {}
@@ -72,6 +73,12 @@ update_status ModuleInput::Update()
                 mouse_wheel_x = sdlEvent.wheel.x;
                 mouse_wheel_y = sdlEvent.wheel.y;
                 break;
+            case SDL_DROPFILE: {
+                MY_LOG("File dropped %s", sdlEvent.drop.file);
+                App->rendererExercise->LoadModel(sdlEvent.drop.file);
+                SDL_free(sdlEvent.drop.file);
+                break;
+            }
         }
     }
 

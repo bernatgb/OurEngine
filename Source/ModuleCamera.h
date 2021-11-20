@@ -23,10 +23,11 @@ private:
 	void ViewProjectionMatrix();
 
 	Frustum frustum;
-	int aspect;
+	float aspect;
 	float3 eye, target;
 	
-	float verticalFov = 45.0f;
+	float initialVerticalFov = 45.0f;
+	float verticalFov = DEGTORAD * initialVerticalFov;
 	float zNear = 0.1f;
 	float zFar = 200.0f;
 

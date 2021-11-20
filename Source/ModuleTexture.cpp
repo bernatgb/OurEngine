@@ -2,6 +2,7 @@
 
 #include "IL/il.h"
 #include "IL/ilu.h"
+#include "GL/glew.h"
 
 ModuleTexture::ModuleTexture()
 {
@@ -18,31 +19,34 @@ bool ModuleTexture::Init()
 	return true;
 }
 
-
-void ModuleTexture::GetTextureData(unsigned int& texture, const char* source, int& width, int& height, byte*& data)
+bool ModuleTexture::LoadTextureData(const char* source)
 {
+	unsigned int texture;
 	ilGenImages(1, &texture);
 	ilBindImage(texture);
-	ilLoadImage(source);
-	width = ilGetInteger(IL_IMAGE_WIDTH);
-	height = ilGetInteger(IL_IMAGE_HEIGHT);
-	data = ilGetData();
+
+	if (!ilLoadImage(source))
+	{
+		return false;
+	}
+
+	byte* data = ilGetData();
 
 	ILinfo textureInfo;
 	iluGetImageInfo(&textureInfo);
 	if (textureInfo.Origin == IL_ORIGIN_UPPER_LEFT)
 		iluFlipImage();
 	
-	this->width = textureInfo.Width;
-	this->height = textureInfo.Height;
-	this->depth = textureInfo.Depth;
-	this->format = textureInfo.Format;
+	width = textureInfo.Width;
+	height = textureInfo.Height;
+	depth = textureInfo.Depth;
+	format = textureInfo.Format;
 	//IL_COLOUR_INDEX, IL_RGB, IL_RGBA, IL_BGR, IL_BGRA, IL_LUMINANCE
-}
 
-void ModuleTexture::CleanTexture(unsigned int& texture)
-{
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
 	ilDeleteImages(1, &texture);
+	return true;
 }
 
 void ModuleTexture::GetLastTextureInfo(unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format) const

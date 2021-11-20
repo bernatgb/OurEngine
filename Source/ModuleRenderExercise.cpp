@@ -81,12 +81,7 @@ bool ModuleRenderExercise::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 	MY_LOG("Textures: Reading the texture file and setting its data");
-	unsigned int devILTexture;
-	int width, height;
-	byte* data = nullptr;
-	App->texture->GetTextureData(devILTexture, "..\\Source\\resources\\Lenna.png", width, height, data);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	App->texture->CleanTexture(devILTexture);
+	App->texture->LoadTextureData("Lenna.png");
 	glGenerateTextureMipmap(texture);
 
 	MY_LOG("Shaders: Creating program");
@@ -94,9 +89,11 @@ bool ModuleRenderExercise::Init()
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(pi / 4.0f),
-		float3(2.0f, 1.0f, 0.0f));
+		float3(2.0f, 1.0f, 1.0f));
 
-	modelObj = new Model("..\\Source\\resources\\BakerHouse.fbx");
+	modelObj = new Model("BakerHouse.fbx");
+
+	modelForHouse = float4x4::identity;
 
 	return true;
 }
@@ -116,7 +113,10 @@ update_status ModuleRenderExercise::Update()
 	glUniform1i(glGetUniformLocation(program, "texture"), 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDisableVertexAttribArray(0);
+	//glDisableVertexAttribArray(0);
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &modelForHouse[0][0]);
+	modelObj->Draw(program);
 
 	return UPDATE_CONTINUE;
 }
@@ -125,11 +125,18 @@ bool ModuleRenderExercise::CleanUp()
 {
 	glDeleteBuffers(1, &vBuffer);
 
+	delete modelObj;
+
 	glDeleteProgram(program);
 
 	glDeleteTextures(1, &texture);
 
 	return true;
+}
+
+void ModuleRenderExercise::DrawModelImGui()
+{
+	modelObj->DrawImGui();
 }
 
 void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
@@ -199,6 +206,12 @@ void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 	}
 
 	ImGui::End();
+}
+
+void ModuleRenderExercise::LoadModel(const char* _fileName)
+{
+	delete modelObj;
+	modelObj = new Model(_fileName);
 }
 
 void ModuleRenderExercise::SetTextureParameters()
