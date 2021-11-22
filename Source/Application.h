@@ -3,6 +3,8 @@
 #include<list>
 #include "Globals.h"
 #include "Module.h"
+#include "Timer.h"
+#include "AccuratedTimer.h"
 
 class ModuleRender;
 class ModuleWindow;
@@ -26,7 +28,7 @@ public:
 	update_status Update();
 	bool CleanUp();
 
-	float GetDeltaTime() { return deltaTime; };
+	float GetDeltaTime();
 
 public:
 	ModuleRender* renderer = nullptr;
@@ -39,12 +41,11 @@ public:
 	ModuleImGui* imGui = nullptr;
 	ModuleCamera* camera = nullptr;
 
-
 private:
 
 	std::list<Module*> modules;
-	float deltaTime = 0.0f;
-	float lastTime = 0.0f;
+	Timer* timer = nullptr;
+	AccuratedTimer* accuratedTimer = nullptr;
 
 };
 

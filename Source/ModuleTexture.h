@@ -11,12 +11,5 @@ public:
 	bool Init();
 
 	bool LoadTextureData(const char* source);
-
-	void GetLastTextureInfo(unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format) const;
-
-private:
-	unsigned int width;
-	unsigned int height;
-	unsigned int depth;
-	unsigned int format;
+	bool LoadTextureData(const char* source, unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format);
 };

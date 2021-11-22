@@ -93,13 +93,15 @@ bool ModuleRenderExercise::Init()
 
 	modelObj = new Model("BakerHouse.fbx");
 
-	modelForHouse = float4x4::identity;
+	modelIdentity = float4x4::identity;
 
 	return true;
 }
 
 update_status ModuleRenderExercise::Update()
 {
+	glGenBuffers(1, &vBuffer);
+
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
@@ -108,14 +110,16 @@ update_status ModuleRenderExercise::Update()
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(glGetUniformLocation(program, "texture"), 0);
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glUniform1i(glGetUniformLocation(program, "texture"), 0);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	//glDisableVertexAttribArray(0);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		//glDisableVertexAttribArray(0);
+	}
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &modelForHouse[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &modelIdentity[0][0]);
 	modelObj->Draw(program);
 
 	return UPDATE_CONTINUE;
@@ -142,12 +146,12 @@ void ModuleRenderExercise::DrawModelImGui()
 void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
 {
 	ImGui::Begin("Texture info", &showWindow);
-	unsigned int width, height, depth, format;
-	App->texture->GetLastTextureInfo(width, height, depth, format);
-	ImGui::Text("Witdh: %i", width);
-	ImGui::Text("Height: %i", height);
-	ImGui::Text("Depth: %i", depth);
-	ImGui::Text("Format: %i", format);
+	//unsigned int width, height, depth, format;
+	//App->texture->GetLastTextureInfo(width, height, depth, format);
+	//ImGui::Text("Witdh: %i", width);
+	//ImGui::Text("Height: %i", height);
+	//ImGui::Text("Depth: %i", depth);
+	//ImGui::Text("Format: %i", format);
 
 	if (ImGui::BeginTabBar("Options"))
 	{

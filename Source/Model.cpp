@@ -17,7 +17,8 @@ Model::Model(const char* _fileName)
 {
 	MY_LOG("Assimp (%s): Loading the model", _fileName);
 
-	m_Name = _fileName;
+	m_Name = new char[strlen(_fileName)];
+	strcpy(m_Name, _fileName);
 
 	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
 	if (scene)
@@ -40,6 +41,11 @@ Model::Model(const char* _fileName)
 Model::~Model()
 {
 	//delete[] m_Name;
+	/*for (int i = 0; i < m_Meshes.size(); ++i)
+		delete m_Meshes[i];
+
+	for (int i = 0; i < m_Textures.size(); ++i)
+		delete m_Textures[i];*/
 }
 
 void Model::Draw(const unsigned int& _program) const
@@ -59,7 +65,7 @@ void Model::DrawImGui()
 	ImGui::Text("Textures:");
 	for (unsigned int i = 0; i < m_Textures.size(); ++i)
 	{
-		ImGui::Text(" -%s", m_Textures[i]->GetName());
+		m_Textures[i]->DrawImGui();
 	}
 }
 

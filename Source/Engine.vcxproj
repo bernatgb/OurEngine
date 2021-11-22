@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AccuratedTimer.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK2D.cpp" />
@@ -208,8 +209,10 @@
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AccuratedTimer.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="assimp-4.1.0\include\assimp\ai_assert.h" />
     <ClInclude Include="assimp-4.1.0\include\assimp\anim.h" />
@@ -429,6 +432,7 @@
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="ModuleWindow.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-4.1.0\include\assimp\color4.inl" />

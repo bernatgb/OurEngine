@@ -30,6 +30,6 @@ void log(const char file[], int line, const char* format, ...)
 	memcpy(str, tmp_string2, length);
 	str[length] = '\0';
 
-	if (App->imGui != nullptr)
+	if (App != nullptr && App->imGui != nullptr)
 		App->imGui->Items.push_back(str);
 }

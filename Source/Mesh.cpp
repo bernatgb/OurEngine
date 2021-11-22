@@ -7,8 +7,6 @@
 
 Mesh::Mesh(aiMesh* _mesh)
 {
-	//TODO: pass to interleaved
-
 	m_NumVertices = _mesh->mNumVertices;
 	m_NumIndices = _mesh->mNumFaces * 3;
 	m_MaterialIndex = _mesh->mMaterialIndex;
@@ -67,6 +65,8 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3));
+
+	MY_LOG("Assimp mesh: Create correctly");
 }
 
 Mesh::~Mesh()

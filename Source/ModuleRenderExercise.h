@@ -25,7 +25,7 @@ private:
 	unsigned int texture;
 	
 	float4x4 model;
-	float4x4 modelForHouse;
+	float4x4 modelIdentity;
 
 	Model* modelObj = nullptr;
 

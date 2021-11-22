@@ -40,7 +40,6 @@ bool ModuleImGui::Init()
 
 	showInfoWindow = false;
 	showConsoleWindow = false;
-	showTextureWindow = false;
 	showCameraWindow = false;
 
 	autoScroll = true;
@@ -77,10 +76,6 @@ update_status ModuleImGui::Update()
 			{
 				showCameraWindow = !showCameraWindow;
 			}
-			if (ImGui::MenuItem("Texture info"))
-			{
-				showTextureWindow = !showTextureWindow;
-			}
 			if (ImGui::MenuItem("Model info"))
 			{
 				showModelWindow = !showModelWindow;
@@ -103,7 +98,7 @@ update_status ModuleImGui::Update()
 		ImGui::Text(TITLE);
 		ImGui::Text("> Author: miquelmiro3");
 		ImGui::Text("> Description: This is MyEngine");
-		ImGui::Text("> Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, ...");
+		ImGui::Text("> Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, Assimp, ...");
 		ImGui::Text("> License: MIT License");
 
 		ImGui::Separator();
@@ -112,11 +107,6 @@ update_status ModuleImGui::Update()
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 		ImGui::End();
-	}
-
-	if (showTextureWindow)
-	{
-		App->rendererExercise->DrawTextureImGui(showTextureWindow);
 	}
 
 	if (showCameraWindow)

@@ -21,6 +21,7 @@ void ModuleCamera::ViewProjectionMatrix()
 	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
 	frustum.SetViewPlaneDistances(zNear, zFar);
 	frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+	//TODO: setHoritzontal
 
 	frustum.SetPos(eye);
 	frustum.SetFront(rotationMatrix.WorldZ());
@@ -36,8 +37,8 @@ bool ModuleCamera::Init()
 	target = float3(0.0f, 0.0f, 0.0f);
 	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * -30.0f, DEGTORAD * 180.0f, 0.0f);
 
-	//view = ViewMatrix(target, eye);
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
+	//LookAt(camera forward(right), target dir, local up, world up)
 
 	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
@@ -69,13 +70,13 @@ update_status ModuleCamera::Update()
 		{
 			float3x3 rotationDeltaMatrix =
 				float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-				float3x3::RotateAxisAngle(float3(0.0f, 1.0f, 0.0f), -deltaX * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+				float3x3::RotateAxisAngle(float3::unitY, -deltaX * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
 
 			rotationMatrix = rotationDeltaMatrix * rotationMatrix;
 
 			float multiplier = 1.0f;
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
-				multiplier = 2.0f;
+				multiplier = 3.0f;
 
 			if (App->input->GetKey(SDL_SCANCODE_W))
 				eye += rotationMatrix.WorldZ() * App->GetDeltaTime() * speed * multiplier;

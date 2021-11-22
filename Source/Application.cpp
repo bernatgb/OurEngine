@@ -32,24 +32,26 @@ Application::~Application()
     {
         delete *it;
     }
+
+	delete timer;
 }
 
 bool Application::Init()
 {
+	timer = new Timer();
+	accuratedTimer = new AccuratedTimer();
 	bool ret = true;
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 		ret = (*it)->Init();
 
+	MY_LOG("Application Init took: %d ms", timer->Read());
+	MY_LOG("Application Init took: %d us", accuratedTimer->Read());
 	return ret;
 }
 
 update_status Application::Update()
 {
-	float currentTime = SDL_GetTicks();
-	deltaTime = (currentTime - lastTime) / 1000.0f;
-	lastTime = currentTime;
-
 	update_status ret = UPDATE_CONTINUE;
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it)
@@ -72,4 +74,9 @@ bool Application::CleanUp()
 		ret = (*it)->CleanUp();
 
 	return ret;
+}
+
+float Application::GetDeltaTime()
+{
+	return 1.0f / 60.0f;
 }

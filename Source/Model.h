@@ -20,7 +20,7 @@ private:
 	void LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes);
 	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials);
 
-	const char* m_Name;
+	char* m_Name = nullptr;
 	std::vector<Mesh*> m_Meshes;
 	std::vector<Texture*> m_Textures;
 

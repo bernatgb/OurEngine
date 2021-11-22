@@ -7,13 +7,14 @@ public:
 
 	void ActivateTexture(const unsigned int& program);
 
-	const char* GetName() {
-		return m_Name;
-	};
+	void DrawImGui();
 
 private:
-	const char* m_Name;
-
 	unsigned int m_Texture;
-};
 
+	char* m_Name = nullptr;
+	unsigned int width;
+	unsigned int height;
+	unsigned int depth;
+	unsigned int format;
+};
