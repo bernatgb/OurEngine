@@ -1,4 +1,6 @@
 #pragma once
+#include <stdint.h>
+
 class AccuratedTimer
 {
 public:
@@ -6,13 +8,13 @@ public:
 
 	void Start();
 	void Stop();
-	double Read();
+	uint64_t Read();
 
 private:
-	static double frequency;
+	static uint64_t frequency;
 	bool stopped;
-	double startCounter;
-	double timerCounter;
+	uint64_t startCounter;
+	uint64_t timerCounter;
 };
 
 

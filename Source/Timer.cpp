@@ -20,7 +20,7 @@ void Timer::Stop()
 	stopped = true;
 }
 
-double Timer::Read()
+uint32_t Timer::Read()
 {
 	if (!stopped)
 		timer = SDL_GetTicks() - startTime;

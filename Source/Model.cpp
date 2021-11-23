@@ -40,7 +40,8 @@ Model::Model(const char* _fileName)
 
 Model::~Model()
 {
-	//delete[] m_Name;
+	//if (m_Name != nullptr)
+	//	delete[] m_Name;
 	/*for (int i = 0; i < m_Meshes.size(); ++i)
 		delete m_Meshes[i];
 

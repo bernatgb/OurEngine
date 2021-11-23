@@ -45,8 +45,8 @@ bool Application::Init()
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)
 		ret = (*it)->Init();
 
-	MY_LOG("Application Init took: %d ms", timer->Read());
-	MY_LOG("Application Init took: %d us", accuratedTimer->Read());
+	MY_LOG("Application Init took: %i ms", timer->Read());
+	MY_LOG("Application Init took: %i us", accuratedTimer->Read());
 	return ret;
 }
 

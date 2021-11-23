@@ -1,7 +1,7 @@
 #include "AccuratedTimer.h"
 #include "SDL/include/SDL.h"
 
-double AccuratedTimer::frequency = SDL_GetPerformanceFrequency();
+uint64_t AccuratedTimer::frequency = SDL_GetPerformanceFrequency();
 
 AccuratedTimer::AccuratedTimer()
 {
@@ -22,9 +22,9 @@ void AccuratedTimer::Stop()
 	stopped = true;
 }
 
-double AccuratedTimer::Read()
+uint64_t AccuratedTimer::Read()
 {
 	if (!stopped)
-		timerCounter = (SDL_GetPerformanceCounter() - startCounter) / AccuratedTimer::frequency;
+		timerCounter = (uint64_t)((SDL_GetPerformanceCounter() - startCounter) / AccuratedTimer::frequency);
 	return timerCounter;
 }

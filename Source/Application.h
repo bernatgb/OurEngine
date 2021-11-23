@@ -2,6 +2,7 @@
 
 #include<list>
 #include "Globals.h"
+#include "Time.h"
 #include "Module.h"
 #include "Timer.h"
 #include "AccuratedTimer.h"

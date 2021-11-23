@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 class Timer
 {
@@ -7,11 +8,11 @@ public:
 
 	void Start();
 	void Stop();
-	double Read();
+	uint32_t Read();
 
 private:
 	bool stopped;
-	double startTime;
-	double timer;
+	uint32_t startTime;
+	uint32_t timer;
 };
 
