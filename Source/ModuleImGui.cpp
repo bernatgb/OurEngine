@@ -41,6 +41,7 @@ bool ModuleImGui::Init()
 	showInfoWindow = false;
 	showConsoleWindow = false;
 	showCameraWindow = false;
+	showTimeWindow = true;
 
 	autoScroll = true;
 
@@ -80,6 +81,10 @@ update_status ModuleImGui::Update()
 			{
 				showModelWindow = !showModelWindow;
 			}
+			if (ImGui::MenuItem("Time"))
+			{
+				showTimeWindow = !showTimeWindow;
+			}
 			if (ImGui::MenuItem("Quit"))
 			{
 				return UPDATE_STOP;
@@ -88,6 +93,8 @@ update_status ModuleImGui::Update()
 		}
 		ImGui::EndMainMenuBar();
 	}
+
+	//ImageButton()
 
 	if (showInfoWindow)
 	{
@@ -124,6 +131,16 @@ update_status ModuleImGui::Update()
 		if (ImGui::Begin("Model", &showModelWindow))
 		{
 			App->rendererExercise->DrawModelImGui();
+
+			ImGui::End();
+		}
+	}
+
+	if (showTimeWindow)
+	{
+		if (ImGui::Begin("Time", &showTimeWindow))
+		{
+			Time::DrawImGui();
 
 			ImGui::End();
 		}

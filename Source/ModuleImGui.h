@@ -19,6 +19,7 @@ private:
 	bool showConsoleWindow;
 	bool showCameraWindow;
 	bool showModelWindow;
+	bool showTimeWindow;
 
 	bool autoScroll;
 };

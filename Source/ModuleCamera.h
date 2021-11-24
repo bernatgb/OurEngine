@@ -34,5 +34,5 @@ private:
 	float speed = 10.0f;
 	float mouseSpeedForRotation = 5.0f;
 	float mouseSpeedForMovement = 2.5f;
-
+	float mouseWheelSpeed = 20.0f;
 };

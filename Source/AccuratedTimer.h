@@ -8,13 +8,13 @@ public:
 
 	void Start();
 	void Stop();
-	uint64_t Read();
+	unsigned long long int Read();
 
 private:
-	static uint64_t frequency;
+	static unsigned long long int frequency;
 	bool stopped;
-	uint64_t startCounter;
-	uint64_t timerCounter;
+	unsigned long long int startCounter;
+	unsigned long long int timerCounter;
 };
 
 

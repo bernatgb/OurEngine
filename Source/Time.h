@@ -1,5 +1,4 @@
 #pragma once
-#include <stdint.h>
 
 class Time
 {
@@ -10,6 +9,9 @@ public:
 	static double GetRealTimeSinceStartup();
 	
 	static void SetTimeScale(float _timeScale);
+	static void SetLimitFramerate(bool _limit, int _FPS = 60);	
+
+	static void LimitFramerate();
 
 	static unsigned long int GetFrameCount() {
 		return m_FrameCount;
@@ -23,6 +25,9 @@ public:
 	static double GetRealTimeDeltaTime() {
 		return m_RealTimeDeltaTime;
 	};
+	static double GetFPS() {
+		return m_FPS;
+	};
 
 	static void DrawImGui();
 
@@ -33,6 +38,11 @@ private:
 	static double m_DeltaTime; // last frame time expressed in seconds(Game Clock)
 	//static uint32_t m_RealTimeSinceStartup; // seconds since game start(Real Time Clock)
 	static double m_RealTimeDeltaTime; // last frame time expressed in seconds(Real Time Clock)
+
+	static bool m_LimitFramerate;
+	static int m_MaxFPS;
+	static double m_FPS;
+	static double m_Delay;
 
 	static unsigned long int m_InitialTime;
 	static unsigned long int m_LastFrameTime;

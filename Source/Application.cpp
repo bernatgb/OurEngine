@@ -52,6 +52,8 @@ bool Application::Init()
 
 update_status Application::Update()
 {
+	Time::NewFrame();
+
 	update_status ret = UPDATE_CONTINUE;
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it)
@@ -62,6 +64,8 @@ update_status Application::Update()
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret == UPDATE_CONTINUE; ++it)
 		ret = (*it)->PostUpdate();
+
+	Time::LimitFramerate();
 
 	return ret;
 }
@@ -74,9 +78,4 @@ bool Application::CleanUp()
 		ret = (*it)->CleanUp();
 
 	return ret;
-}
-
-float Application::GetDeltaTime()
-{
-	return 1.0f / 60.0f;
 }

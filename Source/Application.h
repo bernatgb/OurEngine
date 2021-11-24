@@ -29,8 +29,6 @@ public:
 	update_status Update();
 	bool CleanUp();
 
-	float GetDeltaTime();
-
 public:
 	ModuleRender* renderer = nullptr;
 	ModuleWindow* window = nullptr;

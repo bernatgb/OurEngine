@@ -64,13 +64,13 @@ update_status ModuleCamera::Update()
 
 		if (App->input->GetKey(SDL_SCANCODE_LALT))
 		{
-			eye += rotationMatrix.WorldZ() * deltaY * App->GetDeltaTime() * mouseSpeedForRotation;
+			eye += rotationMatrix.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForRotation;
 		}
 		else
 		{
 			float3x3 rotationDeltaMatrix =
-				float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-				float3x3::RotateAxisAngle(float3::unitY, -deltaX * App->GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+				float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+				float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
 
 			rotationMatrix = rotationDeltaMatrix * rotationMatrix;
 
@@ -79,17 +79,17 @@ update_status ModuleCamera::Update()
 				multiplier = 3.0f;
 
 			if (App->input->GetKey(SDL_SCANCODE_W))
-				eye += rotationMatrix.WorldZ() * App->GetDeltaTime() * speed * multiplier;
+				eye += rotationMatrix.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_S))
-				eye -= rotationMatrix.WorldZ() * App->GetDeltaTime() * speed * multiplier;
+				eye -= rotationMatrix.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_A))
-				eye += rotationMatrix.WorldX() * App->GetDeltaTime() * speed * multiplier;
+				eye += rotationMatrix.WorldX() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_D))
-				eye -= rotationMatrix.WorldX() * App->GetDeltaTime() * speed * multiplier;
+				eye -= rotationMatrix.WorldX() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_Q))
-				eye += rotationMatrix.WorldY() * App->GetDeltaTime() * speed * multiplier;
+				eye += rotationMatrix.WorldY() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_E))
-				eye -= rotationMatrix.WorldY() * App->GetDeltaTime() * speed * multiplier;
+				eye -= rotationMatrix.WorldY() * Time::GetDeltaTime() * speed * multiplier;
 		}
 
 		ViewProjectionMatrix();
@@ -99,8 +99,8 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		eye += rotationMatrix.WorldX() * deltaX * App->GetDeltaTime() * mouseSpeedForMovement +
-			rotationMatrix.WorldY() * deltaY * App->GetDeltaTime() * mouseSpeedForMovement;
+		eye += rotationMatrix.WorldX() * deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
+			rotationMatrix.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 
 		ViewProjectionMatrix();
 	}
@@ -109,7 +109,7 @@ update_status ModuleCamera::Update()
 		int wheelX, wheelY;
 		App->input->GetMouseWheel(wheelX, wheelY);
 
-		eye += rotationMatrix.WorldZ() * wheelY * App->GetDeltaTime() * speed;
+		eye += rotationMatrix.WorldZ() * wheelY * Time::GetDeltaTime() * mouseWheelSpeed;
 
 		ViewProjectionMatrix();
 	}
