@@ -16,7 +16,7 @@ Mesh::Mesh(aiMesh* _mesh)
 	glGenBuffers(1, &m_Vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
-	unsigned int vertex_size = (sizeof(float) * 3 + sizeof(float) * 2);
+	unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3;
 	unsigned int buffer_size = vertex_size * m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
@@ -30,6 +30,10 @@ Mesh::Mesh(aiMesh* _mesh)
 
 		*(pointer++) = _mesh->mTextureCoords[0][i].x;
 		*(pointer++) = _mesh->mTextureCoords[0][i].y;
+		
+		*(pointer++) = _mesh->mNormals[i].x;
+		*(pointer++) = _mesh->mNormals[i].y;
+		*(pointer++) = _mesh->mNormals[i].z;
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -65,6 +69,9 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
 	MY_LOG("Assimp mesh: Create correctly");
 }

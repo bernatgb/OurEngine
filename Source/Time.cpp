@@ -20,6 +20,9 @@ unsigned long int Time::m_InitialTime = SDL_GetTicks();
 unsigned long int Time::m_LastFrameTime = Time::m_InitialTime;
 unsigned long int Time::m_LastTime = Time::m_InitialTime;
 
+std::vector<float> Time::m_FPSGraph = std::vector<float>(100);
+std::vector<float> Time::m_DeltaTimeGraph = std::vector<float>(100);
+
 void Time::NewFrame()
 {
 	++m_FrameCount;
@@ -36,6 +39,8 @@ void Time::NewFrame()
 
 	m_LastFrameTime = currentTime;
 	m_LastTime = currentTime;
+
+	Shift();
 }
 
 double Time::GetTime()
@@ -67,14 +72,17 @@ void Time::LimitFramerate()
 {
 	if (m_LimitFramerate) 
 	{
-		m_Delay = 1.0f / m_MaxFPS - m_RealTimeDeltaTime;
-		SDL_Delay(m_Delay);
+		m_Delay = 1.0f / m_MaxFPS - ((SDL_GetTicks() - m_LastFrameTime) / 1000.0f);
+		if (m_Delay > 0.0f)
+			SDL_Delay(m_Delay);
 	}
 	else
 	{
 		m_Delay = 0.0f;
 	}
 }
+
+
 
 void Time::DrawImGui()
 {
@@ -94,5 +102,19 @@ void Time::DrawImGui()
 
 	ImGui::Text("FPS: %f; Frame count: %d", Time::GetFPS(), Time::GetFrameCount());
 
-	//display -> histogram delta / frames
+	ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f);
+	ImGui::PlotHistogram("##framerate", &m_DeltaTimeGraph[0], m_DeltaTimeGraph.size(), 0, "DeltaTime", 0.0f);
+}
+
+void Time::Shift() 
+{
+	int lenght = m_FPSGraph.size() - 1;
+	for (int i = 0; i < lenght; ++i)
+	{
+		m_FPSGraph[i] = m_FPSGraph[i + 1];
+		m_DeltaTimeGraph[i] = m_DeltaTimeGraph[i + 1];
+	}
+
+	m_FPSGraph[lenght] = m_FPS;
+	m_DeltaTimeGraph[lenght] = m_RealTimeDeltaTime;
 }

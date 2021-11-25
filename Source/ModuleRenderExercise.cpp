@@ -38,7 +38,7 @@ ModuleRenderExercise::~ModuleRenderExercise()
 bool ModuleRenderExercise::Init()
 {
 	MY_LOG("Buffer: Creating vertex buffer");
-	GLfloat vertex[] = {
+	/*GLfloat vertex[] = {
 		-1.0f, -1.0f, 0.0f,
 		1.0f, -1.0f, 0.0f,
 		-1.0f, 1.0f, 0.0f,
@@ -82,25 +82,27 @@ bool ModuleRenderExercise::Init()
 
 	MY_LOG("Textures: Reading the texture file and setting its data");
 	App->texture->LoadTextureData("Lenna.png");
-	glGenerateTextureMipmap(texture);
+	glGenerateTextureMipmap(texture);*/
 
 	MY_LOG("Shaders: Creating program");
 	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
+	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(pi / 4.0f),
 		float3(2.0f, 1.0f, 1.0f));
 
-	modelObj = new Model("BakerHouse.fbx");
-
+	MY_LOG("Model: Model creation");
 	modelIdentity = float4x4::identity;
+
+	modelObj = new Model("BakerHouse.fbx");
 
 	return true;
 }
 
 update_status ModuleRenderExercise::Update()
 {
-	glGenBuffers(1, &vBuffer);
+	/*glGenBuffers(1, &vBuffer);
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -117,9 +119,30 @@ update_status ModuleRenderExercise::Update()
 
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		//glDisableVertexAttribArray(0);
-	}
+	}*/
 
+	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &modelIdentity[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
+
+	float3 light_dir = float3(1.0f, 0.0f, 0.0f);
+	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
+	glUniform3fv(glGetUniformLocation(program, "cam_pos"), 1, &App->camera->eye[0]);
+	
+	float3 color_a = float3(0.1f, 0.0f, 0.0f);
+	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
+	float3 color_l = float3(1.0f, 0.0f, 0.0f);
+	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
+
+	//color ambient
+	//color diffuse
+	//kd
+	//ks
+	//color light
+	//light pos // light direction L
+	//cam pos
+
 	modelObj->Draw(program);
 
 	return UPDATE_CONTINUE;

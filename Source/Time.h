@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 class Time
 {
@@ -32,6 +33,8 @@ public:
 	static void DrawImGui();
 
 private:
+	static void Shift();
+
 	static unsigned long int m_FrameCount; // app graphics frames since game start
 	static double m_Time; // second since game start(Game Clock)
 	static float m_TimeScale; // scale at which time is passing(Game Clock)
@@ -47,5 +50,8 @@ private:
 	static unsigned long int m_InitialTime;
 	static unsigned long int m_LastFrameTime;
 	static unsigned long int m_LastTime;
+
+	static std::vector<float> m_FPSGraph;
+	static std::vector<float> m_DeltaTimeGraph;
 };
 

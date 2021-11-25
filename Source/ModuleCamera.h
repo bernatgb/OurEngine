@@ -18,13 +18,13 @@ public:
 
 	float4x4 view, proj;
 	float3x3 rotationMatrix;
+	float3 eye, target;
 
 private:
 	void ViewProjectionMatrix();
 
 	Frustum frustum;
 	float aspect;
-	float3 eye, target;
 	
 	float initialVerticalFov = 45.0f;
 	float verticalFov = DEGTORAD * initialVerticalFov;

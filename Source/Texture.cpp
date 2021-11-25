@@ -17,7 +17,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 {
 	MY_LOG("Assimp texture (%s): Loading the texture file and setting its configuration", _fileName);
 	
-	m_Name = new char[strlen(_fileName)];
+	m_Name = new char[strlen(_fileName)+1];
 	strcpy(m_Name, _fileName);
 
 	glGenTextures(1, &m_Texture);
@@ -58,9 +58,9 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &m_Texture);
+	delete[] m_Name;
 
-	//delete[] m_Name;
+	glDeleteTextures(1, &m_Texture);
 }
 
 void Texture::ActivateTexture(const unsigned int& program) 

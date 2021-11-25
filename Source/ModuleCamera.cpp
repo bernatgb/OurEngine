@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "ModuleInput.h"
+#include "ModuleWindow.h"
 #include "SDL.h"
 
 #include "imgui.h"
@@ -40,7 +41,7 @@ bool ModuleCamera::Init()
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 	//LookAt(camera forward(right), target dir, local up, world up)
 
-	aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+	aspect = App->window->width / App->window->height;
 
 	ViewProjectionMatrix();
 
@@ -68,11 +69,7 @@ update_status ModuleCamera::Update()
 		}
 		else
 		{
-			float3x3 rotationDeltaMatrix =
-				float3x3::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-				float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
-
-			rotationMatrix = rotationDeltaMatrix * rotationMatrix;
+			rotationMatrix = float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * rotationMatrix * float3x3::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
 
 			float multiplier = 1.0f;
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
