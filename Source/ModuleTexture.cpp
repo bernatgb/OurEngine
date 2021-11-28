@@ -35,9 +35,7 @@ bool ModuleTexture::LoadTextureData(const char* source)
 	if (textureInfo.Origin == IL_ORIGIN_UPPER_LEFT)
 		iluFlipImage();
 
-	//IL_COLOUR_INDEX, IL_RGB, IL_RGBA, IL_BGR, IL_BGRA, IL_LUMINANCE
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureInfo.Width, textureInfo.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, textureInfo.Format, textureInfo.Width, textureInfo.Height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
 
 	ilDeleteImages(1, &texture);
 	return true;
@@ -63,9 +61,8 @@ bool ModuleTexture::LoadTextureData(const char* source, unsigned int& width, uns
 	height = textureInfo.Height;
 	depth = textureInfo.Depth;
 	format = textureInfo.Format;
-	//IL_COLOUR_INDEX, IL_RGB, IL_RGBA, IL_BGR, IL_BGRA, IL_LUMINANCE
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, textureInfo.Format, width, height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
 
 	ilDeleteImages(1, &texture);
 	return true;

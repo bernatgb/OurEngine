@@ -159,8 +159,10 @@ bool ModuleRender::CleanUp()
 	//Destroy window
 	SDL_GL_DeleteContext(context);
 
-	//glViewport(0, 0, width, height);
-
 	return true;
 }
 
+void ModuleRender::WindowResized(unsigned width, unsigned height)
+{
+	glViewport(0, 0, width, height);
+}

@@ -10,6 +10,8 @@ public:
 	void DrawImGui();
 
 private:
+	const char* ConfigToString(unsigned int _config) const;
+
 	unsigned int m_Texture;
 
 	char* m_Name = nullptr;
@@ -17,4 +19,8 @@ private:
 	unsigned int height;
 	unsigned int depth;
 	unsigned int format;
+
+	unsigned int m_MinFilter;
+	unsigned int m_MagFilter;
+	unsigned int m_Wrap;
 };

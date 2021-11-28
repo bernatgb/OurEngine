@@ -2,8 +2,6 @@
 #include "Application.h"
 #include "ModuleTexture.h"
 
-#include "IL/il.h"
-#include "IL/ilu.h"
 #include "GL/glew.h"
 #include <string>
 
@@ -20,12 +18,16 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 	m_Name = new char[strlen(_fileName)+1];
 	strcpy(m_Name, _fileName);
 
+	m_MinFilter = GL_LINEAR;
+	m_MagFilter = GL_LINEAR;
+	m_Wrap = GL_CLAMP;
+
 	glGenTextures(1, &m_Texture);
 	glBindTexture(GL_TEXTURE_2D, m_Texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_MinFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_MagFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 
 	MY_LOG("Assimp texture: Loading model from the path described in the FBX");
 	if (!App->texture->LoadTextureData(_fileName, width, height, depth, format))
@@ -53,7 +55,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
 	
-	//glGenerateTextureMipmap(texture);
+	glGenerateTextureMipmap(m_Texture);
 }
 
 Texture::~Texture()
@@ -80,24 +82,133 @@ void Texture::DrawImGui()
 
 		switch (format)
 		{
-		case IL_COLOUR_INDEX:
+		case GL_COLOR_INDEX:
 			ImGui::Text("Format: COLOUR_INDEX");
 			break;
-		case IL_RGB:
+		case GL_RGB:
 			ImGui::Text("Format: RGB");
 			break;
-		case IL_RGBA:
+		case GL_RGBA:
 			ImGui::Text("Format: RGBA");
 			break;
-		case IL_BGR:
+		case GL_BGR:
 			ImGui::Text("Format: BGR");
 			break;
-		case IL_BGRA:
+		case GL_BGRA:
 			ImGui::Text("Format: BGRA");
 			break;
-		case IL_LUMINANCE:
+		case GL_LUMINANCE:
 			ImGui::Text("Format: LUMINANCE");
 			break;
 		}
+		ImGui::Separator();
+
+		bool change = false;
+
+		if (ImGui::Button("Select Min filter.."))
+			ImGui::OpenPopup("min_filter_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(ConfigToString(m_MinFilter));
+		if (ImGui::BeginPopup("min_filter_popup"))
+		{
+			ImGui::Text("Min Filter");
+			ImGui::Separator();
+			if (ImGui::Selectable("GL_NEAREST"))
+			{
+				m_MinFilter = GL_NEAREST;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_LINEAR"))
+			{
+				m_MinFilter = GL_LINEAR;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_NEAREST_MIPMAP_NEAREST"))
+			{
+				m_MinFilter = GL_NEAREST_MIPMAP_NEAREST;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_LINEAR_MIPMAP_NEAREST"))
+			{
+				m_MinFilter = GL_LINEAR_MIPMAP_NEAREST;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_NEAREST_MIPMAP_LINEAR"))
+			{
+				m_MinFilter = GL_NEAREST_MIPMAP_LINEAR;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_LINEAR_MIPMAP_LINEAR"))
+			{
+				m_MinFilter = GL_LINEAR_MIPMAP_LINEAR;
+				change = true;
+			}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Select Mag filter.."))
+			ImGui::OpenPopup("mag_filter_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(ConfigToString(m_MagFilter));
+		if (ImGui::BeginPopup("mag_filter_popup"))
+		{
+			ImGui::Text("Mag Filter");
+			ImGui::Separator();
+			if (ImGui::Selectable("GL_NEAREST"))
+			{
+				m_MagFilter = GL_NEAREST;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_LINEAR"))
+			{
+				m_MagFilter = GL_LINEAR;
+				change = true;
+			}
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Select Wrap.."))
+			ImGui::OpenPopup("wrap_popup");
+		ImGui::SameLine();
+		ImGui::TextUnformatted(ConfigToString(m_Wrap));
+		if (ImGui::BeginPopup("wrap_popup"))
+		{
+			ImGui::Text("Wrap");
+			ImGui::Separator();
+			if (ImGui::Selectable("GL_CLAMP"))
+			{
+				m_Wrap = GL_CLAMP;
+				change = true;
+			}
+			if (ImGui::Selectable("GL_REPEAT"))
+			{
+				m_Wrap = GL_REPEAT;
+				change = true;
+			}
+			ImGui::EndPopup();
+		}
+
+		if (change) 
+		{
+			glBindTexture(GL_TEXTURE_2D, m_Texture);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_MinFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_MagFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
+		}
+	}
+}
+
+const char* Texture::ConfigToString(unsigned int _config) const
+{
+	switch (_config) {
+	case GL_NEAREST: return "GL_NEAREST";
+	case GL_LINEAR: return "GL_LINEAR";
+	case GL_NEAREST_MIPMAP_NEAREST: return "GL_NEAREST_MIPMAP_NEAREST";
+	case GL_LINEAR_MIPMAP_NEAREST: return "GL_LINEAR_MIPMAP_NEAREST";
+	case GL_NEAREST_MIPMAP_LINEAR: return "GL_NEAREST_MIPMAP_LINEAR";
+	case GL_LINEAR_MIPMAP_LINEAR: return "GL_LINEAR_MIPMAP_LINEAR";
+	case GL_CLAMP: return "GL_CLAMP";
+	case GL_REPEAT: return "GL_REPEAT";
 	}
 }

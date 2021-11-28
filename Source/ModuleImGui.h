@@ -15,6 +15,9 @@ public:
 	std::list<char*> Items;
 
 private:
+	void About();
+	void Console();
+
 	bool showInfoWindow;
 	bool showConsoleWindow;
 	bool showCameraWindow;

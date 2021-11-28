@@ -3,6 +3,7 @@
 #include "ModuleInput.h"
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
+#include "ModuleRender.h"
 #include "ModuleRenderExercise.h"
 
 ModuleInput::ModuleInput()
@@ -55,6 +56,7 @@ update_status ModuleInput::Update()
                 {
                     App->window->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                     App->camera->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
+                    App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 }
                 //TODO: WINDOW FOR SIZE
                 break;

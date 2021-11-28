@@ -17,7 +17,8 @@ public:
 	void LoadModel(const char* _fileName);
 
 	void DrawModelImGui();
-	void DrawTextureImGui(bool& showWindow);
+
+	Model* modelObj = nullptr;
 
 private:
 	unsigned int program;
@@ -25,28 +26,4 @@ private:
 	unsigned int texture;
 	
 	float4x4 model;
-	float4x4 modelIdentity;
-
-	Model* modelObj = nullptr;
-
-	void SetTextureParameters();
-	/*unsigned int minPar;
-	unsigned int magPar;
-	unsigned int wrapPar;
-
-	unsigned int* minFilter;
-	unsigned int* magFilter;
-	unsigned int* wrap;
-	
-	std::vector<string> minFilterName{
-		"GL_NEAREST", "GL_LINEAR",
-		"GL_NEAREST_MIPMAP_NEAREST", "GL_LINEAR_MIPMAP_NEAREST",
-		"GL_NEAREST_MIPMAP_LINEAR", "GL_LINEAR_MIPMAP_LINEAR"
-	};
-	std::vector<string> magFilterName{
-		"GL_NEAREST", "GL_LINEAR"
-	};
-	std::vector<string> wrapName {
-		"GL_CLAMP", "GL_REPEAT"
-	};*/
 };

@@ -11,28 +11,10 @@
 
 ModuleRenderExercise::ModuleRenderExercise()
 {
-	/*minFilter = new unsigned int[6]{
-		GL_NEAREST, GL_LINEAR,
-		GL_NEAREST_MIPMAP_NEAREST, GL_LINEAR_MIPMAP_NEAREST,
-		GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR
-	};
-	magFilter = new unsigned int[2]{
-		GL_NEAREST, GL_LINEAR
-	};
-	wrap = new unsigned int[2]{
-		GL_CLAMP, GL_REPEAT
-	};
-
-	minPar = 1;
-	magPar = 1;
-	wrapPar = 0;*/
 }
 
 ModuleRenderExercise::~ModuleRenderExercise()
-{	
-	/*delete[] minFilter;
-	delete[] magFilter;
-	delete[] wrap;*/
+{
 }
 
 bool ModuleRenderExercise::Init()
@@ -93,7 +75,6 @@ bool ModuleRenderExercise::Init()
 		float3(2.0f, 1.0f, 1.0f));
 
 	MY_LOG("Model: Model creation");
-	modelIdentity = float4x4::identity;
 
 	modelObj = new Model("BakerHouse.fbx");
 
@@ -122,26 +103,24 @@ update_status ModuleRenderExercise::Update()
 	}*/
 
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_TRUE, &modelIdentity[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
 
-	float3 light_dir = float3(1.0f, 0.0f, 0.0f);
-	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
+	/*float3 light_pos = float3(5.0f, 5.0f, 5.0f);
+	glUniform3fv(glGetUniformLocation(program, "light_pos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(program, "cam_pos"), 1, &App->camera->eye[0]);
 	
-	float3 color_a = float3(0.1f, 0.0f, 0.0f);
-	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
-	float3 color_l = float3(1.0f, 0.0f, 0.0f);
-	glUniform3fv(glGetUniformLocation(program, "light_dir"), 1, &light_dir[0]);
+	float3 color_a = float3(0.25f, 0.25f, 0.25f);
+	glUniform3fv(glGetUniformLocation(program, "color_a"), 1, &color_a[0]);
+	float3 color_l = float3(1.0f, 1.0f, 1.0f);
+	glUniform3fv(glGetUniformLocation(program, "color_l"), 1, &color_l[0]);
 
-	//color ambient
-	//color diffuse
-	//kd
-	//ks
-	//color light
-	//light pos // light direction L
-	//cam pos
+	float kd = 0.75f;
+	glUniform1f(glGetUniformLocation(program, "kd"), kd);
+	float ks = 0.0f;
+	glUniform1f(glGetUniformLocation(program, "ks"), ks);
+	float n = 0.0f;
+	glUniform1f(glGetUniformLocation(program, "n"), n);*/
 
 	modelObj->Draw(program);
 
@@ -150,13 +129,13 @@ update_status ModuleRenderExercise::Update()
 
 bool ModuleRenderExercise::CleanUp()
 {
-	glDeleteBuffers(1, &vBuffer);
+	//glDeleteBuffers(1, &vBuffer);
 
 	delete modelObj;
 
 	glDeleteProgram(program);
 
-	glDeleteTextures(1, &texture);
+	//glDeleteTextures(1, &texture);
 
 	return true;
 }
@@ -166,86 +145,10 @@ void ModuleRenderExercise::DrawModelImGui()
 	modelObj->DrawImGui();
 }
 
-void ModuleRenderExercise::DrawTextureImGui(bool& showWindow)
-{
-	ImGui::Begin("Texture info", &showWindow);
-	//unsigned int width, height, depth, format;
-	//App->texture->GetLastTextureInfo(width, height, depth, format);
-	//ImGui::Text("Witdh: %i", width);
-	//ImGui::Text("Height: %i", height);
-	//ImGui::Text("Depth: %i", depth);
-	//ImGui::Text("Format: %i", format);
-
-	if (ImGui::BeginTabBar("Options"))
-	{
-		/*if (ImGui::Button("Select Min filter.."))
-			ImGui::OpenPopup("min_filter_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(minPar == -1 ? "<None>" : minFilterName[minPar]);
-		if (ImGui::BeginPopup("min_filter_popup"))
-		{
-			ImGui::Text("Min Filter");
-			ImGui::Separator();
-			for (int i = 0; i < 6; i++)
-				if (ImGui::Selectable(minFilterName[i]))
-				{
-					minPar = i;
-					SetTextureParameters();
-				}
-			ImGui::EndPopup();
-		}
-
-		if (ImGui::Button("Select Mag filter.."))
-			ImGui::OpenPopup("mag_filter_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(magPar == -1 ? "<None>" : minFilterName[magPar]);
-		if (ImGui::BeginPopup("mag_filter_popup"))
-		{
-			ImGui::Text("Mag Filter");
-			ImGui::Separator();
-			for (int i = 0; i < 2; i++)
-				if (ImGui::Selectable(magFilterName[i]))
-				{
-					magPar = i;
-					SetTextureParameters();
-				}
-			ImGui::EndPopup();
-		}
-
-		if (ImGui::Button("Select Wrap.."))
-			ImGui::OpenPopup("wrap_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(wrapPar == -1 ? "<None>" : wrapName[wrapPar]);
-		if (ImGui::BeginPopup("wrap_popup"))
-		{
-			ImGui::Text("Wrap");
-			ImGui::Separator();
-			for (int i = 0; i < 2; i++)
-				if (ImGui::Selectable(wrapName[i]))
-				{
-					wrapPar = i;
-					SetTextureParameters();
-				}
-			ImGui::EndPopup();
-		}*/
-
-		ImGui::EndTabBar();
-	}
-
-	ImGui::End();
-}
-
 void ModuleRenderExercise::LoadModel(const char* _fileName)
 {
 	delete modelObj;
 	modelObj = new Model(_fileName);
-}
 
-void ModuleRenderExercise::SetTextureParameters()
-{
-	/*glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter[minPar]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter[magPar]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap[wrapPar]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap[wrapPar]);*/
+	App->camera->AdjustToModel(modelObj);
 }

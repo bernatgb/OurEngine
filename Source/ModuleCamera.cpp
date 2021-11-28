@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
+#include "ModuleRenderExercise.h"
 #include "SDL.h"
 
 #include "imgui.h"
@@ -34,14 +35,19 @@ void ModuleCamera::ViewProjectionMatrix()
 
 bool ModuleCamera::Init()
 {
-	eye = float3(0.0f, 4.0f, 8.0f);
+	eye = float3(0.0f, 3.0f, -8.0f);
 	target = float3(0.0f, 0.0f, 0.0f);
-	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * -30.0f, DEGTORAD * 180.0f, 0.0f);
+	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * 15.0f, 0.0f, 0.0f);
 
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 	//LookAt(camera forward(right), target dir, local up, world up)
 
-	aspect = App->window->width / App->window->height;
+	aspect = (float)App->window->width / (float)App->window->height;
+
+	if (aspect >= 1.0f)
+		verticalFov = DEGTORAD * initialVerticalFov;
+	else
+		verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
 
 	ViewProjectionMatrix();
 
@@ -69,7 +75,10 @@ update_status ModuleCamera::Update()
 		}
 		else
 		{
-			rotationMatrix = float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * rotationMatrix * float3x3::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+			rotationMatrix = 
+				float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * 
+				rotationMatrix * 
+				float3x3::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
 
 			float multiplier = 1.0f;
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
@@ -101,6 +110,40 @@ update_status ModuleCamera::Update()
 
 		ViewProjectionMatrix();
 	}
+	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) && App->input->GetKey(SDL_SCANCODE_LALT))
+	{
+		int deltaX, deltaY;
+		App->input->GetMouseMotion(deltaX, deltaY);
+
+		eye += rotationMatrix.WorldX() * -deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
+			rotationMatrix.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
+
+		float4 target = App->rendererExercise->modelObj->GetCenter();
+
+		float3 front = (float3(target.x, target.y, target.z) - eye).Normalized();
+		float3 right = Cross(front, float3::unitY).Normalized();
+		float3 up = Cross(right, front).Normalized();
+
+		rotationMatrix = float3x3(right, up, front);
+
+		/*float4 target = App->rendererExercise->modelObj->GetCenter();
+		float3 vector = eye - float3(target.x, target.y, target.z);
+
+		float3 up_vector = rotationMatrix.Col(1).Normalized();
+		float3 right_vector = rotationMatrix.Col(0).Normalized();
+
+		float3x3 rotation_matrixX = float3x3::RotateAxisAngle(up_vector, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+		float3x3 rotation_matrixY = float3x3::RotateAxisAngle(right_vector, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+
+		float4 newEye = rotation_matrixY * rotation_matrixX * float4(eye.x, eye.y, eye.z, 1.0f);
+
+		eye = float3(transformation * glm::vec4(eye, 1));
+
+		// translate back to the origin, rotate and translate back to the pivot location
+		glm::mat4x4 transformation = glm::translate(rotation_center) * rotation_matrixY * rotation_matrixX * glm::translate(-rotation_center);*/
+
+		ViewProjectionMatrix();
+	}
 	else if (App->input->MouseWheel()) 
 	{
 		int wheelX, wheelY;
@@ -110,11 +153,9 @@ update_status ModuleCamera::Update()
 
 		ViewProjectionMatrix();
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_O)) 
+	else if (App->input->GetKey(SDL_SCANCODE_F)) 
 	{
-		eye = float3::zero;
-
-		ViewProjectionMatrix();
+		AdjustToModel(App->rendererExercise->modelObj);
 	}
 
 	return UPDATE_CONTINUE;
@@ -128,6 +169,14 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 		verticalFov = DEGTORAD * initialVerticalFov;
 	else
 		verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+
+	ViewProjectionMatrix();
+}
+
+void ModuleCamera::AdjustToModel(Model* _model)
+{
+	float4 newPos = _model->GetCenter();
+	eye = float3(newPos.x, newPos.y, newPos.z) - rotationMatrix.WorldZ().Normalized() * _model->GetRadius();
 
 	ViewProjectionMatrix();
 }

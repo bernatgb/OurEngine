@@ -461,7 +461,9 @@
     <None Include="MathGeoLib_Source\Math\float2.inl" />
     <None Include="MathGeoLib_Source\Math\Matrix.inl" />
     <None Include="shaders\fragment_shader.frag" />
+    <None Include="shaders\fragment_shader_phong.frag" />
     <None Include="shaders\vertex_shader.vert" />
+    <None Include="shaders\vertex_shader_phong.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

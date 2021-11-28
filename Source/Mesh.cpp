@@ -22,8 +22,21 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, GL_MAP_WRITE_BIT));
 
+	m_MinX = m_MaxX = _mesh->mVertices[0].x;
+	m_MinY = m_MaxY = _mesh->mVertices[0].y;
+	m_MinZ = m_MaxZ = _mesh->mVertices[0].z;
+
 	for (unsigned int i = 0; i < m_NumVertices; ++i)
 	{
+		if (_mesh->mVertices[i].x > m_MaxX) m_MaxX = _mesh->mVertices[i].x;
+		if (_mesh->mVertices[i].x < m_MinX) m_MinX = _mesh->mVertices[i].x;
+
+		if (_mesh->mVertices[i].y > m_MaxY) m_MaxY = _mesh->mVertices[i].y;
+		if (_mesh->mVertices[i].y < m_MinY) m_MinY = _mesh->mVertices[i].y;
+
+		if (_mesh->mVertices[i].z > m_MaxZ) m_MaxZ = _mesh->mVertices[i].z;
+		if (_mesh->mVertices[i].z < m_MinZ) m_MinZ = _mesh->mVertices[i].z;
+
 		*(pointer++) = _mesh->mVertices[i].x;
 		*(pointer++) = _mesh->mVertices[i].y;
 		*(pointer++) = _mesh->mVertices[i].z;

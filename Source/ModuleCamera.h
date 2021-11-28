@@ -1,6 +1,8 @@
 #pragma once
 #include "Module.h"
 
+#include "Model.h"
+
 #include "Math/float4x4.h"
 #include "Math/float3x3.h"
 #include "Geometry/Frustum.h"
@@ -15,6 +17,8 @@ public:
 	update_status Update();
 	void WindowResized(unsigned width, unsigned height);
 	void DrawImGui();
+
+	void AdjustToModel(Model* _model);
 
 	float4x4 view, proj;
 	float3x3 rotationMatrix;

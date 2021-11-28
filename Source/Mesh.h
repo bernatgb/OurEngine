@@ -21,6 +21,24 @@ public:
 	unsigned int GetNumIndices() const {
 		return m_NumIndices;
 	};
+	float GetMinX() const {
+		return m_MinX;
+	};
+	float GetMaxX() const {
+		return m_MaxX;
+	};
+	float GetMinY() const {
+		return m_MinY;
+	};
+	float GetMaxY() const {
+		return m_MaxY;
+	};
+	float GetMinZ() const {
+		return m_MinZ;
+	};
+	float GetMaxZ() const {
+		return m_MaxZ;
+	};
 
 private:
 	unsigned int m_Vao;
@@ -29,5 +47,9 @@ private:
 	unsigned int m_MaterialIndex;
 	unsigned int m_NumVertices;
 	unsigned int m_NumIndices;
+
+	float m_MinX, m_MaxX;
+	float m_MinY, m_MaxY;
+	float m_MinZ, m_MaxZ;
 };
 
