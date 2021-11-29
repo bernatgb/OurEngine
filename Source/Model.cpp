@@ -22,7 +22,8 @@ Model::Model(const char* _fileName)
 
 	m_ModelMatrix = float4x4::identity;
 	m_Position = float3(0.0f, 0.0f, 0.0f);
-	m_Rotation = float3(0.0f, 0.0f, 0.0f);
+	m_RotationEuler = float3(0.0f, 0.0f, 0.0f);
+	m_Rotation = Quat::identity;
 	m_Scale = float3(1.0f, 1.0f, 1.0f);
 
 	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
@@ -97,40 +98,18 @@ void Model::DrawImGui()
 	{
 		ImGui::Text("In progress");
 
-		bool change = false;
-		float position[3] = {m_Position.x, m_Position.y, m_Position.z};
-		float rotation[3] = { m_Rotation.x, m_Rotation.y, m_Rotation.z };
-		float scale[3] = { m_Scale.x, m_Scale.y, m_Scale.z };
-		if (ImGui::SliderFloat3("Position", position, -10.0f, 10.0f)) 
+		if (ImGui::SliderFloat3("Position", &m_Position[0], -10.0f, 10.0f))
 		{
-			m_Position.x = position[0];
-			m_Position.y = position[1];
-			m_Position.z = position[2];
-
-			change = true;
+			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
 		}
-		if (ImGui::SliderFloat3("Rotation", rotation, 0.0f, 360.0f))
+		if (ImGui::SliderFloat3("Rotation", &m_RotationEuler[0], 0.0f, 360.0f))
 		{
-			m_Rotation.x = rotation[0];
-			m_Rotation.y = rotation[1];
-			m_Rotation.z = rotation[2];
-
-			change = true;
+			m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
+			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
 		}
-		if (ImGui::SliderFloat3("Scale", scale, -10.0f, 10.0f))
+		if (ImGui::SliderFloat3("Scale", &m_Scale[0], -10.0f, 10.0f))
 		{
-			m_Scale.x = scale[0];
-			m_Scale.y = scale[1];
-			m_Scale.z = scale[2];
-
-			change = true;
-		}
-
-		if (change) 
-		{
-			m_ModelMatrix = float4x4::FromTRS(m_Position,
-				float4x4::FromEulerXYZ(DEGTORAD * m_Rotation.x, DEGTORAD * m_Rotation.y, DEGTORAD * m_Rotation.z),
-				m_Scale);
+			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
 		}
 	}
 }

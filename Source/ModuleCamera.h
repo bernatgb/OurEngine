@@ -21,6 +21,7 @@ public:
 	void AdjustToModel(Model* _model);
 
 	float4x4 view, proj;
+	float4x4 m_RotationMatrix;
 	float3x3 rotationMatrix;
 	float3 eye, target;
 

@@ -45,7 +45,8 @@ private:
 	std::vector<Texture*> m_Textures;
 
 	float4x4 m_ModelMatrix;
-	float3 m_Position, m_Rotation, m_Scale;
+	float3 m_Position, m_RotationEuler, m_Scale;
+	Quat m_Rotation;
 
 	unsigned int m_NumVertices = 0;
 	unsigned int m_NumTriangles = 0;

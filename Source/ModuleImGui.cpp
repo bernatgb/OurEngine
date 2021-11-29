@@ -34,13 +34,18 @@ bool ModuleImGui::Init()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	ImGuiIO& io = ImGui::GetIO(); 
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 	ImGui_ImplSDL2_InitForOpenGL(App->window->window, App->renderer->context);
 	ImGui_ImplOpenGL3_Init();
 
 	ImGui::StyleColorsDark();
+
+	inspector = false;
+	hierarchy = false;
+	config = false;
+	console = false;
 
 	showInfoWindow = false;
 	showConsoleWindow = false;
@@ -90,6 +95,11 @@ update_status ModuleImGui::Update()
 		ImGui::EndMainMenuBar();
 	}
 
+	inspector = false;
+	hierarchy = false;
+	config = false;
+	console = false;
+
 	//ImageButton()
 
 	if (showInfoWindow)
@@ -129,13 +139,7 @@ update_status ModuleImGui::Update()
 	}
 
 	if (showConsoleWindow)
-	{
-		if (ImGui::Begin("Console", &showConsoleWindow))
-		{
-			Console();
-			ImGui::End();
-		}
-	}
+		Console(showConsoleWindow);
 
 	return UPDATE_CONTINUE;
 }
@@ -181,34 +185,39 @@ void ModuleImGui::About()
 	ImGui::Text("Vram Avaliable: %.1f Mb", vram_free_mb);
 }
 
-void ModuleImGui::Console()
+void ModuleImGui::Console(bool& show)
 {
-	if (ImGui::SmallButton("Clear"))
+	if (ImGui::Begin("Console", &show))
 	{
+		if (ImGui::SmallButton("Clear"))
+		{
+			for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
+				free(*it);
+			Items.clear();
+		}
+		ImGui::SameLine();
+		ImGui::Checkbox("Auto-scroll", &autoScroll);
+
+		ImGui::Separator();
+
+		ImGui::BeginChild("ScrollingRegion", ImVec2(0, -10), false, ImGuiWindowFlags_HorizontalScrollbar);
 		for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
-			free(*it);
-		Items.clear();
+		{
+			ImVec4 color;
+			bool has_color = false;
+			if (strstr((*it), "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
+			if (has_color)
+				ImGui::PushStyleColor(ImGuiCol_Text, color);
+			ImGui::TextUnformatted((*it));
+			if (has_color)
+				ImGui::PopStyleColor();
+		}
+
+		if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+			ImGui::SetScrollHereY(0.0f);
+
+		ImGui::EndChild();
+
+		ImGui::End();
 	}
-	ImGui::SameLine();
-	ImGui::Checkbox("Auto-scroll", &autoScroll);
-
-	ImGui::Separator();
-
-	ImGui::BeginChild("ScrollingRegion", ImVec2(0, -10), false, ImGuiWindowFlags_HorizontalScrollbar);
-	for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
-	{
-		ImVec4 color;
-		bool has_color = false;
-		if (strstr((*it), "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
-		if (has_color)
-			ImGui::PushStyleColor(ImGuiCol_Text, color);
-		ImGui::TextUnformatted((*it));
-		if (has_color)
-			ImGui::PopStyleColor();
-	}
-
-	if (autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-		ImGui::SetScrollHereY(0.0f);
-
-	ImGui::EndChild();
 }

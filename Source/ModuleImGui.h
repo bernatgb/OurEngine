@@ -16,8 +16,14 @@ public:
 
 private:
 	void About();
-	void Console();
+	void Console(bool& show);
 
+	bool inspector;
+	bool hierarchy;
+	bool config;
+	bool console;
+
+	//TODO: REMOVE
 	bool showInfoWindow;
 	bool showConsoleWindow;
 	bool showCameraWindow;

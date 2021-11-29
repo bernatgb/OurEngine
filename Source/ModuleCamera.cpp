@@ -28,6 +28,9 @@ void ModuleCamera::ViewProjectionMatrix()
 	frustum.SetPos(eye);
 	frustum.SetFront(rotationMatrix.WorldZ());
 	frustum.SetUp(rotationMatrix.WorldY());
+	/*frustum.SetPos(m_RotationMatrix.Col3(3));
+	frustum.SetFront(m_RotationMatrix.WorldZ());
+	frustum.SetUp(m_RotationMatrix.WorldY());*/
 
 	view = float4x4(frustum.ViewMatrix());
 	proj = frustum.ProjectionMatrix();
@@ -38,6 +41,11 @@ bool ModuleCamera::Init()
 	eye = float3(0.0f, 3.0f, -8.0f);
 	target = float3(0.0f, 0.0f, 0.0f);
 	rotationMatrix = float3x3::FromEulerXYZ(DEGTORAD * 15.0f, 0.0f, 0.0f);
+	m_RotationMatrix = float4x4::FromTRS(
+		eye,
+		float3x3::FromEulerXYZ(DEGTORAD * 15.0f, 0.0f, 0.0f),
+		float3::one
+	);
 
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 	//LookAt(camera forward(right), target dir, local up, world up)
@@ -71,7 +79,7 @@ update_status ModuleCamera::Update()
 
 		if (App->input->GetKey(SDL_SCANCODE_LALT))
 		{
-			eye += rotationMatrix.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForRotation;
+			eye += rotationMatrix.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 		}
 		else
 		{
@@ -79,6 +87,11 @@ update_status ModuleCamera::Update()
 				float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * 
 				rotationMatrix * 
 				float3x3::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+			
+			/*m_RotationMatrix =
+				float4x4::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+				m_RotationMatrix *
+				float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);*/
 
 			float multiplier = 1.0f;
 			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
@@ -115,14 +128,41 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		eye += rotationMatrix.WorldX() * -deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
-			rotationMatrix.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
+		/*float3 euler = rotationMatrix.ToEulerXYZ();
+		float4x4 newRotation = float4x4::FromTRS(eye,
+			float4x4::FromEulerXYZ(euler.x, euler.y, euler.z),
+			float3::one);
+
+		newRotation =
+			float4x4::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+			float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * 
+			newRotation;
+
+		eye = newRotation.Col3(3);*/
+
+		
+
+		//eye += rotationMatrix.WorldX() * -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation +
+		//	rotationMatrix.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForRotation;
+
+		//eye = float3x3::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+		//	float3x3::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) * 
+		//	eye;
 
 		float4 target = App->rendererExercise->modelObj->GetCenter();
 
+		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
+
+		vector = 
+			vector *
+			float4x4::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+			float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+
+		eye = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
+
 		float3 front = (float3(target.x, target.y, target.z) - eye).Normalized();
-		float3 right = Cross(front, float3::unitY).Normalized();
-		float3 up = Cross(right, front).Normalized();
+		float3 right = Cross(float3::unitY, front).Normalized();
+		float3 up = Cross(front, right).Normalized();
 
 		rotationMatrix = float3x3(right, up, front);
 
@@ -194,9 +234,7 @@ void ModuleCamera::DrawImGui()
 	ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f");
 	
 	ImGui::Text("Vectors");
-	ImGui::DragFloat("Eye-X", &eye.x, 1.0f, -25.0f, 25.0f, "%.2f");
-	ImGui::DragFloat("Eye-Y", &eye.y, 1.0f, -25.0f, 25.0f, "%.2f");
-	ImGui::DragFloat("Eye-Z", &eye.z, 1.0f, -25.0f, 25.0f, "%.2f");
+	ImGui::DragFloat3("Cam pos", &eye[0], 1.0f, -25.0f, 25.0f, "%.2f");
 	ImGui::Separator();
 
 	ViewProjectionMatrix();
