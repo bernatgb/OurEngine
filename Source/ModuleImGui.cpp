@@ -158,7 +158,10 @@ void ModuleImGui::About()
 	ImGui::BulletText("Description: This is MyEngine");
 	ImGui::BulletText("Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, Assimp, ...");
 	ImGui::BulletText("License: MIT License");
-	ImGui::BulletText("Github: https://github.com/miquelmiro3/MyEngine");
+	if (ImGui::Button("Github"))
+		ShellExecute(0, 0, "https://github.com/miquelmiro3/MyEngine", 0, 0, SW_SHOW);
+	ImGui::SameLine();
+	ImGui::Text("https://github.com/miquelmiro3/MyEngine");
 
 	ImGui::Separator();
 

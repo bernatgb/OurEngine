@@ -154,9 +154,9 @@ update_status ModuleCamera::Update()
 		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
 
 		vector = 
-			vector *
 			float4x4::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-			float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD);
+			float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+			vector;
 
 		eye = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
 
