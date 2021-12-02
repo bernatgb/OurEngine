@@ -155,16 +155,21 @@ update_status ModuleCamera::Update()
 
 		vector = 
 			float4x4::RotateAxisAngle(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-			float4x4::RotateAxisAngle(float3::unitX, deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+			float4x4::RotateAxisAngle(rotationMatrix.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
 			vector;
 
-		eye = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
+		float aux = Dot(vector, float4::unitY);
+		if (aux > -0.98f && aux < 0.98f)
+		{
+		}
 
-		float3 front = (float3(target.x, target.y, target.z) - eye).Normalized();
-		float3 right = Cross(float3::unitY, front).Normalized();
-		float3 up = Cross(front, right).Normalized();
+			eye = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
 
-		rotationMatrix = float3x3(right, up, front);
+			float3 front = (float3(target.x, target.y, target.z) - eye).Normalized();
+			float3 right = Cross(float3::unitY, front).Normalized();
+			float3 up = Cross(front, right).Normalized();
+
+			rotationMatrix = float3x3(right, up, front);
 
 		/*float4 target = App->rendererExercise->modelObj->GetCenter();
 		float3 vector = eye - float3(target.x, target.y, target.z);
@@ -216,26 +221,29 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 void ModuleCamera::AdjustToModel(Model* _model)
 {
 	float4 newPos = _model->GetCenter();
-	eye = float3(newPos.x, newPos.y, newPos.z) - rotationMatrix.WorldZ().Normalized() * _model->GetRadius();
+	eye = float3(newPos.x, newPos.y, newPos.z) - rotationMatrix.WorldZ().Normalized() * _model->GetDiameter();
 
 	ViewProjectionMatrix();
 }
 
 void ModuleCamera::DrawImGui()
 {
-	ImGui::Text("Variables");
-	if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
-		if (aspect >= 1)
-			verticalFov = DEGTORAD * initialVerticalFov;
-		else
-			verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
-	}
-	ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f");
-	ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f");
+	if (ImGui::CollapsingHeader("Camera"))
+	{
+		ImGui::Text("Variables");
+		if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
+			if (aspect >= 1)
+				verticalFov = DEGTORAD * initialVerticalFov;
+			else
+				verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+		}
+		ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f");
+		ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f");
 	
-	ImGui::Text("Vectors");
-	ImGui::DragFloat3("Cam pos", &eye[0], 1.0f, -25.0f, 25.0f, "%.2f");
-	ImGui::Separator();
+		ImGui::Text("Vectors");
+		ImGui::DragFloat3("Cam pos", &eye[0], 1.0f, -25.0f, 25.0f, "%.2f");
+		ImGui::Separator();
 
-	ViewProjectionMatrix();
+		ViewProjectionMatrix();
+	}
 }

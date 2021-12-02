@@ -1,6 +1,8 @@
 #pragma once
 #include "Globals.h"
 
+#include "MathGeoLib.h"
+
 #include "assimp/cimport.h"
 #include "Assimp/scene.h"
 
@@ -21,23 +23,11 @@ public:
 	unsigned int GetNumIndices() const {
 		return m_NumIndices;
 	};
-	float GetMinX() const {
-		return m_MinX;
+	float3 GetMin() const {
+		return m_Min;
 	};
-	float GetMaxX() const {
-		return m_MaxX;
-	};
-	float GetMinY() const {
-		return m_MinY;
-	};
-	float GetMaxY() const {
-		return m_MaxY;
-	};
-	float GetMinZ() const {
-		return m_MinZ;
-	};
-	float GetMaxZ() const {
-		return m_MaxZ;
+	float3 GetMax() const {
+		return m_Max;
 	};
 
 private:
@@ -48,8 +38,7 @@ private:
 	unsigned int m_NumVertices;
 	unsigned int m_NumIndices;
 
-	float m_MinX, m_MaxX;
-	float m_MinY, m_MaxY;
-	float m_MinZ, m_MaxZ;
+	float3 m_Min;
+	float3 m_Max;
 };
 

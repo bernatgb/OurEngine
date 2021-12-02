@@ -48,9 +48,6 @@ bool ModuleImGui::Init()
 	console = false;
 
 	showInfoWindow = false;
-	showConsoleWindow = false;
-	showCameraWindow = false;
-	showTimeWindow = true;
 
 	autoScroll = true;
 
@@ -74,8 +71,8 @@ update_status ModuleImGui::Update()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("About"))
-				showInfoWindow = !showInfoWindow;
+			if (ImGui::MenuItem("Config"))
+				config = !config;
 			if (ImGui::MenuItem("Quit"))
 				return UPDATE_STOP;
 			ImGui::EndMenu();
@@ -83,63 +80,42 @@ update_status ModuleImGui::Update()
 		if (ImGui::BeginMenu("Windows"))
 		{
 			if (ImGui::MenuItem("Console"))
-				showConsoleWindow = !showConsoleWindow;
-			if (ImGui::MenuItem("Camera"))
-				showCameraWindow = !showCameraWindow;
-			if (ImGui::MenuItem("Model info"))
-				showModelWindow = !showModelWindow;
-			if (ImGui::MenuItem("Time"))
-				showTimeWindow = !showTimeWindow;
+				console = !console;
+			if (ImGui::MenuItem("Inspector"))
+				inspector = !inspector;
+			if (ImGui::MenuItem("Hierarchy (in progress)"))
+				hierarchy = !hierarchy;
 			ImGui::EndMenu();
 		}
-		ImGui::EndMainMenuBar();
 	}
-
-	inspector = false;
-	hierarchy = false;
-	config = false;
-	console = false;
+	ImGui::EndMainMenuBar();
 
 	//ImageButton()
 
-	if (showInfoWindow)
+	if (console)
+		Console(console);
+
+	if (config)
 	{
-		if (ImGui::Begin("About...", &showInfoWindow)) 
+		if (ImGui::Begin("Config", &config))
 		{
+			//SDL_SetWindowFullscreen();
+
 			About();
-			ImGui::End();
-		}
-	}
-
-	if (showCameraWindow)
-	{
-		if (ImGui::Begin("Camera", &showCameraWindow))
-		{
+			Time::DrawImGui();
 			App->camera->DrawImGui();
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 
-	if (showModelWindow)
+	if (inspector)
 	{
-		if (ImGui::Begin("Model", &showModelWindow))
+		if (ImGui::Begin("Inspector", &inspector))
 		{
 			App->rendererExercise->DrawModelImGui();
-			ImGui::End();
 		}
+		ImGui::End();
 	}
-
-	if (showTimeWindow)
-	{
-		if (ImGui::Begin("Time", &showTimeWindow))
-		{
-			Time::DrawImGui();
-			ImGui::End();
-		}
-	}
-
-	if (showConsoleWindow)
-		Console(showConsoleWindow);
 
 	return UPDATE_CONTINUE;
 }
@@ -151,41 +127,44 @@ update_status ModuleImGui::PostUpdate()
 
 void ModuleImGui::About()
 {
-	ImGui::BulletText("Engine name: ");
-	ImGui::SameLine();
-	ImGui::Text(TITLE);
-	ImGui::BulletText("Author: miquelmiro3");
-	ImGui::BulletText("Description: This is MyEngine");
-	ImGui::BulletText("Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, Assimp, ...");
-	ImGui::BulletText("License: MIT License");
-	if (ImGui::Button("Github"))
-		ShellExecute(0, 0, "https://github.com/miquelmiro3/MyEngine", 0, 0, SW_SHOW);
-	ImGui::SameLine();
-	ImGui::Text("https://github.com/miquelmiro3/MyEngine");
+	if (ImGui::CollapsingHeader("About"))
+	{
+		ImGui::BulletText("Engine name: ");
+		ImGui::SameLine();
+		ImGui::Text(TITLE);
+		ImGui::BulletText("Author: miquelmiro3");
+		ImGui::BulletText("Description: This is MyEngine");
+		ImGui::BulletText("Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, Assimp, ...");
+		ImGui::BulletText("License: MIT License");
+		if (ImGui::Button("Github"))
+			ShellExecute(0, 0, "https://github.com/miquelmiro3/MyEngine", 0, 0, SW_SHOW);
+		ImGui::SameLine();
+		ImGui::Text("https://github.com/miquelmiro3/MyEngine");
 
-	ImGui::Separator();
+		ImGui::Separator();
 
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
-	ImGui::Separator();
+		ImGui::Separator();
 
-	SDL_version version;
-	SDL_GetVersion(&version);
-	int vram_free, vram_budget;
-	glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_free);
-	glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
-	float vram_budget_mb = vram_budget / 1024.0f;
-	float vram_free_mb = vram_free / 1024.0f;
-	float vram_usage_mb = vram_budget_mb - vram_free_mb;
+		SDL_version version;
+		SDL_GetVersion(&version);
+		int vram_free, vram_budget;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_free);
+		glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
+		float vram_budget_mb = vram_budget / 1024.0f;
+		float vram_free_mb = vram_free / 1024.0f;
+		float vram_usage_mb = vram_budget_mb - vram_free_mb;
 
-	ImGui::Text("SDL Version: %d.%d.%d", version.major, version.minor, version.patch);
-	ImGui::Text("CPUs: %d", SDL_GetCPUCount());
-	ImGui::Text("System RAM: %.1f Gb", SDL_GetSystemRAM() / 1024.0f);
-	ImGui::Text("GPU: %s", (unsigned char*)glGetString(GL_RENDERER));
-	ImGui::Text("Brand: %s", (unsigned char*)glGetString(GL_VENDOR));
-	ImGui::Text("VRAM Budget: %.1f Mb", vram_budget_mb);
-	ImGui::Text("Vram Usage: %.1f Mb", vram_usage_mb);
-	ImGui::Text("Vram Avaliable: %.1f Mb", vram_free_mb);
+		ImGui::Text("SDL Version: %d.%d.%d", version.major, version.minor, version.patch);
+		ImGui::Text("CPUs: %d", SDL_GetCPUCount());
+		ImGui::Text("System RAM: %.1f Gb", SDL_GetSystemRAM() / 1024.0f);
+		ImGui::Text("GPU: %s", (unsigned char*)glGetString(GL_RENDERER));
+		ImGui::Text("Brand: %s", (unsigned char*)glGetString(GL_VENDOR));
+		ImGui::Text("VRAM Budget: %.1f Mb", vram_budget_mb);
+		ImGui::Text("Vram Usage: %.1f Mb", vram_usage_mb);
+		ImGui::Text("Vram Avaliable: %.1f Mb", vram_free_mb);
+	}
 }
 
 void ModuleImGui::Console(bool& show)
@@ -221,6 +200,6 @@ void ModuleImGui::Console(bool& show)
 
 		ImGui::EndChild();
 
-		ImGui::End();
 	}
+	ImGui::End();
 }

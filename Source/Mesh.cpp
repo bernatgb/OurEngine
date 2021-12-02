@@ -20,22 +20,22 @@ Mesh::Mesh(aiMesh* _mesh)
 	unsigned int buffer_size = vertex_size * m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
-	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, GL_MAP_WRITE_BIT));
 
-	m_MinX = m_MaxX = _mesh->mVertices[0].x;
-	m_MinY = m_MaxY = _mesh->mVertices[0].y;
-	m_MinZ = m_MaxZ = _mesh->mVertices[0].z;
+	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, GL_MAP_WRITE_BIT));
+	
+	m_Min = float3(_mesh->mVertices[0].x, _mesh->mVertices[0].y, _mesh->mVertices[0].z);
+	m_Max = float3(_mesh->mVertices[0].x, _mesh->mVertices[0].y, _mesh->mVertices[0].z);
 
 	for (unsigned int i = 0; i < m_NumVertices; ++i)
 	{
-		if (_mesh->mVertices[i].x > m_MaxX) m_MaxX = _mesh->mVertices[i].x;
-		if (_mesh->mVertices[i].x < m_MinX) m_MinX = _mesh->mVertices[i].x;
+		if (_mesh->mVertices[i].x > m_Max.x) m_Max.x = _mesh->mVertices[i].x;
+		if (_mesh->mVertices[i].x < m_Min.x) m_Min.x = _mesh->mVertices[i].x;
 
-		if (_mesh->mVertices[i].y > m_MaxY) m_MaxY = _mesh->mVertices[i].y;
-		if (_mesh->mVertices[i].y < m_MinY) m_MinY = _mesh->mVertices[i].y;
+		if (_mesh->mVertices[i].y > m_Max.y) m_Max.y= _mesh->mVertices[i].y;
+		if (_mesh->mVertices[i].y < m_Min.y) m_Min.y = _mesh->mVertices[i].y;
 
-		if (_mesh->mVertices[i].z > m_MaxZ) m_MaxZ = _mesh->mVertices[i].z;
-		if (_mesh->mVertices[i].z < m_MinZ) m_MinZ = _mesh->mVertices[i].z;
+		if (_mesh->mVertices[i].z > m_Max.z) m_Max.z = _mesh->mVertices[i].z;
+		if (_mesh->mVertices[i].z < m_Min.z) m_Min.z = _mesh->mVertices[i].z;
 
 		*(pointer++) = _mesh->mVertices[i].x;
 		*(pointer++) = _mesh->mVertices[i].y;
@@ -49,7 +49,7 @@ Mesh::Mesh(aiMesh* _mesh)
 		*(pointer++) = _mesh->mNormals[i].z;
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-
+	
 	//CREATE THE EBO
 	MY_LOG("Assimp mesh: Creating the ebo");
 	glGenBuffers(1, &m_Ebo);
@@ -59,6 +59,7 @@ Mesh::Mesh(aiMesh* _mesh)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, nullptr, GL_STATIC_DRAW);
 	unsigned* indices = (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, index_size, GL_MAP_WRITE_BIT));
 
+	
 	for (unsigned int i = 0; i < _mesh->mNumFaces; ++i)
 	{
 		assert(_mesh->mFaces[i].mNumIndices == 3); // note: assume triangles = 3 indices per face
@@ -69,13 +70,16 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
+
+
 	//CREATE THE VAO
 	MY_LOG("Assimp mesh: Creating the vao");
 	glGenVertexArrays(1, &m_Vao);
 
+
 	glBindVertexArray(m_Vao);
-	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
@@ -86,6 +90,8 @@ Mesh::Mesh(aiMesh* _mesh)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
+	glBindVertexArray(0);
+	
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -93,7 +99,7 @@ Mesh::~Mesh()
 {
 	glDeleteBuffers(1, &m_Vbo);
 	glDeleteBuffers(1, &m_Ebo);
-	glDeleteBuffers(1, &m_Vao);
+	glDeleteVertexArrays(1, &m_Vao);
 }
 
 void Mesh::Draw() const

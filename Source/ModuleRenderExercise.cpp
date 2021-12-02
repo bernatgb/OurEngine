@@ -67,8 +67,8 @@ bool ModuleRenderExercise::Init()
 	glGenerateTextureMipmap(texture);*/
 
 	MY_LOG("Shaders: Creating program");
-	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
-	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
+	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
+	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(pi / 4.0f),
@@ -106,7 +106,7 @@ update_status ModuleRenderExercise::Update()
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
 
-	/*float3 light_pos = float3(5.0f, 5.0f, 5.0f);
+	float3 light_pos = float3(5.0f, 5.0f, 5.0f);
 	glUniform3fv(glGetUniformLocation(program, "light_pos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(program, "cam_pos"), 1, &App->camera->eye[0]);
 	
@@ -120,7 +120,8 @@ update_status ModuleRenderExercise::Update()
 	float ks = 0.0f;
 	glUniform1f(glGetUniformLocation(program, "ks"), ks);
 	float n = 0.0f;
-	glUniform1f(glGetUniformLocation(program, "n"), n);*/
+		int loc = glGetUniformLocation(program, "n");
+	glUniform1f(loc, n);
 
 	modelObj->Draw(program);
 
@@ -150,5 +151,5 @@ void ModuleRenderExercise::LoadModel(const char* _fileName)
 	delete modelObj;
 	modelObj = new Model(_fileName);
 
-	App->camera->AdjustToModel(modelObj);
+	//App->camera->AdjustToModel(modelObj);
 }

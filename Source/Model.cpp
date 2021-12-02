@@ -32,26 +32,22 @@ Model::Model(const char* _fileName)
 		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
 		LoadTextures(scene->mMaterials, scene->mNumMaterials);
 
-		m_MinX = m_Meshes[0]->GetMinX();
-		m_MaxX = m_Meshes[0]->GetMaxX();
-		m_MinY = m_Meshes[0]->GetMinY();
-		m_MaxY = m_Meshes[0]->GetMaxY();
-		m_MinZ = m_Meshes[0]->GetMinZ();
-		m_MaxZ = m_Meshes[0]->GetMaxZ();
+		m_Min = m_Meshes[0]->GetMin();
+		m_Max = m_Meshes[0]->GetMax();
 
 		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
 		{
 			m_NumVertices += m_Meshes[i]->GetNumVertices();
 			m_NumTriangles += m_Meshes[i]->GetNumIndices() / 3;
 
-			if (m_Meshes[i]->GetMaxX() > m_MaxX) m_MaxX = m_Meshes[i]->GetMaxX();
-			if (m_Meshes[i]->GetMinX() < m_MinX) m_MinX = m_Meshes[i]->GetMinX();
+			if (m_Meshes[i]->GetMax().x > m_Max.x) m_Max.x = m_Meshes[i]->GetMax().x;
+			if (m_Meshes[i]->GetMin().x < m_Min.x) m_Min.x = m_Meshes[i]->GetMin().x;
 
-			if (m_Meshes[i]->GetMaxY() > m_MaxY) m_MaxY = m_Meshes[i]->GetMaxY();
-			if (m_Meshes[i]->GetMinY() < m_MinY) m_MinY = m_Meshes[i]->GetMinY();
+			if (m_Meshes[i]->GetMax().y > m_Max.y) m_Max.y = m_Meshes[i]->GetMax().y;
+			if (m_Meshes[i]->GetMin().y < m_Min.y) m_Min.y = m_Meshes[i]->GetMin().y;
 
-			if (m_Meshes[i]->GetMaxZ() > m_MaxZ) m_MaxZ = m_Meshes[i]->GetMaxZ();
-			if (m_Meshes[i]->GetMinZ() < m_MinZ) m_MinZ = m_Meshes[i]->GetMinZ();
+			if (m_Meshes[i]->GetMax().z > m_Max.z) m_Max.z = m_Meshes[i]->GetMax().z;
+			if (m_Meshes[i]->GetMin().z < m_Min.z) m_Min.z = m_Meshes[i]->GetMin().z;
 		}
 	}
 	else

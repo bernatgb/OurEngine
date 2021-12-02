@@ -86,24 +86,27 @@ void Time::LimitFramerate()
 
 void Time::DrawImGui()
 {
-	if (ImGui::Checkbox("", &m_LimitFramerate)) {
-		SDL_GL_SetSwapInterval(m_LimitFramerate ? 0 : 1);
+	if (ImGui::CollapsingHeader("Time"))
+	{
+		if (ImGui::Checkbox("", &m_LimitFramerate)) {
+			SDL_GL_SetSwapInterval(m_LimitFramerate ? 0 : 1);
+		}
+		ImGui::SameLine();
+		ImGui::SliderInt("Max FPS", &m_MaxFPS, 10, 120);
+
+		ImGui::Text("Limiting to %i means each frame needs to take %f ms", m_MaxFPS, 1.0f / m_MaxFPS);
+		ImGui::Text("Last frame we delayed for %f", m_Delay);
+
+		ImGui::Text("Real time since start: %f; Real time dt: %f", Time::GetRealTimeSinceStartup(), Time::GetRealTimeDeltaTime());
+		ImGui::Text("Game time since start: %f; Game time dt: %f", Time::GetTime(), Time::GetDeltaTime());
+
+		ImGui::SliderFloat("Game clock scale", &m_TimeScale, 0.0f, 4.0f);
+
+		ImGui::Text("FPS: %f; Frame count: %d", Time::GetFPS(), Time::GetFrameCount());
+
+		ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f); //ImVec2(310, 100)
+		ImGui::PlotHistogram("##framerate", &m_DeltaTimeGraph[0], m_DeltaTimeGraph.size(), 0, "DeltaTime", 0.0f);
 	}
-	ImGui::SameLine();
-	ImGui::SliderInt("Max FPS", &m_MaxFPS, 10, 120);
-
-	ImGui::Text("Limiting to %i means each frame needs to take %f ms", m_MaxFPS, 1.0f / m_MaxFPS);
-	ImGui::Text("Last frame we delayed for %f", m_Delay);
-
-	ImGui::Text("Real time since start: %f; Real time dt: %f", Time::GetRealTimeSinceStartup(), Time::GetRealTimeDeltaTime());
-	ImGui::Text("Game time since start: %f; Game time dt: %f", Time::GetTime(), Time::GetDeltaTime());
-
-	ImGui::SliderFloat("Game clock scale", &m_TimeScale, 0.0f, 4.0f);
-
-	ImGui::Text("FPS: %f; Frame count: %d", Time::GetFPS(), Time::GetFrameCount());
-
-	ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f);
-	ImGui::PlotHistogram("##framerate", &m_DeltaTimeGraph[0], m_DeltaTimeGraph.size(), 0, "DeltaTime", 0.0f);
 }
 
 void Time::Shift() 

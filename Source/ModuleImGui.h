@@ -25,10 +25,6 @@ private:
 
 	//TODO: REMOVE
 	bool showInfoWindow;
-	bool showConsoleWindow;
-	bool showCameraWindow;
-	bool showModelWindow;
-	bool showTimeWindow;
 
 	bool autoScroll;
 };

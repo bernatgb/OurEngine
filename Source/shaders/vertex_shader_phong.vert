@@ -16,7 +16,7 @@ void main()
 {
 	gl_Position = proj * view * model * vec4(my_vertex_position, 1.0);
 	uv0 = vertex_uv0;
-	normal = vec3(view * transpose(inverse(model)) * vec4(vertex_normal, 0.0));
-	vec4 pos = view * model * vec4(my_vertex_position, 1.0);
-	position = vec3(pos) / pos.w;
+	normal = vec3(transpose(inverse(mat3(model))) * vertex_normal);
+	vec4 pos = model * vec4(my_vertex_position, 1.0);
+	position = vec3(pos);
 }

@@ -22,8 +22,8 @@ out vec4 color;
 void main()
 {
 	vec3 N = normalize(normal);
-	vec3 L = normalize(position - vec3(view * vec4(light_pos, 1.0)));
-	vec3 V = normalize(vec3(view * vec4(cam_pos, 1.0)) - position); // normalize(cam_pos - position)
+	vec3 L = normalize(position - light_pos);
+	vec3 V = normalize(cam_pos - position);
 	vec3 R = normalize(reflect(L, N));
 	//vec3 R = L - 2 * dot(N, L) * N;
 
