@@ -30,6 +30,8 @@ public:
 		return m_Max;
 	};
 
+	void DrawImGui();
+
 private:
 	unsigned int m_Vao;
 	unsigned int m_Vbo;

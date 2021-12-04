@@ -2,6 +2,10 @@
 #include "Application.h"
 #include "ModuleWindow.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 ModuleWindow::ModuleWindow()
 {
 }
@@ -17,7 +21,7 @@ bool ModuleWindow::Init()
 	MY_LOG("Init SDL window & surface");
 	bool ret = true;
 
-	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		MY_LOG("SDL_VIDEO could not initialize! SDL_Error: %s\n", SDL_GetError());
 		ret = false;
@@ -27,20 +31,27 @@ bool ModuleWindow::Init()
 		//Create window
 		width = SCREEN_WIDTH;
 		height = SCREEN_HEIGHT;
-		Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL; // | SDL_WINDOW_RESIZABLE;
+		Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 
-		if(FULLSCREEN == true)
+		if (FULLSCREEN == true)
 		{
-			flags |= SDL_WINDOW_FULLSCREEN;
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			fullscreen = true;
 		}
 		else
 		{
 			flags |= SDL_WINDOW_RESIZABLE;
+			fullscreen = false;
 		}
+
+		SDL_DisplayMode current;
+		SDL_GetCurrentDisplayMode(0, &current);
+		width = current.w * DEFAULT_SCREEN_RATIO;
+		height = current.h * DEFAULT_SCREEN_RATIO;
 
 		window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, flags);
 
-		if(window == NULL)
+		if (window == NULL)
 		{
 			MY_LOG("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 			ret = false;
@@ -48,7 +59,7 @@ bool ModuleWindow::Init()
 		else
 		{
 			//Get window surface
-			
+
 			screen_surface = SDL_GetWindowSurface(window);
 		}
 	}
@@ -62,7 +73,7 @@ bool ModuleWindow::CleanUp()
 	MY_LOG("Destroying SDL window and quitting all SDL systems");
 
 	//Destroy window
-	if(window != NULL)
+	if (window != NULL)
 	{
 		SDL_DestroyWindow(window);
 	}
@@ -78,11 +89,26 @@ void ModuleWindow::WindowResized(unsigned _width, unsigned _height)
 	height = _height;
 }
 
-// TODO
-/*void ModuleRender::WindowResized(unsigned width, unsigned height)
+void ModuleWindow::DrawImGui()
 {
-	aspect = width / height;
+	if (ImGui::CollapsingHeader("Window"))
+	{
+		if (ImGui::Checkbox("Fullscreen", &fullscreen)) {
+			if (fullscreen) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			else SDL_SetWindowFullscreen(window, 0);
+		}
 
-	ViewProjectionMatrix();
-}*/
+		ImGui::Separator();
+
+		ImGui::Text("Width: %i", width);
+		ImGui::Text("Height: %i", height);
+		
+		ImGui::Separator();
+
+		SDL_DisplayMode current;
+		SDL_GetCurrentDisplayMode(0, &current);
+		ImGui::Text("Screen width: %i", current.w);
+		ImGui::Text("Screen height: %i", current.h);
+	}
+}
 

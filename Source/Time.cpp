@@ -72,7 +72,7 @@ void Time::LimitFramerate()
 {
 	if (m_LimitFramerate) 
 	{
-		m_Delay = 1.0f / m_MaxFPS - ((SDL_GetTicks() - m_LastFrameTime) / 1000.0f);
+		m_Delay = 1000.0f / m_MaxFPS - (SDL_GetTicks() - m_LastFrameTime);
 		if (m_Delay > 0.0f)
 			SDL_Delay(m_Delay);
 	}
@@ -88,12 +88,12 @@ void Time::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Time"))
 	{
-		if (ImGui::Checkbox("", &m_LimitFramerate)) {
+		if (ImGui::Checkbox("Fix", &m_LimitFramerate)) {
 			SDL_GL_SetSwapInterval(m_LimitFramerate ? 0 : 1);
 		}
 		ImGui::SameLine();
 		ImGui::SliderInt("Max FPS", &m_MaxFPS, 10, 120);
-
+		
 		ImGui::Text("Limiting to %i means each frame needs to take %f ms", m_MaxFPS, 1.0f / m_MaxFPS);
 		ImGui::Text("Last frame we delayed for %f", m_Delay);
 

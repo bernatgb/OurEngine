@@ -6,7 +6,7 @@ class ModuleProgram : public Module
 {
 public:
 	ModuleProgram();
-	~ModuleProgram();
+	~ModuleProgram() override;
 
 	unsigned int CreateProgram(const char* vtx_shader_source, const char* frg_shader_source) const;
 };

@@ -67,8 +67,8 @@ bool ModuleRenderExercise::Init()
 	glGenerateTextureMipmap(texture);*/
 
 	MY_LOG("Shaders: Creating program");
-	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
-	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
+	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
+	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(pi / 4.0f),
@@ -76,7 +76,7 @@ bool ModuleRenderExercise::Init()
 
 	MY_LOG("Model: Model creation");
 
-	modelObj = new Model("BakerHouse.fbx");
+	modelObj = new Model(".\\BakerHouse.fbx");
 
 	return true;
 }
@@ -106,22 +106,43 @@ update_status ModuleRenderExercise::Update()
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
 
+
+	/*unsigned int loc;
+
 	float3 light_pos = float3(5.0f, 5.0f, 5.0f);
-	glUniform3fv(glGetUniformLocation(program, "light_pos"), 1, &light_pos[0]);
-	glUniform3fv(glGetUniformLocation(program, "cam_pos"), 1, &App->camera->eye[0]);
+	loc = glGetUniformLocation(program, "light_pos");
+	if (loc < 0) MY_LOG("Uniform location not found: light_pos");
+	glUniform3fv(loc, 1, &light_pos[0]);
+
+	loc = glGetUniformLocation(program, "cam_pos");
+	if (loc < 0) MY_LOG("Uniform location not found: cam_pos");
+	glUniform3fv(loc, 1, &App->camera->eye[0]);
 	
 	float3 color_a = float3(0.25f, 0.25f, 0.25f);
-	glUniform3fv(glGetUniformLocation(program, "color_a"), 1, &color_a[0]);
-	float3 color_l = float3(1.0f, 1.0f, 1.0f);
-	glUniform3fv(glGetUniformLocation(program, "color_l"), 1, &color_l[0]);
+	loc = glGetUniformLocation(program, "color_a");
+	if (loc < 0) MY_LOG("Uniform location not found: color_a");
+	glUniform3fv(loc, 1, &color_a[0]);
 
-	float kd = 0.75f;
-	glUniform1f(glGetUniformLocation(program, "kd"), kd);
+	float3 color_l = float3(1.0f, 1.0f, 1.0f);
+	loc = glGetUniformLocation(program, "color_l");
+	if (loc < 0) MY_LOG("Uniform location not found: color_l");
+	glUniform3fv(loc, 1, &color_l[0]);
+
+
+	float kd = 1.0f;
+	loc = glGetUniformLocation(program, "kd");
+	if (loc < 0) MY_LOG("Uniform location not found: kd");
+	glUniform1f(loc, kd);
+
 	float ks = 0.0f;
-	glUniform1f(glGetUniformLocation(program, "ks"), ks);
+	loc = glGetUniformLocation(program, "ks");
+	if (loc < 0) MY_LOG("Uniform location not found: ks");
+	glUniform1f(loc, ks);
+
 	float n = 0.0f;
-		int loc = glGetUniformLocation(program, "n");
-	glUniform1f(loc, n);
+	loc = glGetUniformLocation(program, "n");
+	if (loc < 0) MY_LOG("Uniform location not found: n");
+	glUniform1f(loc, n);*/
 
 	modelObj->Draw(program);
 

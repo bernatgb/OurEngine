@@ -13,7 +13,7 @@ public:
 	ModuleWindow();
 
 	// Destructor
-	virtual ~ModuleWindow();
+	virtual ~ModuleWindow() override;
 
 	// Called before quitting
 	bool Init();
@@ -22,6 +22,7 @@ public:
 	bool CleanUp();
 
 	void WindowResized(unsigned _width, unsigned _height);
+	void DrawImGui();
 
 public:
 	//The window we'll be rendering to
@@ -31,6 +32,8 @@ public:
 	SDL_Surface* screen_surface = NULL;
 
 	int width, height;
+
+	bool fullscreen;
 };
 
 #endif // __ModuleWindow_H__

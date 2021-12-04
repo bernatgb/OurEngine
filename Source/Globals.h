@@ -24,3 +24,6 @@ enum update_status
 #define TITLE "Super Awesome Engine"
 
 #define TEXTURES_FOLDER ".\\Assets\\Textures\\"
+#define GITHUB "https://github.com/miquelmiro3/MyEngine"
+#define LICENSE_DIR "..\\LICENSE"
+#define DEFAULT_SCREEN_RATIO 0.8

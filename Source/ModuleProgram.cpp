@@ -24,7 +24,7 @@ char* LoadShaderSource(const char* shader_file_name)
 	return data;
 }
 
-unsigned CompileShader(unsigned type, const char* source)
+unsigned CompileShader(unsigned type, const char* name, const char* source)
 {
 	unsigned shader_id = glCreateShader(type);
 	glShaderSource(shader_id, 1, &source, 0);
@@ -41,7 +41,7 @@ unsigned CompileShader(unsigned type, const char* source)
 			int written = 0;
 			char* info = (char*)malloc(len);
 			glGetShaderInfoLog(shader_id, len, &written, info);
-			MY_LOG("Log Info: %s", info);
+			MY_LOG("Log Info (%s): %s", name, info);
 			free(info);
 		}
 	}
@@ -58,8 +58,8 @@ ModuleProgram::~ModuleProgram()
 
 unsigned int ModuleProgram::CreateProgram(const char* vtx_shader_file_name, const char* frg_shader_file_name) const
 {
-	unsigned vtx_shader = CompileShader(GL_VERTEX_SHADER, LoadShaderSource(vtx_shader_file_name));
-	unsigned frg_shader = CompileShader(GL_FRAGMENT_SHADER, LoadShaderSource(frg_shader_file_name));
+	unsigned vtx_shader = CompileShader(GL_VERTEX_SHADER, vtx_shader_file_name, LoadShaderSource(vtx_shader_file_name));
+	unsigned frg_shader = CompileShader(GL_FRAGMENT_SHADER, frg_shader_file_name, LoadShaderSource(frg_shader_file_name));
 
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vtx_shader);

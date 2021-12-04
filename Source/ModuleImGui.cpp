@@ -27,6 +27,8 @@ ModuleImGui::~ModuleImGui()
 	{
 		delete[] * it;
 	}
+
+	delete[] license;
 }
 
 bool ModuleImGui::Init()
@@ -51,6 +53,20 @@ bool ModuleImGui::Init()
 
 	autoScroll = true;
 
+	FILE* file = nullptr;
+	fopen_s(&file, LICENSE_DIR, "rb");
+
+	if (file)
+	{
+		fseek(file, 0, SEEK_END);
+		int size = ftell(file);
+		license = (char*)malloc(size + 1);
+		fseek(file, 0, SEEK_SET);
+		fread(license, 1, size, file);
+		license[size] = 0;
+		fclose(file);
+	}
+
 	return true;
 }
 
@@ -60,6 +76,52 @@ update_status ModuleImGui::PreUpdate()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
+	//dockerspace
+	constexpr ImGuiWindowFlags dockspace_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+		ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
+
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+	ImGui::Begin("Dockspace", nullptr, dockspace_flags);
+	ImGui::PopStyleVar(3);
+
+	const ImGuiID dockSpaceId = ImGui::GetID("DockspaceID");
+
+	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Menu"))
+		{
+			if (ImGui::MenuItem("Github"))
+				ShellExecute(0, 0, GITHUB, 0, 0, SW_SHOW);
+			ImGui::MenuItem("About", NULL, &about);
+			ImGui::MenuItem("Config", NULL, &config);
+			if (ImGui::MenuItem("Quit"))
+				return UPDATE_STOP;
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Windows"))
+		{
+			ImGui::MenuItem("Console", NULL, &console);
+			ImGui::MenuItem("Inspector", NULL, &inspector);
+			ImGui::MenuItem("Hierarchy (in progress)", NULL, &hierarchy);
+			ImGui::EndMenu();
+		}
+	}
+	ImGui::EndMainMenuBar();
+
+	ImGui::End();
+
 	return UPDATE_CONTINUE;
 }
 
@@ -67,43 +129,22 @@ update_status ModuleImGui::Update()
 {
 	//ImGui::ShowDemoWindow();
 
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("Config"))
-				config = !config;
-			if (ImGui::MenuItem("Quit"))
-				return UPDATE_STOP;
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Windows"))
-		{
-			if (ImGui::MenuItem("Console"))
-				console = !console;
-			if (ImGui::MenuItem("Inspector"))
-				inspector = !inspector;
-			if (ImGui::MenuItem("Hierarchy (in progress)"))
-				hierarchy = !hierarchy;
-			ImGui::EndMenu();
-		}
-	}
-	ImGui::EndMainMenuBar();
-
 	//ImageButton()
 
 	if (console)
 		Console(console);
 
+	if (about)
+		About(about);
+
 	if (config)
 	{
 		if (ImGui::Begin("Config", &config))
 		{
-			//SDL_SetWindowFullscreen();
-
-			About();
 			Time::DrawImGui();
 			App->camera->DrawImGui();
+			App->window->DrawImGui();
+			SoftwareAndHardware();
 		}
 		ImGui::End();
 	}
@@ -122,49 +163,53 @@ update_status ModuleImGui::Update()
 
 update_status ModuleImGui::PostUpdate()
 {
+	/*ImGuiIO& io = ImGui::GetIO();
+
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		const auto win = SDL_GL_GetCurrentWindow();
+		const auto ctx = SDL_GL_GetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		SDL_GL_MakeCurrent(win, ctx);
+	}*/
+
 	return UPDATE_CONTINUE;
 }
 
-void ModuleImGui::About()
+void ModuleImGui::About(bool& show)
 {
-	if (ImGui::CollapsingHeader("About"))
+	if (ImGui::Begin("About", &show))
 	{
-		ImGui::BulletText("Engine name: ");
-		ImGui::SameLine();
+		ImGui::Text("Engine name:");
+		ImGui::Indent();
 		ImGui::Text(TITLE);
-		ImGui::BulletText("Author: miquelmiro3");
-		ImGui::BulletText("Description: This is MyEngine");
-		ImGui::BulletText("Libraries: SDL, glew, ImGui, MathGeoLab, DevIL, Assimp, ...");
-		ImGui::BulletText("License: MIT License");
+		ImGui::Unindent();
+
+		ImGui::Text("Author:");
+		ImGui::Indent();
+		ImGui::Text("miquelmiro3");
+		ImGui::Unindent();
+
+		ImGui::Text("Description:");
+		ImGui::Indent();
+		ImGui::Text("This is MyEngine");
+		ImGui::Unindent();
+
 		if (ImGui::Button("Github"))
-			ShellExecute(0, 0, "https://github.com/miquelmiro3/MyEngine", 0, 0, SW_SHOW);
+			ShellExecute(0, 0, GITHUB, 0, 0, SW_SHOW);
 		ImGui::SameLine();
-		ImGui::Text("https://github.com/miquelmiro3/MyEngine");
+		ImGui::Text(GITHUB);
 
 		ImGui::Separator();
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::TextWrapped("License");
 
-		ImGui::Separator();
-
-		SDL_version version;
-		SDL_GetVersion(&version);
-		int vram_free, vram_budget;
-		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_free);
-		glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
-		float vram_budget_mb = vram_budget / 1024.0f;
-		float vram_free_mb = vram_free / 1024.0f;
-		float vram_usage_mb = vram_budget_mb - vram_free_mb;
-
-		ImGui::Text("SDL Version: %d.%d.%d", version.major, version.minor, version.patch);
-		ImGui::Text("CPUs: %d", SDL_GetCPUCount());
-		ImGui::Text("System RAM: %.1f Gb", SDL_GetSystemRAM() / 1024.0f);
-		ImGui::Text("GPU: %s", (unsigned char*)glGetString(GL_RENDERER));
-		ImGui::Text("Brand: %s", (unsigned char*)glGetString(GL_VENDOR));
-		ImGui::Text("VRAM Budget: %.1f Mb", vram_budget_mb);
-		ImGui::Text("Vram Usage: %.1f Mb", vram_usage_mb);
-		ImGui::Text("Vram Avaliable: %.1f Mb", vram_free_mb);
+		ImGui::Indent();
+		ImGui::TextWrapped(license);
+		ImGui::Unindent();
 	}
+	ImGui::End();
 }
 
 void ModuleImGui::Console(bool& show)
@@ -202,4 +247,41 @@ void ModuleImGui::Console(bool& show)
 
 	}
 	ImGui::End();
+}
+
+void ModuleImGui::SoftwareAndHardware()
+{
+	if (ImGui::CollapsingHeader("About Software & Hardware"))
+	{
+		ImGui::TextWrapped("Libraries");
+
+		ImGui::BulletText("Assimp v 143");
+		ImGui::BulletText("DevIL v 1.8.0");
+		ImGui::BulletText("Glew v 2.1.0");
+		ImGui::BulletText("ImGui v 1.86 WIP");
+		ImGui::BulletText("MathGeoLib v 1.5");
+		ImGui::BulletText("SDL v 2.0.16");
+
+		ImGui::Separator();
+
+		ImGui::TextWrapped("Hardware");
+
+		SDL_version version;
+		SDL_GetVersion(&version);
+		int vram_free, vram_budget;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &vram_free);
+		glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &vram_budget);
+		float vram_budget_mb = vram_budget / 1024.0f;
+		float vram_free_mb = vram_free / 1024.0f;
+		float vram_usage_mb = vram_budget_mb - vram_free_mb;
+
+		//ImGui::Text("SDL Version: %d.%d.%d", version.major, version.minor, version.patch);
+		ImGui::BulletText("CPUs: %d", SDL_GetCPUCount());
+		ImGui::BulletText("System RAM: %.1f Gb", SDL_GetSystemRAM() / 1024.0f);
+		ImGui::BulletText("GPU: %s", (unsigned char*)glGetString(GL_RENDERER));
+		ImGui::BulletText("Brand: %s", (unsigned char*)glGetString(GL_VENDOR));
+		ImGui::BulletText("VRAM Budget: %.1f Mb", vram_budget_mb);
+		ImGui::BulletText("Vram Usage: %.1f Mb", vram_usage_mb);
+		ImGui::BulletText("Vram Avaliable: %.1f Mb", vram_free_mb);
+	}
 }

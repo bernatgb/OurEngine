@@ -5,6 +5,10 @@
 
 #include <assert.h> 
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 Mesh::Mesh(aiMesh* _mesh)
 {
 	m_NumVertices = _mesh->mNumVertices;
@@ -106,4 +110,14 @@ void Mesh::Draw() const
 {
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, m_NumIndices, GL_UNSIGNED_INT, nullptr);
+}
+
+void Mesh::DrawImGui()
+{
+	ImGui::Text("Material index: %i", m_MaterialIndex);
+	ImGui::Text("Num vertices: %i", m_NumVertices);
+	ImGui::Text("Num indices: %i", m_NumIndices);
+
+	ImGui::Text("Min point: %f %f %f", m_Min.x, m_Min.y, m_Min.z);
+	ImGui::Text("Max point: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
 }

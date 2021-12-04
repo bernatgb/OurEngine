@@ -11,7 +11,7 @@ class ModuleCamera : public Module
 {
 public:
 	ModuleCamera();
-	~ModuleCamera();
+	~ModuleCamera() override;
 
 	bool Init();
 	update_status Update();
@@ -21,12 +21,14 @@ public:
 	void AdjustToModel(Model* _model);
 
 	float4x4 view, proj;
-	float4x4 m_RotationMatrix;
-	float3x3 rotationMatrix;
-	float3 eye, target;
+	float3 eye;
 
 private:
 	void ViewProjectionMatrix();
+	void Rotate(float _deltaPitch, float _deltaYaw);
+
+	Quat m_CameraRotation;
+	float3 m_PitchYawRoll;
 
 	Frustum frustum;
 	float aspect;

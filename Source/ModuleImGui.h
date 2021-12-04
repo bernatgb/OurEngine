@@ -5,7 +5,7 @@ class ModuleImGui : public Module
 {
 public:
 	ModuleImGui();
-	~ModuleImGui();
+	~ModuleImGui() override;
 
 	bool Init();
 	update_status PreUpdate();
@@ -15,16 +15,20 @@ public:
 	std::list<char*> Items;
 
 private:
-	void About();
+	void About(bool& show);
 	void Console(bool& show);
+	void SoftwareAndHardware();
 
 	bool inspector;
 	bool hierarchy;
 	bool config;
 	bool console;
+	bool about;
 
 	//TODO: REMOVE
 	bool showInfoWindow;
 
 	bool autoScroll;
+
+	char* license;
 };

@@ -29,22 +29,21 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 
-	MY_LOG("Assimp texture: Loading model from the path described in the FBX");
+	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
 	if (!App->texture->LoadTextureData(_fileName, width, height, depth, format))
 	{
-		MY_LOG("Assimp texture: Loading model from the same folder you of the FBX");
-
 		std::string directoryPath = _fullPath;
-		directoryPath = directoryPath.substr(0, directoryPath.rfind('\\'));
-		directoryPath += '\\' + _fileName;
-
+		const size_t last_slash_idx = directoryPath.rfind('\\');
+		if (std::string::npos != last_slash_idx)
+			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + _fileName;
+		
+		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
 		if (!App->texture->LoadTextureData(directoryPath.c_str(), width, height, depth, format))
 		{
-
 			directoryPath = TEXTURES_FOLDER;
 			directoryPath += _fileName;
 
-			MY_LOG("Assimp texture: Loading model from the Textures/ folder");
+			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
 			if (!App->texture->LoadTextureData(directoryPath.c_str(), width, height, depth, format))
 			{
 				MY_LOG("Assimp texture: Texture couldn't be loaded");

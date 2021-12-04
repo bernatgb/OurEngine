@@ -84,12 +84,7 @@ void Model::DrawImGui()
 	ImGui::Text("Name: %s", m_Name);
 	ImGui::Text("Num vertices: %i", m_NumVertices);
 	ImGui::Text("Num triangles: %i", m_NumTriangles);
-	ImGui::Text("Textures:");
-	for (unsigned int i = 0; i < m_Textures.size(); ++i)
-	{
-		m_Textures[i]->DrawImGui();
-	}
-	ImGui::Separator();
+
 	if (ImGui::CollapsingHeader("Transform"))
 	{
 		ImGui::Text("In progress");
@@ -106,6 +101,25 @@ void Model::DrawImGui()
 		if (ImGui::SliderFloat3("Scale", &m_Scale[0], -10.0f, 10.0f))
 		{
 			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Meshes"))
+	{
+		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
+		{
+			ImGui::Text("Mesh %i:", i);
+			ImGui::Indent();
+			m_Meshes[i]->DrawImGui();
+			ImGui::Unindent();
+		}
+	}
+
+	if (ImGui::CollapsingHeader("Textures"))
+	{
+		for (unsigned int i = 0; i < m_Textures.size(); ++i)
+		{
+			m_Textures[i]->DrawImGui();
 		}
 	}
 }
