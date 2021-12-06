@@ -25,5 +25,9 @@ private:
 	unsigned int vBuffer;
 	unsigned int texture;
 	
+	unsigned int fbo;
+	unsigned int fbo_texture;
+	unsigned int rbo;
+
 	float4x4 model;
 };

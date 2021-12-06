@@ -36,7 +36,7 @@ void main()
 	if (lambert > 0.0) 
 	{
 		aux_color += (kd * color_d * color_l * lambert);
-		aux_color += (ks * color_l * pow(max(dot(V, R), 0.0), n));
+		aux_color += (ks * color_l * pow(max(dot(V, R), 0.0001), n));
 	}
 	color = vec4(aux_color, 1.0);
 

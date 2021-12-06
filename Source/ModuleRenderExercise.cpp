@@ -67,8 +67,8 @@ bool ModuleRenderExercise::Init()
 	glGenerateTextureMipmap(texture);*/
 
 	MY_LOG("Shaders: Creating program");
-	program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader.vert", "..\\Source\\shaders\\fragment_shader.frag");
-	//program = App->program->CreateProgram("..\\Source\\shaders\\vertex_shader_phong.vert", "..\\Source\\shaders\\fragment_shader_phong.frag");
+	program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
+	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag");
 
 	model = float4x4::FromTRS(float3(2.0f, 0.0f, 0.0f),
 		float4x4::RotateZ(pi / 4.0f),
@@ -76,7 +76,34 @@ bool ModuleRenderExercise::Init()
 
 	MY_LOG("Model: Model creation");
 
-	modelObj = new Model(".\\BakerHouse.fbx");
+	modelObj = new Model(".\\assets\\Models\\BakerHouse.fbx");
+
+	//FBO
+	/*glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	//FBO texture color
+	glGenTextures(1, &fbo_texture);
+	glBindTexture(GL_TEXTURE_2D, fbo_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_texture, 0);
+
+	//FBO render buffer
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		MY_LOG("ERROR: Framebuffer is not complete!");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
 
 	return true;
 }
@@ -101,6 +128,9 @@ update_status ModuleRenderExercise::Update()
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		//glDisableVertexAttribArray(0);
 	}*/
+
+	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	//glClearFramebuffer
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
@@ -146,6 +176,8 @@ update_status ModuleRenderExercise::Update()
 
 	modelObj->Draw(program);
 
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	return UPDATE_CONTINUE;
 }
 
@@ -159,11 +191,24 @@ bool ModuleRenderExercise::CleanUp()
 
 	//glDeleteTextures(1, &texture);
 
+	glDeleteFramebuffers(1, &fbo);
+	glDeleteTextures(1, &fbo_texture);
+
 	return true;
 }
 
 void ModuleRenderExercise::DrawModelImGui()
 {
+	/*ImGui::Begin("Scene Window");
+
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+
+	ImGui::GetWindowDrawList()->AddImage(
+		(void*)fbo_texture, ImVec2(ImGui::GetCursorScreenPos()),
+		ImVec2(ImGui::GetCursorScreenPos().x + window.getWidth() / 2, ImGui::GetCursorScreenPos().y + window.getHeight() / 2), ImVec2(0, 1), ImVec2(1, 0));
+
+	ImGui::End();*/
+
 	modelObj->DrawImGui();
 }
 
