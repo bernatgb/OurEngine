@@ -79,7 +79,7 @@ bool ModuleRenderExercise::Init()
 	modelObj = new Model(".\\assets\\Models\\BakerHouse.fbx");
 
 	//FBO
-	/*glGenFramebuffers(1, &fbo);
+	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	//FBO texture color
@@ -103,13 +103,21 @@ bool ModuleRenderExercise::Init()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		MY_LOG("ERROR: Framebuffer is not complete!");
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	return true;
 }
 
 update_status ModuleRenderExercise::Update()
 {
+	ImGui::Begin("Scene");
+
+	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	float x = viewportPanelSize.x, y = viewportPanelSize.y;
+	glViewport(0, 0, x, y);
+
+	//App->renderer->Resize(x, y);
+
 	/*glGenBuffers(1, &vBuffer);
 
 	glEnableVertexAttribArray(0);
@@ -129,8 +137,8 @@ update_status ModuleRenderExercise::Update()
 		//glDisableVertexAttribArray(0);
 	}*/
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	//glClearFramebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
@@ -176,7 +184,10 @@ update_status ModuleRenderExercise::Update()
 
 	modelObj->Draw(program);
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	ImGui::Image((void*)fbo_texture, ImVec2{ x, y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+	ImGui::End();
 
 	return UPDATE_CONTINUE;
 }
@@ -193,6 +204,7 @@ bool ModuleRenderExercise::CleanUp()
 
 	glDeleteFramebuffers(1, &fbo);
 	glDeleteTextures(1, &fbo_texture);
+	glDeleteRenderbuffers(1, &rbo);
 
 	return true;
 }

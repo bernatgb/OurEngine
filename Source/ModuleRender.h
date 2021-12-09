@@ -9,6 +9,8 @@ struct SDL_Texture;
 struct SDL_Renderer;
 struct SDL_Rect;
 
+class CubeMap;
+
 class ModuleRender : public Module
 {
 public:
@@ -23,4 +25,13 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 
 	void* context;
+
+private:
+	unsigned int program;
+
+	unsigned int fbo;
+	unsigned int fbo_texture;
+	unsigned int rbo;
+
+	CubeMap* cubeMap;
 };

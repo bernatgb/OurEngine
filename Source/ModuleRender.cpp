@@ -6,6 +6,8 @@
 #include "ModuleProgram.h"
 #include "ModuleDebugDraw.h"
 #include "ModuleCamera.h"
+#include "ModuleScene.h"
+#include "CubeMap.h"
 #include "SDL.h"
 #include "GL/glew.h"
 #include <MathGeoLib.h>
@@ -118,6 +120,54 @@ bool ModuleRender::Init()
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
+	// Framebuffer
+
+	MY_LOG("Shaders: Creating program");
+	program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
+	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag");
+
+	MY_LOG("Framebuffer: Creating framebuffer");
+	//FBO
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	//FBO texture color
+	glGenTextures(1, &fbo_texture);
+	glBindTexture(GL_TEXTURE_2D, fbo_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_texture, 0);
+
+	//FBO render buffer
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		MY_LOG("ERROR: Framebuffer is not complete!");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//Create cube map
+	std::vector<std::string> faces
+	{
+		".\\assets\\Textures\\Skybox\\right.jpg",
+		".\\assets\\Textures\\Skybox\\left.jpg",
+		".\\assets\\Textures\\Skybox\\top.jpg",
+		".\\assets\\Textures\\Skybox\\bottom.jpg",
+		".\\assets\\Textures\\Skybox\\front.jpg",
+		".\\assets\\Textures\\Skybox\\back.jpg"
+	};
+
+	cubeMap = new CubeMap();
+	cubeMap->LoadTexture(faces);
+
 	return true;
 }
 
@@ -136,13 +186,86 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
+	ImGui::Begin("Scene");
+
+	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+	float x = viewportPanelSize.x, y = viewportPanelSize.y;
+	glViewport(0, 0, x, y);
+
+	{//Resize textures
+		glBindTexture(GL_TEXTURE_2D, fbo_texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, x, y);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+	App->camera->WindowResized(x, y);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(program);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
+
+
+	
+	/*unsigned int loc;
+
+	float3 light_pos = float3(5.0f, 5.0f, 5.0f);
+	loc = glGetUniformLocation(program, "light_pos");
+	if (loc < 0) MY_LOG("Uniform location not found: light_pos");
+	glUniform3fv(loc, 1, &light_pos[0]);
+
+	loc = glGetUniformLocation(program, "cam_pos");
+	if (loc < 0) MY_LOG("Uniform location not found: cam_pos");
+	glUniform3fv(loc, 1, &App->camera->eye[0]);
+
+	float3 color_a = float3(0.25f, 0.25f, 0.25f);
+	loc = glGetUniformLocation(program, "color_a");
+	if (loc < 0) MY_LOG("Uniform location not found: color_a");
+	glUniform3fv(loc, 1, &color_a[0]);
+
+	float3 color_l = float3(1.0f, 1.0f, 1.0f);
+	loc = glGetUniformLocation(program, "color_l");
+	if (loc < 0) MY_LOG("Uniform location not found: color_l");
+	glUniform3fv(loc, 1, &color_l[0]);
+
+
+	float kd = 1.0f;
+	loc = glGetUniformLocation(program, "kd");
+	if (loc < 0) MY_LOG("Uniform location not found: kd");
+	glUniform1f(loc, kd);
+
+	float ks = 0.0f;
+	loc = glGetUniformLocation(program, "ks");
+	if (loc < 0) MY_LOG("Uniform location not found: ks");
+	glUniform1f(loc, ks);
+
+	float n = 0.0f;
+	loc = glGetUniformLocation(program, "n");
+	if (loc < 0) MY_LOG("Uniform location not found: n");
+	glUniform1f(loc, n);
+	*/
+
+	App->scene->Draw(program);
+	App->debugDraw->Draw(App->camera->view, App->camera->proj, App->window->width, App->window->height);
+
+	// Draw cubemap
+	cubeMap->Draw(0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	ImGui::Image((void*)fbo_texture, ImVec2{ x, y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+	ImGui::End();
+
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleRender::PostUpdate()
 {
-	App->debugDraw->Draw(App->camera->view, App->camera->proj, App->window->width, App->window->height);
-
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -155,6 +278,17 @@ update_status ModuleRender::PostUpdate()
 bool ModuleRender::CleanUp()
 {
 	MY_LOG("Destroying renderer");
+
+	//Destroy program
+	glDeleteProgram(program);
+
+	//Destroy framebuffer
+	glDeleteRenderbuffers(1, &rbo);
+	glDeleteTextures(1, &fbo_texture);
+	glDeleteFramebuffers(1, &fbo);
+
+	//Destroy cubemap
+	delete cubeMap;
 
 	//Destroy window
 	SDL_GL_DeleteContext(context);

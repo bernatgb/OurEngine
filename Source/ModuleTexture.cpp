@@ -2,7 +2,7 @@
 
 #include "IL/il.h"
 #include "IL/ilu.h"
-#include "GL/glew.h"
+
 
 ModuleTexture::ModuleTexture()
 {
@@ -19,7 +19,7 @@ bool ModuleTexture::Init()
 	return true;
 }
 
-bool ModuleTexture::LoadTextureData(const char* source)
+bool ModuleTexture::LoadTextureData(const char* source, GLenum target)
 {
 	unsigned int texture;
 	ilGenImages(1, &texture);
@@ -32,16 +32,16 @@ bool ModuleTexture::LoadTextureData(const char* source)
 
 	ILinfo textureInfo;
 	iluGetImageInfo(&textureInfo);
-	if (textureInfo.Origin == IL_ORIGIN_UPPER_LEFT)
-		iluFlipImage();
+	//if (textureInfo.Origin == IL_ORIGIN_UPPER_LEFT)
+	//	iluFlipImage();
 
-	glTexImage2D(GL_TEXTURE_2D, 0, textureInfo.Format, textureInfo.Width, textureInfo.Height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(target, 0, textureInfo.Format, textureInfo.Width, textureInfo.Height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
 
 	ilDeleteImages(1, &texture);
 	return true;
 }
 
-bool ModuleTexture::LoadTextureData(const char* source, unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format)
+bool ModuleTexture::LoadTextureData(const char* source, unsigned int& width, unsigned int& height, unsigned int& depth, unsigned int& format, GLenum target)
 {
 	unsigned int texture;
 	ilGenImages(1, &texture);
@@ -62,7 +62,7 @@ bool ModuleTexture::LoadTextureData(const char* source, unsigned int& width, uns
 	depth = textureInfo.Depth;
 	format = textureInfo.Format;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, textureInfo.Format, width, height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(target, 0, textureInfo.Format, width, height, 0, textureInfo.Format, GL_UNSIGNED_BYTE, data);
 
 	ilDeleteImages(1, &texture);
 	return true;

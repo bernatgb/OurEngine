@@ -2,7 +2,7 @@
 #include "Application.h"
 #include "ModuleImGui.h"
 #include "ModuleRender.h"
-#include "ModuleRenderExercise.h"
+#include "ModuleScene.h"
 #include "ModuleWindow.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
@@ -44,10 +44,10 @@ bool ModuleImGui::Init()
 
 	ImGui::StyleColorsDark();
 
-	inspector = false;
-	hierarchy = false;
+	inspector = true;
+	hierarchy = true;
 	config = false;
-	console = false;
+	console = true;
 
 	showInfoWindow = false;
 
@@ -153,7 +153,16 @@ update_status ModuleImGui::Update()
 	{
 		if (ImGui::Begin("Inspector", &inspector))
 		{
-			App->rendererExercise->DrawModelImGui();
+			App->scene->DrawImGuiModel();
+		}
+		ImGui::End();
+	}
+
+	if (hierarchy)
+	{
+		if (ImGui::Begin("Hierarchy", &hierarchy))
+		{
+			App->scene->DrawImGuiHierarchy();
 		}
 		ImGui::End();
 	}

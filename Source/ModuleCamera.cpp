@@ -3,7 +3,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
-#include "ModuleRenderExercise.h"
+#include "ModuleScene.h"
 #include "SDL.h"
 
 #include "imgui.h"
@@ -129,7 +129,7 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		float4 target = App->rendererExercise->modelObj->GetCenter();
+		float4 target = App->scene->modelObj->GetCenter();
 
 		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
 
@@ -164,7 +164,7 @@ update_status ModuleCamera::Update()
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_F)) 
 	{
-		AdjustToModel(App->rendererExercise->modelObj);
+		AdjustToModel(App->scene->modelObj);
 	}
 
 	return UPDATE_CONTINUE;
@@ -186,6 +186,8 @@ void ModuleCamera::AdjustToModel(Model* _model)
 {
 	float4 newPos = _model->GetCenter();
 	eye = float3(newPos.x, newPos.y, newPos.z) - m_CameraRotation.WorldZ().Normalized() * _model->GetDiameter();
+
+	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
 
 	ViewProjectionMatrix();
 }

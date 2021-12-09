@@ -4,7 +4,7 @@
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
-#include "ModuleRenderExercise.h"
+#include "ModuleScene.h"
 
 ModuleInput::ModuleInput()
 {}
@@ -77,7 +77,7 @@ update_status ModuleInput::Update()
                 break;
             case SDL_DROPFILE: {
                 MY_LOG("File dropped %s", sdlEvent.drop.file);
-                App->rendererExercise->LoadModel(sdlEvent.drop.file);
+                App->scene->LoadModel(sdlEvent.drop.file);
                 SDL_free(sdlEvent.drop.file);
                 break;
             }
