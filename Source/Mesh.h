@@ -32,6 +32,7 @@ public:
 	};
 
 	void DrawImGui();
+	void PrintBB() const; //TODO: REMOVE
 
 private:
 	unsigned int m_Vao;
@@ -41,6 +42,7 @@ private:
 	unsigned int m_NumVertices;
 	unsigned int m_NumIndices;
 
+	//unsigned int m_VaoBB;
 	unsigned int m_VboBB;
 
 	float3 m_Min;

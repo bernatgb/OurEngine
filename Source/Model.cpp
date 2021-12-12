@@ -27,6 +27,7 @@ Model::Model(const char* _fileName)
 	if (scene)
 	{
 		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
+		//LoadMeshes(scene->mMeshes, 1);
 		LoadTextures(scene->mMaterials, scene->mNumMaterials);
 
 		m_Min = m_Meshes[0]->GetLocalMin();

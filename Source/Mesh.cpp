@@ -24,7 +24,6 @@ Mesh::Mesh(aiMesh* _mesh)
 	unsigned int buffer_size = vertex_size * m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
-
 	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer_size, GL_MAP_WRITE_BIT));
 	
 	m_Min = float3(_mesh->mVertices[0].x, _mesh->mVertices[0].y, _mesh->mVertices[0].z);
@@ -120,6 +119,16 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	/*glGenVertexArrays(1, &m_VaoBB);
+
+	glBindVertexArray(m_VaoBB);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindVertexArray(0);*/
+
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -130,6 +139,7 @@ Mesh::~Mesh()
 	glDeleteVertexArrays(1, &m_Vao);
 
 	glDeleteBuffers(1, &m_VboBB);
+	//glDeleteVertexArrays(1, &m_VaoBB);
 }
 
 void Mesh::Draw() const
@@ -179,6 +189,9 @@ void Mesh::DrawBB() const
 
 	glDeleteBuffers(1, &aux);*/
 
+	MY_LOG("%f", m_Min.x);
+	PrintBB();
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -195,4 +208,20 @@ void Mesh::DrawImGui()
 
 	ImGui::Text("Min point: %f %f %f", m_Min.x, m_Min.y, m_Min.z);
 	ImGui::Text("Max point: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
+}
+
+void Mesh::PrintBB() const
+{
+	//TEST
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
+
+	float* pointer = (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, 42 * sizeof(float), GL_MAP_WRITE_BIT));
+
+	MY_LOG("-------------------------MESH---------------------------");
+	for (unsigned int i = 0; i < 14; ++i)
+	{
+		MY_LOG("%f %f %f", *(pointer++), *(pointer++), *(pointer++));
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	//
 }
