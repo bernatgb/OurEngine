@@ -7,6 +7,8 @@
 #include "Math/float3x3.h"
 #include "Geometry/Frustum.h"
 
+class CCamera;
+
 class ModuleCamera : public Module
 {
 public:
@@ -18,14 +20,18 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 	void DrawImGui();
 
+	void ViewProjectionMatrix();
 	void AdjustToModel(Model* _model);
+
+	void SetCurrentCamera(CCamera* _camera);
 
 	float4x4 view, proj;
 	float3 eye;
 
 private:
-	void ViewProjectionMatrix();
 	void Rotate(float _deltaPitch, float _deltaYaw);
+
+	CCamera* m_CurrentCamera;
 
 	Quat m_CameraRotation;
 	float3 m_PitchYawRoll;

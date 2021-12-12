@@ -2,6 +2,10 @@
 
 #include "Application.h"
 #include "ModuleCamera.h"
+#include "ModuleInput.h"
+
+#include "SDL.h"
+#include "CCamera.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -19,28 +23,110 @@ bool ModuleScene::Init()
 {
 	MY_LOG("Model: Model creation");
 
-	modelObj = new Model(".\\assets\\Models\\BakerHouse.fbx");
+    models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
+    activeModel = 0;
 
 	m_Root = new GameObject("Root", nullptr);
+    m_GOSelected = nullptr;
+
+    GameObject* camera = m_Root->AddChild("Camera");
+    camera->AddComponent(new CCamera(true, camera));
+
+    SelectGameObject(models[activeModel]->ExportToGO(m_Root));
 
 	return true;
 }
 
 bool ModuleScene::CleanUp()
 {
-	delete modelObj;
+    delete m_Root;
+
+    for (unsigned int i = 0; i < models.size(); ++i)
+        delete models[i];
 
 	return true;
 }
 
 void ModuleScene::DrawImGuiModel()
 {
-	modelObj->DrawImGui();
+    if (m_GOSelected != nullptr) 
+        m_GOSelected->DrawImGui();
+}
+
+void ModuleScene::SelectGameObject(GameObject* go)
+{
+    if (m_GOSelected != nullptr && go != m_GOSelected)
+        m_GOSelected->m_Selected = false;
+
+    go->m_Selected = !go->m_Selected;
+    if (go->m_Selected)
+        m_GOSelected = go;
+    else
+        m_GOSelected = nullptr;
+}
+
+void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
+{
+    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;
+
+    if (go->m_Selected)
+        node_flags |= ImGuiTreeNodeFlags_Selected;
+
+    if (go->m_Children.size() <= 0)
+        node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+
+    bool node_open = ImGui::TreeNodeEx(go, node_flags, go->m_Name);
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+        node_clicked = go;
+    if (ImGui::BeginDragDropSource())
+    {
+        ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+        ImGui::Text("This is a drag and drop source");
+        ImGui::EndDragDropSource();
+    }
+
+    if (node_open && go->m_Children.size() > 0)
+    {
+        for (int i = 0; i < go->m_Children.size(); ++i)
+        {
+            RecursiveHierarchy(go->m_Children[i], node_clicked);
+        }
+        ImGui::TreePop();
+    }
 }
 
 void ModuleScene::DrawImGuiHierarchy()
 {
-    if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
+    if (ImGui::Button("Create a new Prefab of the model"))
+    {
+        models[activeModel]->ExportToGO(m_Root);
+    }
+
+    ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
+    if (ImGui::TreeNode("Root"))
+    {
+        static int selection_mask = 0;
+
+        GameObject* node_clicked = nullptr;
+        for (unsigned int i = 0; i < m_Root->m_Children.size(); ++i)
+            RecursiveHierarchy(m_Root->m_Children[i], node_clicked);
+
+        if (node_clicked != nullptr)
+        {
+            SelectGameObject(node_clicked);
+
+            /*
+            // Update selection state
+            if (ImGui::GetIO().KeyCtrl)
+                selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
+            else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
+                selection_mask = (1 << node_clicked);           // Click to single-select
+            */
+        }
+        ImGui::TreePop();
+    }
+
+    /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
     {
         static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;
         static bool test_drag_and_drop = false;
@@ -131,18 +217,46 @@ void ModuleScene::DrawImGuiHierarchy()
             }
         }
         ImGui::TreePop();
-    }
+    }*/
 }
 
 void ModuleScene::Draw(unsigned int program)
 {
-	modelObj->Draw(program);
+    m_Root->Update();
+
+    if (App->input->GetKey(SDL_SCANCODE_DELETE) && m_GOSelected != nullptr)
+    {
+        m_GOSelected->m_Parent->DeleteChild(m_GOSelected);
+        m_GOSelected = nullptr;
+    }
 }
 
 void ModuleScene::LoadModel(const char* _fileName)
 {
-    delete modelObj;
-    modelObj = new Model(_fileName);
+    activeModel = -1;
+    for (unsigned int i = 0; i < models.size(); ++i)
+    {
+        unsigned int j = 0;
+        while (models[i]->m_Name[j] == _fileName[j]) {
+            if (models[i]->m_Name[j] == '\0' && _fileName[j] == '\0') 
+            {
+                activeModel = i;
+                break;
+            }
+            ++j;
+        }
 
-    App->camera->AdjustToModel(modelObj);
+        if (activeModel != -1)
+            break;
+    }
+
+    if (activeModel == -1) 
+    {
+        models.push_back(new Model(_fileName));
+        activeModel = models.size()-1;
+    }
+
+    SelectGameObject(models[activeModel]->ExportToGO(m_Root));
+
+    App->camera->AdjustToModel(models[activeModel]);
 }

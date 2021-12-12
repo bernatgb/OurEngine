@@ -25,7 +25,7 @@ ModuleImGui::~ModuleImGui()
 
 	for (std::list<char*>::iterator it = Items.begin(); it != Items.end(); ++it)
 	{
-		delete[] * it;
+		free(*it);
 	}
 
 	delete[] license;
@@ -166,6 +166,8 @@ update_status ModuleImGui::Update()
 		}
 		ImGui::End();
 	}
+
+	ImGui::EndFrame();
 
 	return UPDATE_CONTINUE;
 }

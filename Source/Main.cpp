@@ -3,6 +3,13 @@
 #include "ModuleRender.h"
 #include "Globals.h"
 
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define DEBUG_NEW new( _NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif
+
 #include "SDL/include/SDL.h"
 #pragma comment( lib, "SDL/lib/x64/SDL2.lib" )
 #pragma comment( lib, "SDL/lib/x64/SDL2main.lib" )
@@ -20,6 +27,8 @@ Application* App = NULL;
 
 int main(int argc, char ** argv)
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;
 
@@ -85,5 +94,6 @@ int main(int argc, char ** argv)
 
 	MY_LOG("Bye :)\n");
 	delete App;
+
 	return main_return;
 }

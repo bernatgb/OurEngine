@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleScene.h"
+#include "imgui_impl_sdl.h"
 
 ModuleInput::ModuleInput()
 {}
@@ -37,7 +38,7 @@ bool ModuleInput::Init()
 // Called every draw update
 update_status ModuleInput::Update()
 {
-    SDL_PumpEvents();
+    //SDL_PumpEvents();
 
     SDL_Event sdlEvent;
 
@@ -47,6 +48,13 @@ update_status ModuleInput::Update()
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
+        ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+
+        //ImGuiIO& io = ImGui::GetIO();
+        
+        //if (io.WantCaptureMouse)
+        //    break;
+
         switch (sdlEvent.type)
         {
             case SDL_QUIT:
@@ -58,9 +66,8 @@ update_status ModuleInput::Update()
                     App->camera->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                     App->renderer->WindowResized(sdlEvent.window.data1, sdlEvent.window.data2);
                 }
-                //TODO: WINDOW FOR SIZE
                 break;
-            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONDOWN:     
                 mouse_buttons[sdlEvent.button.button - 1] = true;
                 break;
             case SDL_MOUSEBUTTONUP:

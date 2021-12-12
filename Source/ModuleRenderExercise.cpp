@@ -114,7 +114,7 @@ update_status ModuleRenderExercise::Update()
 
 	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	float x = viewportPanelSize.x, y = viewportPanelSize.y;
-	glViewport(0, 0, x, y);
+	//glViewport(0, 0, x, y);
 
 	//App->renderer->Resize(x, y);
 
@@ -182,7 +182,7 @@ update_status ModuleRenderExercise::Update()
 	if (loc < 0) MY_LOG("Uniform location not found: n");
 	glUniform1f(loc, n);*/
 
-	modelObj->Draw(program);
+	//modelObj->Draw(program);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

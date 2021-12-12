@@ -217,7 +217,10 @@
   <ItemGroup>
     <ClCompile Include="AccuratedTimer.cpp" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="ComponentTransform.cpp" />
+    <ClCompile Include="CCamera.cpp" />
+    <ClCompile Include="CMaterial.cpp" />
+    <ClCompile Include="CMesh.cpp" />
+    <ClCompile Include="CTransform.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK.cpp" />
@@ -407,8 +410,11 @@
     <ClInclude Include="Assimp\include\assimp\Vertex.h" />
     <ClInclude Include="Assimp\include\assimp\XMLTools.h" />
     <ClInclude Include="Assimp\include\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="CCamera.h" />
+    <ClInclude Include="CMaterial.h" />
+    <ClInclude Include="CMesh.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="ComponentTransform.h" />
+    <ClInclude Include="CTransform.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="debug_draw\debugdraw.h" />
     <ClInclude Include="debug_draw\debug_draw.hpp" />

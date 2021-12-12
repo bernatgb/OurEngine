@@ -56,10 +56,32 @@ ModuleProgram::~ModuleProgram()
 {
 }
 
+bool ModuleProgram::Init()
+{
+	m_Shaders.push_back(0);
+	m_Shaders.push_back(0);
+	m_Shaders.push_back(0);
+
+	// TEXTURE SHADER
+	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag"));
+	// PHONG SHADER
+	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag"));
+	// CUBE_MAP SHADER
+	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader_cubemap.vert", ".\\assets\\Shaders\\fragment_shader_cubemap.frag"));
+
+	return true;
+}
+
 unsigned int ModuleProgram::CreateProgram(const char* vtx_shader_file_name, const char* frg_shader_file_name) const
 {
-	unsigned vtx_shader = CompileShader(GL_VERTEX_SHADER, vtx_shader_file_name, LoadShaderSource(vtx_shader_file_name));
-	unsigned frg_shader = CompileShader(GL_FRAGMENT_SHADER, frg_shader_file_name, LoadShaderSource(frg_shader_file_name));
+	char* vtx_data = LoadShaderSource(vtx_shader_file_name);
+	char* frg_data = LoadShaderSource(frg_shader_file_name);
+
+	unsigned vtx_shader = CompileShader(GL_VERTEX_SHADER, vtx_shader_file_name, vtx_data);
+	unsigned frg_shader = CompileShader(GL_FRAGMENT_SHADER, frg_shader_file_name, frg_data);
+
+	delete[] vtx_data;
+	delete[] frg_data;
 
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vtx_shader);

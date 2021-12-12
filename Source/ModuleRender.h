@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 
+#include "Math/float2.h"
 #include "Math/float4x4.h"
 #include "Math/float3x3.h"
 #include "Geometry/Frustum.h"
@@ -25,13 +26,15 @@ public:
 	void WindowResized(unsigned width, unsigned height);
 
 	void* context;
+	unsigned int program;
 
 private:
-	unsigned int program;
 
 	unsigned int fbo;
 	unsigned int fbo_texture;
 	unsigned int rbo;
 
 	CubeMap* cubeMap;
+
+	float2 viewportPanelSize;
 };

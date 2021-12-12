@@ -6,6 +6,8 @@
 #include "ModuleScene.h"
 #include "SDL.h"
 
+#include "CCamera.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -20,17 +22,30 @@ ModuleCamera::~ModuleCamera()
 
 void ModuleCamera::ViewProjectionMatrix()
 {
-	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-	frustum.SetViewPlaneDistances(zNear, zFar);
-	frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
-	//TODO: setHoritzontal
+	if (m_CurrentCamera == nullptr) 
+	{
+		frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+		frustum.SetViewPlaneDistances(zNear, zFar);
+		frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+		//TODO: setHoritzontal
 
-	frustum.SetPos(eye);
-	frustum.SetFront(m_CameraRotation.WorldZ());
-	frustum.SetUp(m_CameraRotation.WorldY());
-	/*frustum.SetPos(m_RotationMatrix.Col3(3));
-	frustum.SetFront(m_RotationMatrix.WorldZ());
-	frustum.SetUp(m_RotationMatrix.WorldY());*/
+		frustum.SetPos(eye);
+		frustum.SetFront(m_CameraRotation.WorldZ());
+		frustum.SetUp(m_CameraRotation.WorldY());
+		/*frustum.SetPos(m_RotationMatrix.Col3(3));
+		frustum.SetFront(m_RotationMatrix.WorldZ());
+		frustum.SetUp(m_RotationMatrix.WorldY());*/
+	}
+	else 
+	{
+		frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+		frustum.SetViewPlaneDistances(zNear, zFar);
+		frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+
+		frustum.SetPos(m_CurrentCamera->m_Owner->m_Transform->GetPos());
+		frustum.SetFront(m_CurrentCamera->m_Owner->m_Transform->GetForward());
+		frustum.SetUp(m_CurrentCamera->m_Owner->m_Transform->GetUp());
+	}
 
 	view = float4x4(frustum.ViewMatrix());
 	proj = frustum.ProjectionMatrix();
@@ -70,6 +85,9 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::Update()
 {
+	if (m_CurrentCamera != nullptr)
+		return UPDATE_CONTINUE;
+
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
 	{
 		int deltaX, deltaY;
@@ -129,7 +147,7 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		float4 target = App->scene->modelObj->GetCenter();
+		float4 target = App->scene->models[App->scene->activeModel]->GetCenter();
 
 		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
 
@@ -164,7 +182,7 @@ update_status ModuleCamera::Update()
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_F)) 
 	{
-		AdjustToModel(App->scene->modelObj);
+		AdjustToModel(App->scene->models[App->scene->activeModel]);
 	}
 
 	return UPDATE_CONTINUE;
@@ -188,6 +206,25 @@ void ModuleCamera::AdjustToModel(Model* _model)
 	eye = float3(newPos.x, newPos.y, newPos.z) - m_CameraRotation.WorldZ().Normalized() * _model->GetDiameter();
 
 	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
+
+	ViewProjectionMatrix();
+}
+
+void ModuleCamera::SetCurrentCamera(CCamera* _camera)
+{
+	if (_camera == nullptr) 
+	{
+		m_CurrentCamera = nullptr;
+	}
+	else if (m_CurrentCamera == nullptr)
+	{
+		m_CurrentCamera = _camera;
+	}
+	else 
+	{
+		m_CurrentCamera->m_CurrentCamera = false;
+		m_CurrentCamera = _camera;
+	}
 
 	ViewProjectionMatrix();
 }

@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Application.h"
 #include "ModuleTexture.h"
+#include "GameObject.h"
 
 #include "GL/glew.h"
 
@@ -13,6 +14,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#include <string>
+
 Model::Model(const char* _fileName)
 {
 	MY_LOG("Assimp (%s): Loading the model", _fileName);
@@ -20,34 +23,28 @@ Model::Model(const char* _fileName)
 	m_Name = new char[strlen(_fileName)+1];
 	strcpy(m_Name, _fileName);
 
-	m_ModelMatrix = float4x4::identity;
-	m_Position = float3(0.0f, 0.0f, 0.0f);
-	m_RotationEuler = float3(0.0f, 0.0f, 0.0f);
-	m_Rotation = Quat::identity;
-	m_Scale = float3(1.0f, 1.0f, 1.0f);
-
 	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
 	if (scene)
 	{
 		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
 		LoadTextures(scene->mMaterials, scene->mNumMaterials);
 
-		m_Min = m_Meshes[0]->GetMin();
-		m_Max = m_Meshes[0]->GetMax();
+		m_Min = m_Meshes[0]->GetLocalMin();
+		m_Max = m_Meshes[0]->GetLocalMax();
 
 		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
 		{
 			m_NumVertices += m_Meshes[i]->GetNumVertices();
 			m_NumTriangles += m_Meshes[i]->GetNumIndices() / 3;
 
-			if (m_Meshes[i]->GetMax().x > m_Max.x) m_Max.x = m_Meshes[i]->GetMax().x;
-			if (m_Meshes[i]->GetMin().x < m_Min.x) m_Min.x = m_Meshes[i]->GetMin().x;
+			if (m_Meshes[i]->GetLocalMax().x > m_Max.x) m_Max.x = m_Meshes[i]->GetLocalMax().x;
+			if (m_Meshes[i]->GetLocalMin().x < m_Min.x) m_Min.x = m_Meshes[i]->GetLocalMin().x;
 
-			if (m_Meshes[i]->GetMax().y > m_Max.y) m_Max.y = m_Meshes[i]->GetMax().y;
-			if (m_Meshes[i]->GetMin().y < m_Min.y) m_Min.y = m_Meshes[i]->GetMin().y;
+			if (m_Meshes[i]->GetLocalMax().y > m_Max.y) m_Max.y = m_Meshes[i]->GetLocalMax().y;
+			if (m_Meshes[i]->GetLocalMin().y < m_Min.y) m_Min.y = m_Meshes[i]->GetLocalMin().y;
 
-			if (m_Meshes[i]->GetMax().z > m_Max.z) m_Max.z = m_Meshes[i]->GetMax().z;
-			if (m_Meshes[i]->GetMin().z < m_Min.z) m_Min.z = m_Meshes[i]->GetMin().z;
+			if (m_Meshes[i]->GetLocalMax().z > m_Max.z) m_Max.z = m_Meshes[i]->GetLocalMax().z;
+			if (m_Meshes[i]->GetLocalMin().z < m_Min.z) m_Min.z = m_Meshes[i]->GetLocalMin().z;
 		}
 	}
 	else
@@ -67,16 +64,28 @@ Model::~Model()
 		delete m_Textures[i];
 }
 
-void Model::Draw(const unsigned int& _program) const
+GameObject* Model::ExportToGO(GameObject* _parent)
 {
-	float4x4 model = m_ModelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(_program, "model"), 1, GL_TRUE, &model[0][0]);
+	GameObject* go = _parent->AddChild(m_Name);
 
-	for (unsigned int i = 0; i < m_Meshes.size(); ++i)
+	if (m_Meshes.size() == 1) 
 	{
-		m_Textures[m_Meshes[i]->GetMaterialIndex()]->ActivateTexture(_program);
-		m_Meshes[i]->Draw();
+		go->AddComponent(new CMesh(true, go, m_Meshes[0]));
+		go->SetMaterial(m_Textures[m_Meshes[0]->GetMaterialIndex()]);
 	}
+	else 
+	{
+		for (unsigned int i = 0; i < m_Meshes.size(); ++i) 
+		{
+			std::string name = m_Name;
+			name += '_' + std::to_string(i);
+			GameObject* goChild = go->AddChild(name.c_str());
+			goChild->AddComponent(new CMesh(true, goChild, m_Meshes[i]));
+			goChild->SetMaterial(m_Textures[m_Meshes[i]->GetMaterialIndex()]);
+		}
+	}
+
+	return go;
 }
 
 void Model::DrawImGui()
@@ -84,25 +93,6 @@ void Model::DrawImGui()
 	ImGui::Text("Name: %s", m_Name);
 	ImGui::Text("Num vertices: %i", m_NumVertices);
 	ImGui::Text("Num triangles: %i", m_NumTriangles);
-
-	if (ImGui::CollapsingHeader("Transform"))
-	{
-		ImGui::Text("In progress");
-
-		if (ImGui::SliderFloat3("Position", &m_Position[0], -10.0f, 10.0f))
-		{
-			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
-		}
-		if (ImGui::SliderFloat3("Rotation", &m_RotationEuler[0], 0.0f, 360.0f))
-		{
-			m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
-			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
-		}
-		if (ImGui::SliderFloat3("Scale", &m_Scale[0], -10.0f, 10.0f))
-		{
-			m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
-		}
-	}
 
 	if (ImGui::CollapsingHeader("Meshes"))
 	{

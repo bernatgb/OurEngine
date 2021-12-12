@@ -36,6 +36,7 @@ Application::~Application()
     }
 
 	delete timer;
+	delete accuratedTimer;
 }
 
 bool Application::Init()

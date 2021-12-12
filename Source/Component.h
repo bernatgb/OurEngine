@@ -3,18 +3,22 @@
 
 class GameObject;
 
-enum ComponentType {
+enum class ComponentType {
 	UNDEFINED,
 	TRANSFORM, 
 	MESH,
-	MATERIAL
+	MATERIAL,
+	CAMERA
 };
 
 class Component
 {
 public:
-	Component()
+	Component(ComponentType _type, bool _enabled, GameObject* _owner)
 	{
+		m_Type = _type;
+		m_Enabled = _enabled;
+		m_Owner = _owner;
 	};
 	virtual ~Component() 
 	{
@@ -27,6 +31,13 @@ public:
 	{
 	};
 	virtual void Disable() 
+	{
+	};
+
+	virtual void NotifyMovement()
+	{
+	};
+	virtual void DrawImGui() 
 	{
 	};
 	

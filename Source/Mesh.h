@@ -13,6 +13,7 @@ public:
 	~Mesh();
 
 	void Draw() const;
+	void DrawBB() const;
 
 	unsigned int GetMaterialIndex() const {
 		return m_MaterialIndex;
@@ -23,10 +24,10 @@ public:
 	unsigned int GetNumIndices() const {
 		return m_NumIndices;
 	};
-	float3 GetMin() const {
+	float3 GetLocalMin() const {
 		return m_Min;
 	};
-	float3 GetMax() const {
+	float3 GetLocalMax() const {
 		return m_Max;
 	};
 
@@ -39,6 +40,8 @@ private:
 	unsigned int m_MaterialIndex;
 	unsigned int m_NumVertices;
 	unsigned int m_NumIndices;
+
+	unsigned int m_VboBB;
 
 	float3 m_Min;
 	float3 m_Max;

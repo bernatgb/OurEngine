@@ -63,7 +63,6 @@ Mesh::Mesh(aiMesh* _mesh)
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, nullptr, GL_STATIC_DRAW);
 	unsigned* indices = (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, index_size, GL_MAP_WRITE_BIT));
 
-	
 	for (unsigned int i = 0; i < _mesh->mNumFaces; ++i)
 	{
 		assert(_mesh->mFaces[i].mNumIndices == 3); // note: assume triangles = 3 indices per face
@@ -74,12 +73,9 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 
-
-
 	//CREATE THE VAO
 	MY_LOG("Assimp mesh: Creating the vao");
 	glGenVertexArrays(1, &m_Vao);
-
 
 	glBindVertexArray(m_Vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
@@ -96,6 +92,34 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glBindVertexArray(0);
 	
+	//CREATING THE BB VBO
+	MY_LOG("Assimp mesh: Creating the BB vbo");
+	GLfloat BBvertex[] = {
+		m_Min.x, m_Max.y, m_Max.z,
+		m_Max.x, m_Max.y, m_Max.z,
+		m_Min.x, m_Min.y, m_Max.z,
+		m_Max.x, m_Min.y, m_Max.z,
+		m_Max.x, m_Min.y, m_Min.z,
+		m_Max.x, m_Max.y, m_Max.z,
+		m_Max.x, m_Max.y, m_Min.z,
+		m_Min.x, m_Max.y, m_Max.z,
+		m_Min.x, m_Max.y, m_Min.z,
+		m_Min.x, m_Min.y, m_Max.z,
+		m_Min.x, m_Min.y, m_Min.z,
+		m_Max.x, m_Min.y, m_Min.z,
+		m_Min.x, m_Max.y, m_Min.z,
+		m_Max.x, m_Max.y, m_Min.z,
+	};
+
+	glGenBuffers(1, &m_VboBB);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(BBvertex), BBvertex, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -104,12 +128,63 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &m_Vbo);
 	glDeleteBuffers(1, &m_Ebo);
 	glDeleteVertexArrays(1, &m_Vao);
+
+	glDeleteBuffers(1, &m_VboBB);
 }
 
 void Mesh::Draw() const
 {
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, m_NumIndices, GL_UNSIGNED_INT, nullptr);
+	glBindVertexArray(0);
+}
+
+void Mesh::DrawBB() const
+{
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glDisable(GL_CULL_FACE);
+
+	/*// TEST
+	GLfloat BBvertex[] = {
+		m_Min.x, m_Max.y, m_Max.z,
+		m_Max.x, m_Max.y, m_Max.z,
+		m_Min.x, m_Min.y, m_Max.z,
+		m_Max.x, m_Min.y, m_Max.z,
+		m_Max.x, m_Min.y, m_Min.z,
+		m_Max.x, m_Max.y, m_Max.z,
+		m_Max.x, m_Max.y, m_Min.z,
+		m_Min.x, m_Max.y, m_Max.z,
+		m_Min.x, m_Max.y, m_Min.z,
+		m_Min.x, m_Min.y, m_Max.z,
+		m_Min.x, m_Min.y, m_Min.z,
+		m_Max.x, m_Min.y, m_Min.z,
+		m_Min.x, m_Max.y, m_Min.z,
+		m_Max.x, m_Max.y, m_Min.z,
+	};
+
+	unsigned int aux;
+	glGenBuffers(1, &aux);
+	glBindBuffer(GL_ARRAY_BUFFER, aux);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(BBvertex), BBvertex, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//
+
+	glBindBuffer(GL_ARRAY_BUFFER, aux);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glDeleteBuffers(1, &aux);*/
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glEnable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Mesh::DrawImGui()

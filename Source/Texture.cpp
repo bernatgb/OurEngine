@@ -100,6 +100,9 @@ void Texture::DrawImGui()
 			ImGui::Text("Format: LUMINANCE");
 			break;
 		}
+
+		ImGui::Image((void*)m_Texture, ImVec2(100, 100));
+
 		ImGui::Separator();
 
 		bool change = false;

@@ -137,17 +137,18 @@ bool ModuleRender::Init()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbo_texture, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//FBO render buffer
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+	
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		MY_LOG("ERROR: Framebuffer is not complete!");
@@ -167,6 +168,8 @@ bool ModuleRender::Init()
 
 	cubeMap = new CubeMap();
 	cubeMap->LoadTexture(faces);
+
+	viewportPanelSize = float2(0.0f, 0.0f);
 
 	return true;
 }
@@ -188,29 +191,31 @@ update_status ModuleRender::Update()
 {
 	ImGui::Begin("Scene");
 
-	const ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-	float x = viewportPanelSize.x, y = viewportPanelSize.y;
-	glViewport(0, 0, x, y);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	{//Resize textures
+	const ImVec2 newViewportPanelSize = ImGui::GetContentRegionAvail();
+	if (viewportPanelSize.x != newViewportPanelSize.x || viewportPanelSize.y != newViewportPanelSize.y) {
+		viewportPanelSize.x = newViewportPanelSize.x;
+		viewportPanelSize.y = newViewportPanelSize.y;
+
+		//Resize textures
 		glBindTexture(GL_TEXTURE_2D, fbo_texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewportPanelSize.x, viewportPanelSize.y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, x, y);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, viewportPanelSize.x, viewportPanelSize.y);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+		
+		App->camera->WindowResized(viewportPanelSize.x, viewportPanelSize.y);
 	}
-	App->camera->WindowResized(x, y);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
-
-
 	
 	/*unsigned int loc;
 
@@ -258,7 +263,7 @@ update_status ModuleRender::Update()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	ImGui::Image((void*)fbo_texture, ImVec2{ x, y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+	ImGui::Image((void*)fbo_texture, ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 	ImGui::End();
 
 	return UPDATE_CONTINUE;

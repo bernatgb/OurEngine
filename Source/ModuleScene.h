@@ -4,6 +4,8 @@
 #include "Model.h"
 #include "GameObject.h"
 
+#include <vector>
+
 class ModuleScene : public Module
 {
 public:
@@ -15,13 +17,19 @@ public:
 
 	GameObject* CreateGameObject();
 	void DrawImGuiModel();
+
+	void SelectGameObject(GameObject* go);
+	void RecursiveHierarchy(GameObject* go, GameObject*& node_clicked);
 	void DrawImGuiHierarchy();
+
 	void Draw(unsigned int program);
 	void LoadModel(const char* _fileName);
 
-	Model* modelObj = nullptr;
+	std::vector<Model*> models;
+	int activeModel;
 
 private:
 	
 	GameObject* m_Root;
+	GameObject* m_GOSelected;
 };
