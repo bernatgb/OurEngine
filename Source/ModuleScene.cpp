@@ -126,6 +126,16 @@ void ModuleScene::DrawImGuiHierarchy()
         ImGui::TreePop();
     }
 
+    ImGui::Separator();
+
+    ImGui::Text("Things to ask to the teacher");
+    ImGui::BulletText("Exporting model gameObject structre - Do it from assimp nodes");
+    ImGui::BulletText("Mesh BB - destroy it");
+    ImGui::BulletText("Render BB - Use DebugDraw");
+    ImGui::BulletText("Shader in materials - yep");
+    ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
+
+
     /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
     {
         static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;

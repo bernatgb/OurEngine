@@ -47,9 +47,9 @@ void CTransform::DrawImGui()
 		{
 			RecalculateModelMatrix();
 		}
-		ImGui::Text("ASK TEACHER (i dont think this is correct)");
 		if (ImGui::DragFloat3("Rotation", &m_RotationEuler[0], 10.0f, 0.0f, 360.0f))
 		{
+			//maybe use the delta rotation deltaRotation (so the quat isnt recalculated)
 			m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
 			RecalculateModelMatrix();
 		}

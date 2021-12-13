@@ -35,8 +35,7 @@ bool ModuleInput::Init()
 	return ret;
 }
 
-// Called every draw update
-update_status ModuleInput::Update()
+update_status ModuleInput::PreUpdate()
 {
     //SDL_PumpEvents();
 
@@ -49,7 +48,7 @@ update_status ModuleInput::Update()
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
         ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
-
+        //ImGui::IsItemHovered
         //ImGuiIO& io = ImGui::GetIO();
         
         //if (io.WantCaptureMouse)
@@ -90,7 +89,6 @@ update_status ModuleInput::Update()
             }
         }
     }
-
 
     return UPDATE_CONTINUE;
 }

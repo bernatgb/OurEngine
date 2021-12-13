@@ -129,6 +129,8 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glBindVertexArray(0);*/
 
+	PrintBB();
+
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -140,6 +142,8 @@ Mesh::~Mesh()
 
 	glDeleteBuffers(1, &m_VboBB);
 	//glDeleteVertexArrays(1, &m_VaoBB);
+
+	delete[] m_BB;
 }
 
 void Mesh::Draw() const
@@ -188,9 +192,6 @@ void Mesh::DrawBB() const
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glDeleteBuffers(1, &aux);*/
-
-	MY_LOG("%f", m_Min.x);
-	PrintBB();
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);

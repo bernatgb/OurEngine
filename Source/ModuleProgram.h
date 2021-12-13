@@ -9,7 +9,6 @@ enum class Shaders {
 	CUBE_MAP
 };
 
-// Module -> static (utils)
 class ModuleProgram : public Module
 {
 public:
@@ -19,6 +18,10 @@ public:
 	bool Init();
 
 	unsigned int CreateProgram(const char* vtx_shader_source, const char* frg_shader_source) const;
+	unsigned int GetProgram(const Shaders _shader) const
+	{
+		return m_Shaders[(int)_shader];
+	};
 
 	std::vector<unsigned int> m_Shaders;
 };

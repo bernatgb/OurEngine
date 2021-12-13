@@ -15,7 +15,7 @@ public:
 	~ModuleInput() override;
 
 	bool Init();
-	update_status Update();
+	update_status PreUpdate();
 	bool CleanUp();
 
 	const Uint8 GetKey(SDL_Scancode key) const;

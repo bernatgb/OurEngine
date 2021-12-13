@@ -42,11 +42,13 @@ void CMesh::DrawImGui()
 
 		ImGui::Checkbox("Show BB", &m_ShowBoundingBox);
 
+		//TEST
 		ImGui::Text(m_Owner->m_Name);
 		if (m_ShowBoundingBox)
 			ImGui::Text("TRUE");
 		else
 			ImGui::Text("FALSE");
+		//
 
 		m_Mesh->DrawImGui();
 	}

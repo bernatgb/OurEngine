@@ -43,6 +43,9 @@ bool Application::Init()
 {
 	timer = new Timer();
 	accuratedTimer = new AccuratedTimer();
+	timer->Start();
+	accuratedTimer->Start();
+
 	bool ret = true;
 
 	for(list<Module*>::iterator it = modules.begin(); it != modules.end() && ret; ++it)

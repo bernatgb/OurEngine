@@ -167,7 +167,7 @@ update_status ModuleImGui::Update()
 		ImGui::End();
 	}
 
-	ImGui::EndFrame();
+	//ImGui::EndFrame();
 
 	return UPDATE_CONTINUE;
 }

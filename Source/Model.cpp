@@ -47,6 +47,10 @@ Model::Model(const char* _fileName)
 			if (m_Meshes[i]->GetLocalMax().z > m_Max.z) m_Max.z = m_Meshes[i]->GetLocalMax().z;
 			if (m_Meshes[i]->GetLocalMin().z < m_Min.z) m_Min.z = m_Meshes[i]->GetLocalMin().z;
 		}
+
+		//TEST
+		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
+			m_Meshes[i]->PrintBB();
 	}
 	else
 	{

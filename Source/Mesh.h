@@ -44,6 +44,7 @@ private:
 
 	//unsigned int m_VaoBB;
 	unsigned int m_VboBB;
+	float3* m_BB = new float3[8];
 
 	float3 m_Min;
 	float3 m_Max;
