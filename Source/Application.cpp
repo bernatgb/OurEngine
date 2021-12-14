@@ -10,6 +10,7 @@
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
 #include "ModuleScene.h"
+#include "SDL.h"
 
 using namespace std;
 
@@ -72,6 +73,9 @@ update_status Application::Update()
 		ret = (*it)->PostUpdate();
 
 	Time::LimitFramerate();
+
+	if (input->GetKey(SDL_SCANCODE_ESCAPE))
+		ret = UPDATE_STOP;
 
 	return ret;
 }

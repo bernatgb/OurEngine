@@ -30,6 +30,11 @@ public:
 		return m_FPS;
 	};
 
+	static void PlayButton();
+	static void PauseButton();
+	static void StepButton();
+	static double GetGameTime();
+
 	static void DrawImGui();
 
 private:
@@ -53,5 +58,10 @@ private:
 
 	static std::vector<float> m_FPSGraph;
 	static std::vector<float> m_DeltaTimeGraph;
+
+	static double m_pause;
+	static double m_pausedTime;
+	static bool m_gamePaused;
+	static int m_stepFrame;
 };
 
