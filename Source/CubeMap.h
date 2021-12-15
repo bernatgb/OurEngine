@@ -72,8 +72,18 @@ public:
 		int width, height, nrChannels;
 		for (unsigned int i = 0; i < _faces.size(); i++)
 		{
-			if (!App->texture->LoadTextureData(_faces[i].c_str(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i))
+			TextureData* textureData = App->texture->LoadAndReturnTextureData(_faces[i].c_str(), false);
+			if (textureData != nullptr) 
+			{
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, textureData->format, textureData->width, textureData->height, 0, textureData->format, GL_UNSIGNED_BYTE, textureData->data);
+				App->texture->DeleteTextureData(textureData);
+			}
+			else 
+			{
 				MY_LOG("Error in CubeMap loading texture: %s", _faces[i]);
+			}
+			//if (!App->texture->LoadTextureData(_faces[i].c_str(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i))
+			//	MY_LOG("Error in CubeMap loading texture: %s", _faces[i]);
 		}
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
