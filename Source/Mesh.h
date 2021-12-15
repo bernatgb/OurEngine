@@ -13,7 +13,7 @@ public:
 	~Mesh();
 
 	void Draw() const;
-	void DrawBB() const;
+	void DrawBB(const float4x4& model) const;
 
 	unsigned int GetMaterialIndex() const {
 		return m_MaterialIndex;

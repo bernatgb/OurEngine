@@ -1,5 +1,8 @@
 #include "CMesh.h"
 
+#include "GameObject.h"
+#include "CTransform.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -25,14 +28,12 @@ void CMesh::Update()
 	m_Mesh->Draw();
 
 	if (m_ShowBoundingBox)
-		m_Mesh->DrawBB();
+		m_Mesh->DrawBB(m_Owner->m_Transform->m_AccumulativeModelMatrix);
 }
 
 void CMesh::Disable()
 {
 }
-
-#include "GameObject.h"
 
 void CMesh::DrawImGui()
 {

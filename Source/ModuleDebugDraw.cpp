@@ -613,6 +613,22 @@ update_status ModuleDebugDraw::Update()
 	return UPDATE_CONTINUE;
 }
 
+void ModuleDebugDraw::DrawBB(const float4x4& model, const float3* vertex)
+{
+    float3 box[] = {
+        (model * vertex[0].ToPos4()).Float3Part(),
+        (model * vertex[1].ToPos4()).Float3Part(),
+        (model * vertex[2].ToPos4()).Float3Part(),
+        (model * vertex[3].ToPos4()).Float3Part(),
+        (model * vertex[4].ToPos4()).Float3Part(),
+        (model * vertex[5].ToPos4()).Float3Part(),
+        (model * vertex[6].ToPos4()).Float3Part(),
+        (model * vertex[7].ToPos4()).Float3Part()
+    };
+
+    dd::box(box, float3(0.7f, 1.0f, 0.0f));
+}
+
 void ModuleDebugDraw::Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height)
 {
     implementation->width     = width;

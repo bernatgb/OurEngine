@@ -256,7 +256,7 @@ update_status ModuleRender::Update()
 	*/
 
 	App->scene->Draw(program);
-	App->debugDraw->Draw(App->camera->view, App->camera->proj, App->window->width, App->window->height);
+	App->debugDraw->Draw(App->camera->view, App->camera->proj, viewportPanelSize.x, viewportPanelSize.y);
 
 	// Draw cubemap
 	cubeMap->Draw(0);

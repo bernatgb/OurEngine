@@ -16,6 +16,7 @@ public:
 	update_status Update();
 	bool CleanUp();
 
+    void DrawBB(const float4x4& model, const float3* vertex);
     void Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height);
 
 private:
