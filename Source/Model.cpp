@@ -30,27 +30,23 @@ Model::Model(const char* _fileName)
 		//LoadMeshes(scene->mMeshes, 1);
 		LoadTextures(scene->mMaterials, scene->mNumMaterials);
 
-		m_Min = m_Meshes[0]->GetLocalMin();
-		m_Max = m_Meshes[0]->GetLocalMax();
+		m_Min = m_Meshes[0]->m_Min;
+		m_Max = m_Meshes[0]->m_Min;
 
 		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
 		{
-			m_NumVertices += m_Meshes[i]->GetNumVertices();
-			m_NumTriangles += m_Meshes[i]->GetNumIndices() / 3;
+			m_NumVertices += m_Meshes[i]->m_NumVertices;
+			m_NumTriangles += m_Meshes[i]->m_NumIndices / 3;
 
-			if (m_Meshes[i]->GetLocalMax().x > m_Max.x) m_Max.x = m_Meshes[i]->GetLocalMax().x;
-			if (m_Meshes[i]->GetLocalMin().x < m_Min.x) m_Min.x = m_Meshes[i]->GetLocalMin().x;
+			if (m_Meshes[i]->m_Min.x > m_Max.x) m_Max.x = m_Meshes[i]->m_Min.x;
+			if (m_Meshes[i]->m_Min.x < m_Min.x) m_Min.x = m_Meshes[i]->m_Min.x;
 
-			if (m_Meshes[i]->GetLocalMax().y > m_Max.y) m_Max.y = m_Meshes[i]->GetLocalMax().y;
-			if (m_Meshes[i]->GetLocalMin().y < m_Min.y) m_Min.y = m_Meshes[i]->GetLocalMin().y;
+			if (m_Meshes[i]->m_Min.y > m_Max.y) m_Max.y = m_Meshes[i]->m_Min.y;
+			if (m_Meshes[i]->m_Min.y < m_Min.y) m_Min.y = m_Meshes[i]->m_Min.y;
 
-			if (m_Meshes[i]->GetLocalMax().z > m_Max.z) m_Max.z = m_Meshes[i]->GetLocalMax().z;
-			if (m_Meshes[i]->GetLocalMin().z < m_Min.z) m_Min.z = m_Meshes[i]->GetLocalMin().z;
+			if (m_Meshes[i]->m_Min.z > m_Max.z) m_Max.z = m_Meshes[i]->m_Min.z;
+			if (m_Meshes[i]->m_Min.z < m_Min.z) m_Min.z = m_Meshes[i]->m_Min.z;
 		}
-
-		//TEST
-		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
-			m_Meshes[i]->PrintBB();
 	}
 	else
 	{
@@ -76,7 +72,7 @@ GameObject* Model::ExportToGO(GameObject* _parent)
 	if (m_Meshes.size() == 1) 
 	{
 		go->AddComponent(new CMesh(true, go, m_Meshes[0]));
-		go->SetMaterial(m_Textures[m_Meshes[0]->GetMaterialIndex()]);
+		go->SetMaterial(m_Textures[m_Meshes[0]->m_MaterialIndex]);
 	}
 	else 
 	{
@@ -86,7 +82,7 @@ GameObject* Model::ExportToGO(GameObject* _parent)
 			name += '_' + std::to_string(i);
 			GameObject* goChild = go->AddChild(name.c_str());
 			goChild->AddComponent(new CMesh(true, goChild, m_Meshes[i]));
-			goChild->SetMaterial(m_Textures[m_Meshes[i]->GetMaterialIndex()]);
+			goChild->SetMaterial(m_Textures[m_Meshes[i]->m_MaterialIndex]);
 		}
 	}
 

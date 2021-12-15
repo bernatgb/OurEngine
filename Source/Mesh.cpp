@@ -6,6 +6,8 @@
 #include "Application.h"
 #include "ModuleDebugDraw.h"
 
+#include "MeshImporter.h"
+
 #include <assert.h> 
 
 #include "imgui.h"
@@ -104,6 +106,11 @@ Mesh::Mesh(aiMesh* _mesh)
 	m_BB[7] = float3(m_Max.x, m_Min.y, m_Min.z);
 	m_BB[6] = float3(m_Min.x, m_Min.y, m_Min.z);
 
+	char* file = nullptr;
+	importer::mesh::Save(this, file);
+
+	delete[] file;
+
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -136,6 +143,28 @@ void Mesh::DrawBB(const float4x4& model) const
 
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+unsigned int* Mesh::MapIndicesBuffer() const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_Ebo);
+
+	return (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int) * m_NumIndices, GL_MAP_WRITE_BIT));
+}
+
+float* Mesh::MapVerticesBuffer() const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+
+	unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3;
+
+	return (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, vertex_size * m_NumVertices, GL_MAP_WRITE_BIT));;
+}
+
+void Mesh::UnMapBuffer() const
+{
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Mesh::DrawImGui()
