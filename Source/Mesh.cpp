@@ -96,6 +96,18 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glBindVertexArray(0);
 	
+	char* file = nullptr;
+	importer::mesh::Save(this, file);
+
+	glDeleteBuffers(1, &m_Vbo);
+	glDeleteBuffers(1, &m_Ebo);
+	glDeleteVertexArrays(1, &m_Vao);
+
+	importer::mesh::Load(file, this);
+
+	delete[] file;
+
+
 	//CREATING THE BB
 	m_BB[0] = float3(m_Max.x, m_Max.y, m_Max.z);
 	m_BB[1] = float3(m_Min.x, m_Max.y, m_Max.z);
@@ -106,10 +118,6 @@ Mesh::Mesh(aiMesh* _mesh)
 	m_BB[7] = float3(m_Max.x, m_Min.y, m_Min.z);
 	m_BB[6] = float3(m_Min.x, m_Min.y, m_Min.z);
 
-	char* file = nullptr;
-	importer::mesh::Save(this, file);
-
-	delete[] file;
 
 	MY_LOG("Assimp mesh: Create correctly");
 }

@@ -70,12 +70,18 @@ void CubeMap::LoadTexture(const std::vector<std::string>& _faces)
 	int width, height, nrChannels;
 	for (unsigned int i = 0; i < _faces.size(); i++)
 	{
-		if (!App->texture->LoadTextureData(_faces[i].c_str(), GL_TEXTURE_CUBE_MAP_POSITIVE_X + i))
+		TextureData* textureData = App->texture->LoadAndReturnTextureData(_faces[i].c_str(), false);
+		if (textureData != nullptr)
 		{
-			MY_LOG("Error in CubeMap loading texture: %s", _faces[i]);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, textureData->format, textureData->width, textureData->height, 0, textureData->format, GL_UNSIGNED_BYTE, textureData->data);
+			App->texture->DeleteTextureData(textureData);
+
+			m_TexturesNames.push_back(_faces[i]);
 		}
 		else
-			m_TexturesNames.push_back(_faces[i]);
+		{
+			MY_LOG("Error in CubeMap loading texture: %s", _faces[i]);
+		}			
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -108,13 +114,16 @@ void CubeMap::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Skybox"))
 	{
+
+		ImGui::Image((void*)m_Textures[0], ImVec2(100, 100));
 		ImGui::Text("Textures used for the skybox:");
 		for (int i = 0; i < m_TexturesNames.size(); ++i)
 		{
 			ImGui::BulletText("%s:", m_TexturesNames[i].c_str());
 
 			TextureData* textureInfo = App->texture->LoadAndReturnTextureData(m_TexturesNames[i].c_str(), false);
-			ImGui::Image((ImTextureID)(intptr_t)textureInfo->texture, ImVec2(50, 50));
+
+			ImGui::Image((void*)textureInfo->texture, ImVec2(50, 50));
 			App->texture->DeleteTextureData(textureInfo);
 			// TODO: change skybox cubemap files using imgui
 		}
