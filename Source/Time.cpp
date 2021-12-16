@@ -9,6 +9,9 @@
 #include "DevIL/include/IL/ilu.h"
 #include "GL/glew.h"
 
+#include "Application.h"
+#include "ModuleTexture.h"
+
 unsigned long int Time::m_FrameCount = 0;
 double Time::m_Time = 0;
 float Time::m_TimeScale = 1.0f;
@@ -162,20 +165,32 @@ void Time::DrawImGui()
 
 		ilDeleteImages(1, &imageID);
 
-		ImGui::Image((ImTextureID)(intptr_t)imageID, ImVec2(150, 150));
+		ImGui::Image((ImTextureID)(intptr_t)imageID, ImVec2(50, 50));
+
+		ImGui::SameLine();
+
+		TextureData* textureInfo = App->texture->LoadAndReturnTextureData(image, false);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, textureInfo->format, textureInfo->width, textureInfo->height, 0, textureInfo->format, GL_UNSIGNED_BYTE, textureInfo->data);
+
+		ImGui::Image((ImTextureID)(intptr_t)textureInfo->texture, ImVec2(50, 50));
+
+		App->texture->DeleteTextureData(textureInfo);
 
 		// TODO: Make it work properly, put all images in an "Init()" & here only call them.
 
 		if (ImGui::Button("Play |>"))
 		{
-			PlayButton();
+			if (m_gamePaused)
+				PlayButton();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Pause ||"))
 		{
-			PauseButton();
+			if (!m_gamePaused)
+				PauseButton();
 		}
 
 		ImGui::SameLine();
