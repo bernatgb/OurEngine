@@ -24,6 +24,8 @@ public:
 	update_status PostUpdate();
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
+	
+	CubeMap* GetCubeMap();
 
 	void* context;
 	unsigned int program;

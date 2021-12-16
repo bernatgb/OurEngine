@@ -6,6 +6,7 @@
 #include "ModuleWindow.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
+#include "CubeMap.h"
 #include "SDL/include/SDL.h"
 #include "GL/glew.h"
 
@@ -144,6 +145,7 @@ update_status ModuleImGui::Update()
 			Time::DrawImGui();
 			App->camera->DrawImGui();
 			App->window->DrawImGui();
+			App->renderer->GetCubeMap()->DrawImGui();
 			SoftwareAndHardware();
 		}
 		ImGui::End();

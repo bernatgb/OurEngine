@@ -256,7 +256,7 @@ update_status ModuleRender::Update()
 	*/
 
 	App->scene->Draw(program);
-	App->debugDraw->Draw(App->camera->view, App->camera->proj, viewportPanelSize.x, viewportPanelSize.y);
+	App->debugDraw->Draw(App->camera->view, App->camera->proj, App->window->width, App->window->height);
 
 	// Draw cubemap
 	cubeMap->Draw(0);
@@ -304,4 +304,9 @@ bool ModuleRender::CleanUp()
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	glViewport(0, 0, width, height);
+}
+
+CubeMap* ModuleRender::GetCubeMap()
+{
+	return cubeMap;
 }
