@@ -223,6 +223,7 @@
     <ClCompile Include="CTransform.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="MaterialImporter.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK2D.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\Random\LCG.cpp" />
@@ -421,6 +422,7 @@
     <ClInclude Include="debug_draw\debugdraw.h" />
     <ClInclude Include="debug_draw\debug_draw.hpp" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="MaterialImporter.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK2D.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\Random\LCG.h" />

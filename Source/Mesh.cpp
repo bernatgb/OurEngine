@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "ModuleDebugDraw.h"
 
+#include "SceneImporter.h"
 #include "MeshImporter.h"
 
 #include <assert.h> 
@@ -97,15 +98,22 @@ Mesh::Mesh(aiMesh* _mesh)
 	glBindVertexArray(0);
 	
 	char* file = nullptr;
-	importer::mesh::Save(this, file);
+	int fileSize = importer::mesh::Save(this, file);
 
 	glDeleteBuffers(1, &m_Vbo);
 	glDeleteBuffers(1, &m_Ebo);
 	glDeleteVertexArrays(1, &m_Vao);
 
-	importer::mesh::Load(file, this);
+	importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
+
+	char* storedFile = nullptr;
+
+	importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);
+
+	importer::mesh::Load(storedFile, this);
 
 	delete[] file;
+	delete[] storedFile;
 
 
 	//CREATING THE BB

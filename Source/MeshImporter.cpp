@@ -88,7 +88,7 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
-void importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
+int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 {
 	// MAYBE USE AN EXTRA BYTE TO STORE MESH INFORMATION (IF THE MESH DOESN'T HAVE TEXCOORDS/NORMALS/...)
 	// 0 - indices
@@ -96,10 +96,7 @@ void importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	// 2 - normales
 	//byte info = 0;
 
-	unsigned int guid = 4;
-
-	unsigned int header[4] = {
-		guid,
+	unsigned int header[3] = {
 		ourMesh->m_NumVertices,
 		ourMesh->m_NumIndices,
 		ourMesh->m_MaterialIndex //??
@@ -142,6 +139,8 @@ void importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	memcpy(cursor, ourMesh->MapIndicesBuffer(), bytes);
 	ourMesh->UnMapBuffer();
 	cursor += bytes;
+
+	return size;
 }
 
 void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
@@ -149,14 +148,14 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	const char* cursor = fileBuffer;
 
 	MY_LOG("MeshImporter_Load: Reading main variables");
-	unsigned int header[4];
+	unsigned int header[3];
 	unsigned int bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
 
-	ourMesh->m_NumVertices = header[1];
-	ourMesh->m_NumIndices = header[2];
-	ourMesh->m_MaterialIndex = header[3];
+	ourMesh->m_NumVertices = header[0];
+	ourMesh->m_NumIndices = header[1];
+	ourMesh->m_MaterialIndex = header[2];
 
 	float extremes[6];
 	bytes = sizeof(extremes);
