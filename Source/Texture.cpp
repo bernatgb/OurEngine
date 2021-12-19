@@ -9,6 +9,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#include "MaterialImporter.h"
+
 //TODO: STRING TO CHAR*
 
 Texture::Texture(const char* _fileName, const char* _fullPath)
@@ -54,7 +56,27 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
 	
+
+	//char* file = nullptr;
+	//int fileSize = importer::material::Save(this, file);
+
+	//glDeleteTextures(1, &m_Texture);
+
+	/*importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
+
+	char* storedFile = nullptr;
+
+	importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);*/
+
+	//importer::material::Load(file, this);
+
+	//delete[] file;
+	//delete[] storedFile;
+
+
 	glGenerateTextureMipmap(m_Texture);
+
+	
 }
 
 Texture::~Texture()
@@ -199,6 +221,19 @@ void Texture::DrawImGui()
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 		}
 	}
+}
+
+byte* Texture::MapTextureBuffer() const
+{
+	glBindTexture(GL_TEXTURE_2D, m_Texture);
+
+	return (byte*)(glMapBufferRange(GL_TEXTURE_BUFFER, 0, sizeof(byte) * 3 * width * height, GL_MAP_WRITE_BIT));
+}
+
+void Texture::UnMapBuffer() const
+{
+	glUnmapBuffer(GL_TEXTURE_BUFFER);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 const char* Texture::ConfigToString(unsigned int _config) const

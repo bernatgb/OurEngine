@@ -41,6 +41,9 @@ public:
 	{
 	};
 	
+	virtual void OnSave() {};
+	virtual void OnLoad() {};
+
 	ComponentType m_Type;
 	bool m_Enabled;
 	GameObject* m_Owner;

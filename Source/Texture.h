@@ -9,8 +9,8 @@ public:
 
 	void DrawImGui();
 
-private:
-	const char* ConfigToString(unsigned int _config) const;
+	unsigned char* MapTextureBuffer() const;
+	void UnMapBuffer() const;
 
 	unsigned int m_Texture;
 
@@ -23,4 +23,7 @@ private:
 	unsigned int m_MinFilter;
 	unsigned int m_MagFilter;
 	unsigned int m_Wrap;
+private:
+	const char* ConfigToString(unsigned int _config) const;
+
 };
