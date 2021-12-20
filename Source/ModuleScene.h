@@ -25,6 +25,8 @@ public:
 	void Draw(unsigned int program);
 	void LoadModel(const char* _fileName);
 
+	GameObject* GetRoot();
+
 	std::vector<Model*> models;
 	int activeModel;
 

@@ -134,6 +134,8 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::BulletText("Render BB - Use DebugDraw");
     ImGui::BulletText("Shader in materials - yep");
     ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
+    ImGui::BulletText("");
+    ImGui::BulletText("Time and skybox images in ImGui");
 
 
     /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
@@ -269,4 +271,9 @@ void ModuleScene::LoadModel(const char* _fileName)
     SelectGameObject(models[activeModel]->ExportToGO(m_Root));
 
     App->camera->AdjustToModel(models[activeModel]);
+}
+
+GameObject* ModuleScene::GetRoot()
+{
+    return m_Root;
 }

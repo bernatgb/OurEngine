@@ -42,9 +42,13 @@ void ModuleCamera::ViewProjectionMatrix()
 		frustum.SetViewPlaneDistances(zNear, zFar);
 		frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
 
-		frustum.SetPos(m_CurrentCamera->m_Owner->m_Transform->GetPos());
-		frustum.SetFront(m_CurrentCamera->m_Owner->m_Transform->GetForward());
-		frustum.SetUp(m_CurrentCamera->m_Owner->m_Transform->GetUp());
+		//frustum.SetPos(m_CurrentCamera->m_Owner->m_Transform->GetPos());
+		//frustum.SetFront(m_CurrentCamera->m_Owner->m_Transform->GetForward());
+		//frustum.SetUp(m_CurrentCamera->m_Owner->m_Transform->GetUp());
+
+		frustum.SetPos(m_CurrentCamera->pos);
+		frustum.SetFront(m_CurrentCamera->front);
+		frustum.SetUp(m_CurrentCamera->up);
 	}
 
 	view = float4x4(frustum.ViewMatrix());
@@ -228,6 +232,51 @@ void ModuleCamera::SetCurrentCamera(CCamera* _camera)
 
 	ViewProjectionMatrix();
 }
+
+Frustum* ModuleCamera::GetFrustum()
+{
+	return &frustum;
+}
+
+// false if fully outside, true if inside or intersects
+bool ModuleCamera::BoxInFrustum(Frustum const& fru, float3* box)
+{
+	// check box outside/inside of frustum
+	for (int i = 0; i < 6; i++)
+	{
+		int out = 0;
+
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[0]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[1]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[2]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[3]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[4]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[5]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[6]));
+		out += fru.GetPlane(i).IsOnPositiveSide(vec(box[7]));
+
+		if (out == 8) return false;
+	}
+
+	// check frustum outside/inside box
+	int out;
+
+	float3* fPoints = new float3[8];
+	fru.GetCornerPoints(fPoints);
+
+	// box[0] = all max components
+	// box[6] = all min components
+	
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x > box[0].x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x < box[6].x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y > box[0].y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y < box[6].y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z > box[0].z) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z < box[6].z) ? 1 : 0); if (out == 8) return false;
+	
+	return true;
+}
+
 
 void ModuleCamera::DrawImGui()
 {
