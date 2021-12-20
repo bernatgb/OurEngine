@@ -36,6 +36,26 @@ void CCamera::NotifyMovement()
 	App->camera->ViewProjectionMatrix();
 }
 
+void RecursiveTest(GameObject* gop) 
+{
+	for (int i = 0; i < gop->m_Children.size(); ++i)
+	{
+		GameObject* go = gop->m_Children[i];
+
+		for (int j = 0; j < go->m_Components.size(); ++j)
+		{
+			if (go->m_Components[j]->m_Type == ComponentType::MESH)
+			{
+				ImGui::Text("%i:", i);
+				ImGui::Text("%s", go->m_Components[j]->m_Type);
+			}
+		}
+		RecursiveTest(go->m_Children[i]);
+
+		ImGui::Text("%i:", i);
+	}
+}
+
 void CCamera::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Camera"))
@@ -54,16 +74,22 @@ void CCamera::DrawImGui()
 		}
 
 		ImGui::Separator();	
-		/* REVISE
-		GameObject* go = App->scene->m_Root->m_Children[1];
+
+		RecursiveTest(App->scene->GetRoot());
+		/*GameObject* go = App->scene->GetRoot()->m_Children[1];
 
 		for (int i = 0; i < go->m_Components.size(); ++i)
 		{
-			ComponentType t = go->m_Components[i]->m_Type;
-			ImGui::Text("%i:", i);
-			ImGui::Text("%s", go->m_Components[i]->m_Type);			
-		}
-		*/
+			if (go->m_Components[i]->m_Type == ComponentType::MESH)
+			{
+				ImGui::Text("%i:", i);
+				ImGui::Text("%s", go->m_Components[i]->m_Type);			
+			}
+		}*/
+		
+		//ComponentType asdasd = ComponentType::CAMERA;
+		//bool asdasd = asdasd == ComponentType::MESH;
+
 		ImGui::Separator();
 	}
 }

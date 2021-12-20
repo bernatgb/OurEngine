@@ -97,6 +97,7 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	glBindVertexArray(0);
 	
+	//////////////////////////////////////////////////////////////
 	char* file = nullptr;
 	int fileSize = importer::mesh::Save(this, file);
 
@@ -114,7 +115,7 @@ Mesh::Mesh(aiMesh* _mesh)
 
 	delete[] file;
 	delete[] storedFile;
-
+	//////////////////////////////////////////////////////////////
 
 	//CREATING THE BB
 	m_BB[0] = float3(m_Max.x, m_Max.y, m_Max.z);
@@ -144,21 +145,6 @@ void Mesh::Draw() const
 	glBindVertexArray(m_Vao);
 	glDrawElements(GL_TRIANGLES, m_NumIndices, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
-}
-
-void Mesh::DrawBB(const float4x4& model) const
-{
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDisable(GL_CULL_FACE);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
-	//glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
-	//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	App->debugDraw->DrawBB(model, m_BB);
-
-	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 unsigned int* Mesh::MapIndicesBuffer() const

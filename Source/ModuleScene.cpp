@@ -131,12 +131,32 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::Text("Things to ask to the teacher");
     ImGui::BulletText("Exporting model gameObject structre - Do it from assimp nodes");
     ImGui::BulletText("Mesh BB - destroy it");
-    ImGui::BulletText("Render BB - Use DebugDraw");
     ImGui::BulletText("Shader in materials - yep");
     ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
     ImGui::BulletText("");
     ImGui::BulletText("Time and skybox images in ImGui");
+    ImGui::BulletText("Binaries GUI (rand)");
+    ImGui::BulletText("Binaries for texture");
+    ImGui::BulletText("Json library");
 
+    ImGui::Separator();
+
+    ImGui::Text("TODO");
+    ImGui::BulletText("Fix the f to work with gameobjects");
+    ImGui::BulletText("CCamera with a boolean to use it for culling");
+    ImGui::BulletText("GUIDs");
+    ImGui::BulletText("Fix camera movement speed -> effected by fps");
+
+    ImGui::Separator();
+
+    ImGui::Text("Corrections");
+    ImGui::BulletText("overrides for the virtuals");
+    ImGui::BulletText("const for const things");
+    ImGui::BulletText("Make things private (sadly)");
+    ImGui::BulletText("Try not to nest ifs");
+    ImGui::BulletText("const & parameters");
+    ImGui::BulletText("function names start with verbs");
+    ImGui::BulletText("initialize in .h");
 
     /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
     {

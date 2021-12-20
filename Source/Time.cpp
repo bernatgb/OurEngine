@@ -149,7 +149,7 @@ void Time::DrawImGui()
 		ImGui::Text("Real time since start: %f; Real time dt: %f", Time::GetRealTimeSinceStartup(), Time::GetRealTimeDeltaTime());
 		ImGui::Text("Game time since start: %f; Game time dt: %f", Time::GetGameTime(), Time::GetDeltaTime());
 
-		const char* image = "assets\\Textures\\Lenna.png";
+		/*const char* image = "assets\\Textures\\Lenna.png";
 		unsigned imageID;
 		ilGenImages(1, &imageID);
 		ilBindImage(imageID);
@@ -176,6 +176,7 @@ void Time::DrawImGui()
 		ImGui::Image((ImTextureID)(intptr_t)textureInfo->texture, ImVec2(50, 50));
 
 		App->texture->DeleteTextureData(textureInfo);
+		glDeleteTextures(1, &imageID);*/
 
 		// TODO: Make it work properly, put all images in an "Init()" & here only call them.
 

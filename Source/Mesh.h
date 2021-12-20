@@ -13,7 +13,6 @@ public:
 	~Mesh();
 
 	void Draw() const;
-	void DrawBB(const float4x4& model) const;
 	void DrawImGui();
 
 	unsigned int* MapIndicesBuffer() const;

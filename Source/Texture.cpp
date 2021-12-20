@@ -56,7 +56,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
 	
-
+	/////////////////////////////////////////////////////////////////////////////////
 	//char* file = nullptr;
 	//int fileSize = importer::material::Save(this, file);
 
@@ -72,7 +72,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 	//delete[] file;
 	//delete[] storedFile;
-
+	/////////////////////////////////////////////////////////////////////////////////
 
 	glGenerateTextureMipmap(m_Texture);
 
@@ -248,4 +248,5 @@ const char* Texture::ConfigToString(unsigned int _config) const
 	case GL_CLAMP: return "GL_CLAMP";
 	case GL_REPEAT: return "GL_REPEAT";
 	}
+	return "";
 }
