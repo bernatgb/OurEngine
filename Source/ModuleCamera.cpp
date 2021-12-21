@@ -239,7 +239,7 @@ Frustum* ModuleCamera::GetFrustum()
 }
 
 // false if fully outside, true if inside or intersects
-bool ModuleCamera::BoxInFrustum(Frustum const& fru, float3* box)
+bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 {
 	// check box outside/inside of frustum
 	for (int i = 0; i < 6; i++)

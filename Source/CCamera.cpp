@@ -36,23 +36,24 @@ void CCamera::NotifyMovement()
 	App->camera->ViewProjectionMatrix();
 }
 
-void RecursiveTest(GameObject* gop) 
+void FindMeshes(const GameObject* gameObject) 
 {
-	for (int i = 0; i < gop->m_Children.size(); ++i)
+	for (int i = 0; i < gameObject->m_Components.size(); ++i)
 	{
-		GameObject* go = gop->m_Children[i];
-
-		for (int j = 0; j < go->m_Components.size(); ++j)
+		if (gameObject->m_Components[i]->m_Type == ComponentType::MESH)
 		{
-			if (go->m_Components[j]->m_Type == ComponentType::MESH)
-			{
-				ImGui::Text("%i:", i);
-				ImGui::Text("%s", go->m_Components[j]->m_Type);
-			}
+			ImGui::Text("%s", "Mesh");
+			//CMesh* cMesh = gameObject->m_Components[i];
+			const Component* c = gameObject->m_Components[i];
+			//CMesh cMesh = Component(*c);
+			//bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
+			// Call a function to draw the mesh, better if the bool is not here?
 		}
-		RecursiveTest(go->m_Children[i]);
+	}
 
-		ImGui::Text("%i:", i);
+	for (int i = 0; i < gameObject->m_Children.size(); ++i)
+	{
+		FindMeshes(gameObject->m_Children[i]);	
 	}
 }
 
@@ -66,29 +67,9 @@ void CCamera::DrawImGui()
 			else App->camera->SetCurrentCamera(nullptr);
 		}
 
-		for (int i = 0; i < App->scene->GetRoot()->m_Children.size(); ++i)
-		{
-			ImGui::Text("%s", App->scene->GetRoot()->m_Children[i]->m_Name);
-			// get obb
-			// get
-		}
-
 		ImGui::Separator();	
 
-		RecursiveTest(App->scene->GetRoot());
-		/*GameObject* go = App->scene->GetRoot()->m_Children[1];
-
-		for (int i = 0; i < go->m_Components.size(); ++i)
-		{
-			if (go->m_Components[i]->m_Type == ComponentType::MESH)
-			{
-				ImGui::Text("%i:", i);
-				ImGui::Text("%s", go->m_Components[i]->m_Type);			
-			}
-		}*/
-		
-		//ComponentType asdasd = ComponentType::CAMERA;
-		//bool asdasd = asdasd == ComponentType::MESH;
+		FindMeshes(App->scene->GetRoot());
 
 		ImGui::Separator();
 	}

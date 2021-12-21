@@ -26,7 +26,7 @@ public:
 	void SetCurrentCamera(CCamera* _camera);
 	
 	Frustum* GetFrustum();
-	bool BoxInFrustum(Frustum const& fru, float3* box);
+	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
 	float4x4 view, proj;
 	float3 eye;

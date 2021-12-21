@@ -293,7 +293,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     App->camera->AdjustToModel(models[activeModel]);
 }
 
-GameObject* ModuleScene::GetRoot()
+const GameObject* ModuleScene::GetRoot() const
 {
     return m_Root;
 }
