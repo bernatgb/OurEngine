@@ -5,6 +5,7 @@
 
 void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 {
+	ourMesh->m_GUID = rand();
 	ourMesh->m_NumVertices = mesh->mNumVertices;
 	ourMesh->m_NumIndices = mesh->mNumFaces * 3;
 	ourMesh->m_MaterialIndex = mesh->mMaterialIndex;
@@ -95,8 +96,9 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	// 1 - texCoords
 	// 2 - normales
 	//byte info = 0;
-
-	unsigned int header[3] = {
+	
+	unsigned int header[4] = {
+		ourMesh->m_GUID,
 		ourMesh->m_NumVertices,
 		ourMesh->m_NumIndices,
 		ourMesh->m_MaterialIndex //??
@@ -148,14 +150,15 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	const char* cursor = fileBuffer;
 
 	MY_LOG("MeshImporter_Load: Reading main variables");
-	unsigned int header[3];
+	unsigned int header[4];
 	unsigned int bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
 
-	ourMesh->m_NumVertices = header[0];
-	ourMesh->m_NumIndices = header[1];
-	ourMesh->m_MaterialIndex = header[2];
+	ourMesh->m_GUID = header[0];
+	ourMesh->m_NumVertices = header[1];
+	ourMesh->m_NumIndices = header[2];
+	ourMesh->m_MaterialIndex = header[3];
 
 	float extremes[6];
 	bytes = sizeof(extremes);

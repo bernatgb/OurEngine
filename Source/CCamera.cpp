@@ -44,9 +44,9 @@ void FindMeshes(const GameObject* gameObject)
 		{
 			ImGui::Text("%s", "Mesh");
 			//CMesh* cMesh = gameObject->m_Components[i];
-			const Component* c = gameObject->m_Components[i];
+			CMesh* c = (CMesh*)gameObject->m_Components[i];
 			//CMesh cMesh = Component(*c);
-			//bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
+			bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), c->m_BB);
 			// Call a function to draw the mesh, better if the bool is not here?
 		}
 	}

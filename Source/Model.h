@@ -9,6 +9,12 @@
 
 class GameObject;
 
+struct ModelNode {
+public:
+	std::vector<ModelNode*> m_Children;
+	std::vector<Mesh*> m_Meshes;
+};
+
 class Model
 {
 public:
@@ -37,9 +43,7 @@ public:
 
 	char* m_Name = nullptr;
 
-private:
-	void LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes);
-	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials);
+	ModelNode* m_RootStructure;
 
 	std::vector<Mesh*> m_Meshes;
 	std::vector<Texture*> m_Textures;
@@ -49,5 +53,10 @@ private:
 
 	float3 m_Min;
 	float3 m_Max;
+
+private:
+	void LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes);
+	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials);
+
 };
 

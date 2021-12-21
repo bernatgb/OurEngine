@@ -19,6 +19,8 @@ public:
 	float* MapVerticesBuffer() const;
 	void UnMapBuffer() const;
 
+	unsigned int m_GUID;
+
 	unsigned int m_MaterialIndex;
 	unsigned int m_NumVertices;
 	unsigned int m_NumIndices;
