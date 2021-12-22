@@ -75,8 +75,6 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 	/////////////////////////////////////////////////////////////////////////////////
 
 	glGenerateTextureMipmap(m_Texture);
-
-	
 }
 
 Texture::~Texture()

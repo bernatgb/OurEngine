@@ -81,8 +81,12 @@ int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 
 	// Store vertices
 	bytes = sizeof(byte) * 3 * ourMaterial->width * ourMaterial->height;
-	memcpy(cursor, ourMaterial->MapTextureBuffer(), bytes);
-	ourMaterial->UnMapBuffer();
+	byte* data = nullptr;
+	glBindTexture(GL_TEXTURE_2D, ourMaterial->m_Texture);
+	glGetTexImage(GL_TEXTURE_2D, 0, ourMaterial->format, GL_UNSIGNED_BYTE, data);
+	memcpy(cursor, data, bytes);
+	//memcpy(cursor, ourMaterial->MapTextureBuffer(), bytes);
+	//ourMaterial->UnMapBuffer();
 	cursor += bytes;
 
 	return size;

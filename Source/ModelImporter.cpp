@@ -1,5 +1,9 @@
 #include "ModelImporter.h"
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 void RecursiveRoot(Model* ourModel, aiNode* node, ModelNode* ourNode)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) 
@@ -16,6 +20,17 @@ void RecursiveRoot(Model* ourModel, aiNode* node, ModelNode* ourNode)
 
 void importer::model::Import(const aiScene* model, Model* ourModel)
 {
+	// 1. Parse a JSON string into DOM.
+	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
+	rapidjson::Document d;
+	d.Parse(json);
+
+	// 2. Modify it by DOM.
+	rapidjson::Value& s = d["stars"];
+	s.SetInt(s.GetInt() + 1);
+
+	MY_LOG("JSOOOOOOOOON %i", d["stars"].GetInt());
+
 	//m_Name = new char[strlen(_fileName) + 1];
 	//strcpy(m_Name, _fileName);
 
@@ -41,7 +56,7 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 	{
 		if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
-			ourModel->m_Textures[i] = new Texture(file.data, ourModel->m_Name);
+			ourModel->m_Textures[i] = new Texture(file.data, ".\\Assets\\Textures\\BakerHouse.png");//ourModel->m_Name);
 		}
 	}
 

@@ -16,6 +16,8 @@
 
 #include <string>
 
+#include "ModelImporter.h"
+
 Model::Model(const char* _fileName)
 {
 	MY_LOG("Assimp (%s): Loading the model", _fileName);
@@ -47,6 +49,10 @@ Model::Model(const char* _fileName)
 			if (m_Meshes[i]->m_Min.z > m_Max.z) m_Max.z = m_Meshes[i]->m_Min.z;
 			if (m_Meshes[i]->m_Min.z < m_Min.z) m_Min.z = m_Meshes[i]->m_Min.z;
 		}
+
+		Model* m = new Model("asdasd");
+		importer::model::Import(scene, m);
+		delete m;
 	}
 	else
 	{
