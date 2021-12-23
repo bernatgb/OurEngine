@@ -1,5 +1,7 @@
 #include "ModelImporter.h"
 
+#include "MeshImporter.h"
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -46,7 +48,9 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 	for (unsigned int i = 0; i < model->mNumMeshes; ++i)
 	{
 		MY_LOG("Assimp: Loading the mesh %i", i);
-		ourModel->m_Meshes[i] = new Mesh(model->mMeshes[i]);
+		ourModel->m_Meshes[i] = new Mesh();
+		importer::mesh::Import(model->mMeshes[i], ourModel->m_Meshes[i]);
+		//ourModel->m_Meshes[i] = new Mesh(model->mMeshes[i]);
 	}
 
 	MY_LOG("Assimp: Loading the textures");
@@ -80,5 +84,4 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 
 	ourModel->m_RootStructure = new ModelNode();
 	RecursiveRoot(ourModel, model->mRootNode, ourModel->m_RootStructure);
-
 }

@@ -1,10 +1,14 @@
 #pragma once
 #include "Module.h"
 
-#include "Model.h"
 #include "GameObject.h"
 
+#include <map>
 #include <vector>
+
+class Model;
+class Mesh;
+class Texture;
 
 class ModuleScene : public Module
 {
@@ -29,6 +33,12 @@ public:
 
 	std::vector<Model*> models;
 	int activeModel;
+
+	void LoadLibraryAssets();
+
+	std::map<std::string, Model*> m_Model;
+	std::map<unsigned int, Mesh*> m_Meshes;
+	std::map<unsigned int, Texture*> m_Textures;
 
 private:
 	

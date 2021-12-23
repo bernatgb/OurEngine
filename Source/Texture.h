@@ -1,4 +1,6 @@
 #pragma once
+
+struct TextureData;
 class Texture
 {
 public:
@@ -9,21 +11,15 @@ public:
 
 	void DrawImGui();
 
-	unsigned char* MapTextureBuffer() const;
-	void UnMapBuffer() const;
+	char* m_Name = nullptr;
 
 	unsigned int m_Texture;
-
-	char* m_Name = nullptr;
-	unsigned int width;
-	unsigned int height;
-	unsigned int depth;
-	unsigned int format;
+	TextureData* m_TextureData;
 
 	unsigned int m_MinFilter;
 	unsigned int m_MagFilter;
 	unsigned int m_Wrap;
+
 private:
 	const char* ConfigToString(unsigned int _config) const;
-
 };

@@ -4,6 +4,8 @@
 #include "ModuleCamera.h"
 #include "ModuleInput.h"
 
+#include "Model.h"
+
 #include "SDL.h"
 #include "CCamera.h"
 
@@ -297,4 +299,11 @@ void ModuleScene::LoadModel(const char* _fileName)
 const GameObject* ModuleScene::GetRoot() const
 {
     return m_Root;
+}
+
+void ModuleScene::LoadLibraryAssets()
+{
+    m_Model;
+    m_Meshes;
+    m_Textures;
 }

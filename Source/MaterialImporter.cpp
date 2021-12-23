@@ -30,8 +30,11 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ourMaterial->m_Wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ourMaterial->m_Wrap);
 
+	ourMaterial->m_TextureData = nullptr;
+
 	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", file.data);
-	if (!App->texture->LoadTextureData(file.data, ourMaterial->width, ourMaterial->height, ourMaterial->depth, ourMaterial->format))
+	ourMaterial->m_TextureData = App->texture->LoadAndReturnTextureData(file.data);
+	if (ourMaterial->m_TextureData == nullptr)
 	{
 		std::string directoryPath = fullPath;
 		const size_t last_slash_idx = directoryPath.rfind('\\');
@@ -39,36 +42,40 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + file.data;
 
 		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
-		if (!App->texture->LoadTextureData(directoryPath.c_str(), ourMaterial->width, ourMaterial->height, ourMaterial->depth, ourMaterial->format))
+		ourMaterial->m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
+		if (ourMaterial->m_TextureData == nullptr)
 		{
 			directoryPath = TEXTURES_FOLDER;
 			directoryPath += file.data;
 
 			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
-			if (!App->texture->LoadTextureData(directoryPath.c_str(), ourMaterial->width, ourMaterial->height, ourMaterial->depth, ourMaterial->format))
+			ourMaterial->m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
+			if (ourMaterial->m_TextureData == nullptr)
 			{
 				MY_LOG("Assimp texture: Texture couldn't be loaded");
 				return;
 			}
 		}
 	}
+	glTexImage2D(GL_TEXTURE_2D, 0, ourMaterial->m_TextureData->format, ourMaterial->m_TextureData->width, ourMaterial->m_TextureData->height, 0, ourMaterial->m_TextureData->format, GL_UNSIGNED_BYTE, ourMaterial->m_TextureData->data);
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
 }
 
 int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 {
-	unsigned int header[7] = {
-		ourMaterial->width,
-		ourMaterial->height,
-		ourMaterial->depth,
-		ourMaterial->format,
+	unsigned int header[8] = {
+		ourMaterial->m_TextureData->width,
+		ourMaterial->m_TextureData->height,
+		ourMaterial->m_TextureData->depth,
+		ourMaterial->m_TextureData->format,
+		ourMaterial->m_TextureData->bpp,
 		ourMaterial->m_MinFilter,
 		ourMaterial->m_MagFilter,
 		ourMaterial->m_Wrap
 	};
 
-	unsigned int size = sizeof(header) + sizeof(byte) * 3 * ourMaterial->width * ourMaterial->height;
+	unsigned int size = sizeof(header) + ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
 
 	// Allocate
 	fileBuffer = new char[size];
@@ -80,13 +87,8 @@ int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 	cursor += bytes;
 
 	// Store vertices
-	bytes = sizeof(byte) * 3 * ourMaterial->width * ourMaterial->height;
-	byte* data = nullptr;
-	glBindTexture(GL_TEXTURE_2D, ourMaterial->m_Texture);
-	glGetTexImage(GL_TEXTURE_2D, 0, ourMaterial->format, GL_UNSIGNED_BYTE, data);
-	memcpy(cursor, data, bytes);
-	//memcpy(cursor, ourMaterial->MapTextureBuffer(), bytes);
-	//ourMaterial->UnMapBuffer();
+	bytes = ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
+	memcpy(cursor, ourMaterial->m_TextureData->data, bytes);
 	cursor += bytes;
 
 	return size;
@@ -97,18 +99,20 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 	const char* cursor = fileBuffer;
 
 	MY_LOG("MaterialImporter_Load: Reading main variables");
-	unsigned int header[7];
+	unsigned int header[8];
 	unsigned int bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
 
-	ourMaterial->width = header[0];
-	ourMaterial->height = header[1];
-	ourMaterial->depth = header[2];
-	ourMaterial->format = header[3];
-	ourMaterial->m_MinFilter = header[4];
-	ourMaterial->m_MagFilter = header[5];
-	ourMaterial->m_Wrap = header[6];
+	ourMaterial->m_TextureData = new TextureData(false, 0, header[0], header[1], header[2], header[3], header[4], nullptr);
+	ourMaterial->m_MinFilter = header[5];
+	ourMaterial->m_MagFilter = header[6];
+	ourMaterial->m_Wrap = header[7];
+
+	bytes = ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
+	ourMaterial->m_TextureData->data = new byte[bytes];
+	memcpy(ourMaterial->m_TextureData->data, cursor, bytes);
+	cursor += bytes;
 
 	//m_Name = new char[strlen(_fileName) + 1];
 	//strcpy(m_Name, _fileName);
@@ -125,18 +129,9 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ourMaterial->m_Wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ourMaterial->m_Wrap);
 
-	unsigned int buffer_size = sizeof(byte) * 3 * ourMaterial->width * ourMaterial->height;
-	glBufferData(GL_TEXTURE_2D, buffer_size, nullptr, GL_STATIC_DRAW);
+	glTexImage2D(GL_TEXTURE_2D, 0, ourMaterial->m_TextureData->format, ourMaterial->m_TextureData->width, ourMaterial->m_TextureData->height, 0, ourMaterial->m_TextureData->format, GL_UNSIGNED_BYTE, ourMaterial->m_TextureData->data);
 
-	unsigned int* pointer = (unsigned int*)(glMapBufferRange(GL_TEXTURE_2D, 0, buffer_size, GL_MAP_WRITE_BIT));
-
-	bytes = buffer_size;
-	memcpy(pointer, cursor, bytes);
-	cursor += bytes;
-
-	glUnmapBuffer(GL_TEXTURE_2D);
-
-	glGenerateTextureMipmap(ourMaterial->m_Texture);
+	//glGenerateTextureMipmap(ourMaterial->m_Texture);
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

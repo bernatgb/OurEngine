@@ -36,14 +36,20 @@ TextureData* ModuleTexture::LoadAndReturnTextureData(const char* source, bool fl
 
 	//ilDeleteImages(1, &texture);
 
-	TextureData* textureData = new TextureData(texture, textureInfo.Width, textureInfo.Height, textureInfo.Depth, textureInfo.Format, data);
+	TextureData* textureData = new TextureData(true, texture, textureInfo.Width, textureInfo.Height, textureInfo.Depth, textureInfo.Format, textureInfo.Bpp, data);
 
 	return textureData;
 }
 
 void ModuleTexture::DeleteTextureData(TextureData* textureData)
 {
-	ilDeleteImages(1, &textureData->texture);
+	if (textureData == nullptr)
+		return;
+
+	if (textureData->loadedFromDevil)
+		ilDeleteImages(1, &textureData->texture);
+	else
+		delete[] textureData->data;
 	
 	delete textureData;
 }

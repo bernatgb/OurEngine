@@ -50,7 +50,7 @@ Model::Model(const char* _fileName)
 			if (m_Meshes[i]->m_Min.z < m_Min.z) m_Min.z = m_Meshes[i]->m_Min.z;
 		}
 
-		Model* m = new Model("asdasd");
+		Model* m = new Model();
 		importer::model::Import(scene, m);
 		delete m;
 	}
@@ -58,6 +58,14 @@ Model::Model(const char* _fileName)
 	{
 		MY_LOG("Error loading %s: %s", m_Name, aiGetErrorString());
 	}
+}
+
+void RecursiveRoot(ModelNode* ourNode)
+{
+	for (unsigned int i = 0; i < ourNode->m_Children.size(); ++i)
+		RecursiveRoot(ourNode->m_Children[i]);
+
+	delete ourNode;
 }
 
 Model::~Model()
@@ -69,6 +77,9 @@ Model::~Model()
 
 	for (int i = 0; i < m_Textures.size(); ++i)
 		delete m_Textures[i];
+
+	if (m_RootStructure != nullptr)
+		RecursiveRoot(m_RootStructure);
 }
 
 GameObject* Model::ExportToGO(GameObject* _parent)

@@ -31,7 +31,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 
-	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
+	/*MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
 	if (!App->texture->LoadTextureData(_fileName, width, height, depth, format))
 	{
 		std::string directoryPath = _fullPath;
@@ -52,15 +52,45 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 				return;
 			}
 		}
+	}*/
+	
+	m_TextureData = nullptr;
+
+	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
+	m_TextureData = App->texture->LoadAndReturnTextureData(_fileName);
+	if (m_TextureData == nullptr)
+	{
+		std::string directoryPath = _fullPath;
+		const size_t last_slash_idx = directoryPath.rfind('\\');
+		if (std::string::npos != last_slash_idx)
+			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + _fileName;
+
+		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
+		m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
+		if (m_TextureData == nullptr)
+		{
+			directoryPath = TEXTURES_FOLDER;
+			directoryPath += _fileName;
+
+			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
+			m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
+			if (m_TextureData == nullptr)
+			{
+				MY_LOG("Assimp texture: Texture couldn't be loaded");
+				return;
+			}
+		}
 	}
+	glTexImage2D(GL_TEXTURE_2D, 0, m_TextureData->format, m_TextureData->width, m_TextureData->height, 0, m_TextureData->format, GL_UNSIGNED_BYTE, m_TextureData->data);
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
-	
-	/////////////////////////////////////////////////////////////////////////////////
-	//char* file = nullptr;
-	//int fileSize = importer::material::Save(this, file);
 
-	//glDeleteTextures(1, &m_Texture);
+	/////////////////////////////////////////////////////////////////////////////////
+	char* file = nullptr;
+	int fileSize = importer::material::Save(this, file);
+
+	App->texture->DeleteTextureData(m_TextureData);
+	glDeleteTextures(1, &m_Texture);
 
 	/*importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
 
@@ -68,9 +98,9 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 
 	importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);*/
 
-	//importer::material::Load(file, this);
+	importer::material::Load(file, this);
 
-	//delete[] file;
+	delete[] file;
 	//delete[] storedFile;
 	/////////////////////////////////////////////////////////////////////////////////
 
@@ -80,6 +110,7 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 Texture::~Texture()
 {
 	delete[] m_Name;
+	App->texture->DeleteTextureData(m_TextureData);
 
 	glDeleteTextures(1, &m_Texture);
 }
@@ -95,11 +126,11 @@ void Texture::DrawImGui()
 {
 	if (ImGui::CollapsingHeader(m_Name))
 	{
-		ImGui::Text("Witdh: %i", width);
-		ImGui::Text("Height: %i", height);
-		ImGui::Text("Depth: %i", depth);
+		ImGui::Text("Witdh: %i", m_TextureData->width);
+		ImGui::Text("Height: %i", m_TextureData->height);
+		ImGui::Text("Depth: %i", m_TextureData->depth);
 
-		switch (format)
+		switch (m_TextureData->format)
 		{
 		case GL_COLOR_INDEX:
 			ImGui::Text("Format: COLOUR_INDEX");
@@ -219,19 +250,6 @@ void Texture::DrawImGui()
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 		}
 	}
-}
-
-byte* Texture::MapTextureBuffer() const
-{
-	glBindTexture(GL_TEXTURE_2D, m_Texture);
-
-	return (byte*)(glMapBufferRange(GL_TEXTURE_BUFFER, 0, sizeof(byte) * 3 * width * height, GL_MAP_WRITE_BIT));
-}
-
-void Texture::UnMapBuffer() const
-{
-	glUnmapBuffer(GL_TEXTURE_BUFFER);
-	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 const char* Texture::ConfigToString(unsigned int _config) const

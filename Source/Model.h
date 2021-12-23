@@ -13,11 +13,17 @@ struct ModelNode {
 public:
 	std::vector<ModelNode*> m_Children;
 	std::vector<Mesh*> m_Meshes;
+
+	ModelNode() {
+		m_Children = std::vector<ModelNode*>(0);
+		m_Meshes = std::vector<Mesh*>(0);
+	}
 };
 
 class Model
 {
 public:
+	Model() {};
 	Model(const char* _fileName);
 	~Model();
 
