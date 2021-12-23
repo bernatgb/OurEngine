@@ -68,6 +68,8 @@ update_status ModuleInput::PreUpdate()
                 break;
             case SDL_MOUSEBUTTONDOWN:     
                 mouse_buttons[sdlEvent.button.button - 1] = true;
+                mouse_position_x = sdlEvent.button.x;
+                mouse_position_y = sdlEvent.button.y;
                 break;
             case SDL_MOUSEBUTTONUP:
                 mouse_buttons[sdlEvent.button.button - 1] = false;

@@ -133,19 +133,20 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::BulletText("Mesh BB - destroy it");
     ImGui::BulletText("Shader in materials - yep");
     ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
-    ImGui::BulletText("");
     ImGui::BulletText("Time and skybox images in ImGui");
     ImGui::BulletText("Binaries GUI (rand)");
     ImGui::BulletText("Binaries for texture");
     ImGui::BulletText("Json library");
+    ImGui::BulletText("Where to do the FindMeshes & co");
 
     ImGui::Separator();
 
     ImGui::Text("TODO");
     ImGui::BulletText("Fix the f to work with gameobjects");
-    ImGui::BulletText("CCamera with a boolean to use it for culling");
     ImGui::BulletText("GUIDs");
     ImGui::BulletText("Fix camera movement speed -> effected by fps");
+    ImGui::BulletText("Fix mouse clicking");
+    ImGui::BulletText("Have two cameras");
 
     ImGui::Separator();
 

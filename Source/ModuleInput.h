@@ -21,6 +21,7 @@ public:
 	const Uint8 GetKey(SDL_Scancode key) const;
 	const bool GetMouseButton(unsigned int key) const;
 	const void GetMouseMotion(int& x, int& y) const;
+	const void GetMousePosition(int& x, int& y) const { x = mouse_position_x; y = mouse_position_y; };
 
 	const bool MouseWheel() const { return mouse_wheel; };
 	const void GetMouseWheel(int& x, int& y) const { x = mouse_wheel_x; y = mouse_wheel_y; };
@@ -29,6 +30,7 @@ private:
 	const Uint8 *keyboard = NULL;
 	bool mouse_buttons[NUM_MOUSE_BUTTONS];
 	int mouse_motion_x, mouse_motion_y;
+	int mouse_position_x, mouse_position_y;
 	bool mouse_wheel;
 	int mouse_wheel_x, mouse_wheel_y;
 };

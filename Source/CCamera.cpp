@@ -43,11 +43,14 @@ void FindMeshes(const GameObject* gameObject)
 		if (gameObject->m_Components[i]->m_Type == ComponentType::MESH)
 		{
 			ImGui::Text("%s", "Mesh");
-			//CMesh* cMesh = gameObject->m_Components[i];
-			CMesh* c = (CMesh*)gameObject->m_Components[i];
-			//CMesh cMesh = Component(*c);
-			bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), c->m_BB);
-			// Call a function to draw the mesh, better if the bool is not here?
+			CMesh* cMesh = (CMesh*)gameObject->m_Components[i];
+			bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
+			ImGui::SameLine();
+			std::string sb = "no";
+			if (b)
+				sb = "yes";
+			ImGui::Text("<- in frustum? %s", sb.c_str());
+			// Call a function to draw the mesh, better if we do this in another part?
 		}
 	}
 
