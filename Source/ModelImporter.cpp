@@ -8,6 +8,8 @@
 
 void RecursiveRoot(Model* ourModel, aiNode* node, ModelNode* ourNode)
 {
+	ourNode->m_Name = node->mName.C_Str();
+
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) 
 	{
 		ourNode->m_Meshes.push_back(ourModel->m_Meshes[node->mMeshes[i]]);
@@ -40,7 +42,7 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 	//strcpy(ourModel->m_Name, model->GetShortFilename());
 
 
-	ourModel->m_Name = nullptr;
+	ourModel->m_Name = "";
 
 	MY_LOG("Assimp: Loading the meshes");
 	ourModel->m_Meshes = std::vector<Mesh*>(model->mNumMeshes);

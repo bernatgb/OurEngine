@@ -13,6 +13,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#include <string>
+
 ModuleScene::ModuleScene()
 {
 }
@@ -268,6 +270,22 @@ void ModuleScene::Draw(unsigned int program)
 
 void ModuleScene::LoadModel(const char* _fileName)
 {
+    /*
+    std::string modelName = _fileName;
+    const size_t last_slash_idx = modelName.rfind('\\');
+    if (std::string::npos != last_slash_idx)
+        modelName = modelName.substr(last_slash_idx, modelName.length());
+
+    std::map<std::string, Model*>::iterator it = m_Models.find(modelName);
+    if (it == m_Models.end()) 
+    {
+        //import new model
+        //and save it
+    }
+
+    SelectGameObject(m_Models[modelName]->ExportToGO(m_Root));
+    App->camera->AdjustToModel(m_Models[modelName]);*/
+
     activeModel = -1;
     for (unsigned int i = 0; i < models.size(); ++i)
     {
@@ -303,7 +321,7 @@ const GameObject* ModuleScene::GetRoot() const
 
 void ModuleScene::LoadLibraryAssets()
 {
-    m_Model;
+    m_Models;
     m_Meshes;
     m_Textures;
 }

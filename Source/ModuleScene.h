@@ -36,7 +36,7 @@ public:
 
 	void LoadLibraryAssets();
 
-	std::map<std::string, Model*> m_Model;
+	std::map<std::string, Model*> m_Models;
 	std::map<unsigned int, Mesh*> m_Meshes;
 	std::map<unsigned int, Texture*> m_Textures;
 

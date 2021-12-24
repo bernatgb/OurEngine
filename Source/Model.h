@@ -5,16 +5,19 @@
 #include "Texture.h"
 
 #include "MathGeoLib.h"
+#include <string>
 #include <vector>
 
 class GameObject;
 
 struct ModelNode {
 public:
+	std::string m_Name;
 	std::vector<ModelNode*> m_Children;
 	std::vector<Mesh*> m_Meshes;
 
 	ModelNode() {
+		m_Name = "";
 		m_Children = std::vector<ModelNode*>(0);
 		m_Meshes = std::vector<Mesh*>(0);
 	}
@@ -47,7 +50,7 @@ public:
 		return Distance3(GetMaxPoint(), GetMinPoint());
 	};
 
-	char* m_Name = nullptr;
+	std::string m_Name;
 
 	ModelNode* m_RootStructure;
 
@@ -62,7 +65,9 @@ public:
 
 private:
 	void LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes);
-	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials);
+	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials, const char* _fullPath);
 
+	GameObject* RecursiveExportToGORoot(ModelNode* ourNode, GameObject* parent);
+	void RecursiveContructionRoot(aiNode* node, ModelNode* ourNode);
 };
 

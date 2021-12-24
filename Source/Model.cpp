@@ -14,23 +14,23 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
-#include <string>
-
 #include "ModelImporter.h"
 
 Model::Model(const char* _fileName)
 {
 	MY_LOG("Assimp (%s): Loading the model", _fileName);
 
-	m_Name = new char[strlen(_fileName)+1];
-	strcpy(m_Name, _fileName);
+	m_Name = _fileName;
+	const size_t last_slash_idx = m_Name.rfind('\\');
+	if (std::string::npos != last_slash_idx)
+		m_Name = m_Name.substr(last_slash_idx, m_Name.length());
 
-	const aiScene* scene = aiImportFile(m_Name, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
+	const aiScene* scene = aiImportFile(_fileName, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
 	if (scene)
 	{
 		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
 		//LoadMeshes(scene->mMeshes, 1);
-		LoadTextures(scene->mMaterials, scene->mNumMaterials);
+		LoadTextures(scene->mMaterials, scene->mNumMaterials, _fileName);
 
 		m_Min = m_Meshes[0]->m_Min;
 		m_Max = m_Meshes[0]->m_Min;
@@ -50,6 +50,10 @@ Model::Model(const char* _fileName)
 			if (m_Meshes[i]->m_Min.z < m_Min.z) m_Min.z = m_Meshes[i]->m_Min.z;
 		}
 
+		m_RootStructure = new ModelNode();
+		RecursiveContructionRoot(scene->mRootNode, m_RootStructure);
+		m_RootStructure->m_Name = m_Name;
+
 		Model* m = new Model();
 		importer::model::Import(scene, m);
 		delete m;
@@ -60,18 +64,16 @@ Model::Model(const char* _fileName)
 	}
 }
 
-void RecursiveRoot(ModelNode* ourNode)
+void RecursiveDeleteRoot(ModelNode* ourNode)
 {
 	for (unsigned int i = 0; i < ourNode->m_Children.size(); ++i)
-		RecursiveRoot(ourNode->m_Children[i]);
+		RecursiveDeleteRoot(ourNode->m_Children[i]);
 
 	delete ourNode;
 }
 
 Model::~Model()
 {
-	delete[] m_Name;
-
 	for (int i = 0; i < m_Meshes.size(); ++i)
 		delete m_Meshes[i];
 
@@ -79,12 +81,14 @@ Model::~Model()
 		delete m_Textures[i];
 
 	if (m_RootStructure != nullptr)
-		RecursiveRoot(m_RootStructure);
+		RecursiveDeleteRoot(m_RootStructure);
 }
 
 GameObject* Model::ExportToGO(GameObject* _parent)
 {
-	GameObject* go = _parent->AddChild(m_Name);
+	return RecursiveExportToGORoot(m_RootStructure, _parent);
+
+	/*GameObject* go = _parent->AddChild(m_Name);
 
 	if (m_Meshes.size() == 1) 
 	{
@@ -103,7 +107,7 @@ GameObject* Model::ExportToGO(GameObject* _parent)
 		}
 	}
 
-	return go;
+	return go;*/
 }
 
 void Model::DrawImGui()
@@ -144,7 +148,7 @@ void Model::LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes)
 	}
 }
 
-void Model::LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials)
+void Model::LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials, const char* _fullPath)
 {
 	MY_LOG("Assimp: Loading the textures");
 	aiString file;
@@ -153,7 +157,36 @@ void Model::LoadTextures(aiMaterial** _materials, const unsigned int& _numMateri
 	{
 		if (_materials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
-			m_Textures[i] = new Texture(file.data, m_Name);
+			m_Textures[i] = new Texture(file.data, _fullPath);
 		}
+	}
+}
+
+GameObject* Model::RecursiveExportToGORoot(ModelNode* ourNode, GameObject* parent)
+{
+	GameObject* go = parent->AddChild(ourNode->m_Name.c_str());
+
+	for (unsigned int i = 0; i < ourNode->m_Meshes.size(); ++i)
+		go->AddComponent(new CMesh(true, go, ourNode->m_Meshes[i]));
+	if (ourNode->m_Meshes.size() > 0)
+		go->SetMaterial(m_Textures[ourNode->m_Meshes[0]->m_MaterialIndex]);
+
+	for (unsigned int i = 0; i < ourNode->m_Children.size(); ++i)
+		RecursiveExportToGORoot(ourNode->m_Children[i], go);
+
+	return go;
+}
+
+void Model::RecursiveContructionRoot(aiNode* node, ModelNode* ourNode)
+{
+	ourNode->m_Name = node->mName.C_Str();
+
+	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+		ourNode->m_Meshes.push_back(m_Meshes[node->mMeshes[i]]);
+
+	for (unsigned int i = 0; i < node->mNumChildren; ++i)
+	{
+		ourNode->m_Children.push_back(new ModelNode());
+		RecursiveContructionRoot(node->mChildren[i], ourNode->m_Children[i]);
 	}
 }
