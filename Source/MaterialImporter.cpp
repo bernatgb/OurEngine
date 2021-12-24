@@ -10,14 +10,15 @@
 
 #include "GL/glew.h"
 
+#include <string>
+
 void importer::material::Import(const aiMaterial* material, Texture* ourMaterial, const char* fullPath)
 {
 	aiString file;
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &file) != AI_SUCCESS)
 		return;
 
-	ourMaterial->m_Name = new char[strlen(file.data) + 1];
-	strcpy(ourMaterial->m_Name, file.data);
+	ourMaterial->m_Name = file.data;
 
 	ourMaterial->m_MinFilter = GL_LINEAR;
 	ourMaterial->m_MagFilter = GL_LINEAR;
@@ -75,14 +76,21 @@ int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 		ourMaterial->m_Wrap
 	};
 
-	unsigned int size = sizeof(header) + ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
+	unsigned int size = ourMaterial->m_Name.length() + 1 + sizeof(header) + ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
 
 	// Allocate
 	fileBuffer = new char[size];
 	char* cursor = fileBuffer;
 
+	// Store name
+	unsigned int bytes = ourMaterial->m_Name.length() + 1;
+	cursor[0] = ourMaterial->m_Name.length();
+	for (unsigned int i = 0; i < ourMaterial->m_Name.length(); ++i)
+		cursor[i+1] = ourMaterial->m_Name[0];
+	cursor += bytes;
+
 	// Store header
-	unsigned int bytes = sizeof(header);
+	bytes = sizeof(header);
 	memcpy(cursor, header, sizeof(header));
 	cursor += bytes;
 
@@ -99,8 +107,14 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 	const char* cursor = fileBuffer;
 
 	MY_LOG("MaterialImporter_Load: Reading main variables");
+	ourMaterial->m_Name = "";
+	unsigned int bytes = cursor[0];
+	for (unsigned int i = 0; i < bytes; ++i)
+		ourMaterial->m_Name += cursor[i + 1];
+	cursor += (bytes + 1);
+
 	unsigned int header[8];
-	unsigned int bytes = sizeof(header);
+	bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
 

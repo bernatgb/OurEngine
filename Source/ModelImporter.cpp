@@ -1,6 +1,7 @@
 #include "ModelImporter.h"
 
 #include "MeshImporter.h"
+#include "MaterialImporter.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -22,27 +23,18 @@ void RecursiveRoot(Model* ourModel, aiNode* node, ModelNode* ourNode)
 	}
 }
 
-void importer::model::Import(const aiScene* model, Model* ourModel)
+void importer::model::Import(const aiScene* model, Model* ourModel, std::string fullPath)
 {
-	// 1. Parse a JSON string into DOM.
-	const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
-	rapidjson::Document d;
-	d.Parse(json);
-
-	// 2. Modify it by DOM.
-	rapidjson::Value& s = d["stars"];
-	s.SetInt(s.GetInt() + 1);
-
-	MY_LOG("JSOOOOOOOOON %i", d["stars"].GetInt());
-
 	//m_Name = new char[strlen(_fileName) + 1];
 	//strcpy(m_Name, _fileName);
 
 	//ourModel->m_Name = new char[strlen(model->GetShortFilename()) + 1];
 	//strcpy(ourModel->m_Name, model->GetShortFilename());
-
-
-	ourModel->m_Name = "";
+	
+	ourModel->m_Name = fullPath;
+	const size_t last_slash_idx = ourModel->m_Name.rfind('\\');
+	if (std::string::npos != last_slash_idx)
+		ourModel->m_Name = ourModel->m_Name.substr(last_slash_idx+1, ourModel->m_Name.length());
 
 	MY_LOG("Assimp: Loading the meshes");
 	ourModel->m_Meshes = std::vector<Mesh*>(model->mNumMeshes);
@@ -60,10 +52,12 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 	ourModel->m_Textures = std::vector<Texture*>(model->mNumMaterials);
 	for (unsigned i = 0; i < model->mNumMaterials; ++i)
 	{
-		if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
+		ourModel->m_Textures[i] = new Texture();
+		importer::material::Import(model->mMaterials[i], ourModel->m_Textures[i], fullPath.c_str());
+		/*if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
-			ourModel->m_Textures[i] = new Texture(file.data, ".\\Assets\\Textures\\BakerHouse.png");//ourModel->m_Name);
-		}
+			ourModel->m_Textures[i] = new Texture(file.data, fullPath.c_str());
+		}*/
 	}
 
 	ourModel->m_Min = ourModel->m_Meshes[0]->m_Min;
@@ -87,3 +81,82 @@ void importer::model::Import(const aiScene* model, Model* ourModel)
 	ourModel->m_RootStructure = new ModelNode();
 	RecursiveRoot(ourModel, model->mRootNode, ourModel->m_RootStructure);
 }
+
+void RecusiveNode(rapidjson::Value& node, ModelNode* modelNode, rapidjson::Document::AllocatorType& allocator) {
+	rapidjson::Value nodeName(modelNode->m_Name.c_str(), allocator);
+
+	rapidjson::Value meshes(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < modelNode->m_Meshes.size(); ++i)
+		meshes.PushBack(modelNode->m_Meshes[i]->m_GUID, allocator);
+
+	rapidjson::Value children(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < modelNode->m_Children.size(); ++i)
+	{
+		rapidjson::Value newNode(rapidjson::kObjectType);
+		RecusiveNode(newNode, modelNode->m_Children[i], allocator);
+		children.PushBack(newNode, allocator);
+	}
+
+	node.AddMember("Name", nodeName, allocator);
+	node.AddMember("Meshes", meshes, allocator);
+	node.AddMember("Children", children, allocator);
+}
+
+int importer::model::Save(const Model* ourModel, char*& fileBuffer)
+{
+	rapidjson::Document d;
+	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
+	d.SetObject();
+
+	rapidjson::Value name(ourModel->m_Name.c_str(), allocator);
+	d.AddMember("Name", name, allocator);
+
+	d.AddMember("NumVertices", rapidjson::Value(ourModel->m_NumVertices), allocator);
+
+	d.AddMember("NumTriangles", rapidjson::Value(ourModel->m_NumTriangles), allocator);
+
+	rapidjson::Value meshes(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < ourModel->m_Meshes.size(); ++i)
+		meshes.PushBack(ourModel->m_Meshes[i]->m_GUID, allocator);
+	d.AddMember("Meshes", meshes, allocator);
+
+	rapidjson::Value textures(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < ourModel->m_Textures.size(); ++i)
+		textures.PushBack(ourModel->m_Textures[i]->m_GUID, allocator);
+	d.AddMember("Textures", textures, allocator);
+
+	rapidjson::Value minPoint(rapidjson::kArrayType);
+	/*minPoint.Reserve(3, allocator);
+	minPoint[0] = ourModel->m_Min.x;
+	minPoint[1] = ourModel->m_Min.y;
+	minPoint[2] = ourModel->m_Min.z;*/
+	minPoint.PushBack(ourModel->m_Min.x, allocator);
+	minPoint.PushBack(ourModel->m_Min.y, allocator);
+	minPoint.PushBack(ourModel->m_Min.z, allocator);
+	d.AddMember("Min", minPoint, allocator);
+
+	rapidjson::Value maxPoint(rapidjson::kArrayType);
+	maxPoint.PushBack(ourModel->m_Max.x, allocator);
+	maxPoint.PushBack(ourModel->m_Max.y, allocator);
+	maxPoint.PushBack(ourModel->m_Max.z, allocator);
+	d.AddMember("Max", maxPoint, allocator);
+
+	//rapidjson::StringBuffer buffer;
+	//rapidjson::Writer<char*> writer(fileBuffer);
+	//d.Accept(writer);
+
+	rapidjson::Value root(rapidjson::kObjectType);
+	RecusiveNode(root, ourModel->m_RootStructure, allocator);
+	d.AddMember("Root", root, allocator);
+
+	//TEST
+	rapidjson::StringBuffer buffer;
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+	d.Accept(writer);
+
+	fileBuffer = (char*)buffer.GetString();
+	//
+
+	return 0;
+}
+

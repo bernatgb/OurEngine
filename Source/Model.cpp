@@ -23,7 +23,7 @@ Model::Model(const char* _fileName)
 	m_Name = _fileName;
 	const size_t last_slash_idx = m_Name.rfind('\\');
 	if (std::string::npos != last_slash_idx)
-		m_Name = m_Name.substr(last_slash_idx, m_Name.length());
+		m_Name = m_Name.substr(last_slash_idx+1, m_Name.length());
 
 	const aiScene* scene = aiImportFile(_fileName, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
 	if (scene)
@@ -55,8 +55,12 @@ Model::Model(const char* _fileName)
 		m_RootStructure->m_Name = m_Name;
 
 		Model* m = new Model();
-		importer::model::Import(scene, m);
+		importer::model::Import(scene, m, _fileName);
+		char* file = nullptr;
+		importer::model::Save(m, file);
+
 		delete m;
+		delete file;
 	}
 	else
 	{

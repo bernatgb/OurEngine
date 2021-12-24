@@ -1,9 +1,12 @@
 #pragma once
 
+#include <string>
+
 struct TextureData;
 class Texture
 {
 public:
+	Texture() {};
 	Texture(const char* _fileName, const char* _fullPath);
 	~Texture();
 
@@ -11,7 +14,8 @@ public:
 
 	void DrawImGui();
 
-	char* m_Name = nullptr;
+	std::string m_Name;
+	unsigned int m_GUID;
 
 	unsigned int m_Texture;
 	TextureData* m_TextureData;
