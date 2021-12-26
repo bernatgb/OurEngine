@@ -59,7 +59,11 @@ Model::Model(const char* _fileName)
 		char* file = nullptr;
 		importer::model::Save(m, file);
 
+		Model* m2 = new Model();
+		importer::model::Load(file, m2);
+
 		delete m;
+		delete m2;
 		delete file;
 	}
 	else

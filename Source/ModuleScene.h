@@ -35,6 +35,20 @@ public:
 	int activeModel;
 
 	void LoadLibraryAssets();
+	Mesh* FindMesh(unsigned int _meshId) {
+		std::map<unsigned int, Mesh*>::iterator it = m_Meshes.find(_meshId);
+		if (it != m_Meshes.end())
+			return it->second;
+
+		return nullptr;
+	};
+	Texture* FindTexture(unsigned int _textureId) {
+		std::map<unsigned int, Texture*>::iterator it = m_Textures.find(_textureId);
+		if (it != m_Textures.end())
+			return it->second;
+
+		return nullptr;
+	};
 
 	std::map<std::string, Model*> m_Models;
 	std::map<unsigned int, Mesh*> m_Meshes;

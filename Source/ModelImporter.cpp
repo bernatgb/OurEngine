@@ -3,11 +3,14 @@
 #include "MeshImporter.h"
 #include "MaterialImporter.h"
 
+#include "Application.h"
+#include "ModuleScene.h"
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-void RecursiveRoot(Model* ourModel, aiNode* node, ModelNode* ourNode)
+void RecursiveRoot(const Model* ourModel, const aiNode* node, ModelNode* ourNode)
 {
 	ourNode->m_Name = node->mName.C_Str();
 
@@ -80,9 +83,10 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 
 	ourModel->m_RootStructure = new ModelNode();
 	RecursiveRoot(ourModel, model->mRootNode, ourModel->m_RootStructure);
+	ourModel->m_RootStructure->m_Name = ourModel->m_Name;
 }
 
-void RecusiveNode(rapidjson::Value& node, ModelNode* modelNode, rapidjson::Document::AllocatorType& allocator) {
+void RecusiveNodeToJson(rapidjson::Value& node, const ModelNode* modelNode, rapidjson::Document::AllocatorType& allocator) {
 	rapidjson::Value nodeName(modelNode->m_Name.c_str(), allocator);
 
 	rapidjson::Value meshes(rapidjson::kArrayType);
@@ -93,7 +97,7 @@ void RecusiveNode(rapidjson::Value& node, ModelNode* modelNode, rapidjson::Docum
 	for (unsigned int i = 0; i < modelNode->m_Children.size(); ++i)
 	{
 		rapidjson::Value newNode(rapidjson::kObjectType);
-		RecusiveNode(newNode, modelNode->m_Children[i], allocator);
+		RecusiveNodeToJson(newNode, modelNode->m_Children[i], allocator);
 		children.PushBack(newNode, allocator);
 	}
 
@@ -146,7 +150,7 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 	//d.Accept(writer);
 
 	rapidjson::Value root(rapidjson::kObjectType);
-	RecusiveNode(root, ourModel->m_RootStructure, allocator);
+	RecusiveNodeToJson(root, ourModel->m_RootStructure, allocator);
 	d.AddMember("Root", root, allocator);
 
 	//TEST
@@ -154,9 +158,85 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	d.Accept(writer);
 
-	fileBuffer = (char*)buffer.GetString();
+	const char* jsonFile = buffer.GetString();
+	unsigned int size = strlen(jsonFile);
+
+	fileBuffer = new char[size + 1];
+	strcpy(fileBuffer, jsonFile);
 	//
 
-	return 0;
+	return size;
+}
+
+void RecusiveNodeFromJson(const rapidjson::Value& node, ModelNode*& modelNode) {
+	modelNode = new ModelNode();
+
+	//Get name
+	rapidjson::Value::ConstMemberIterator it = node.MemberBegin();
+	modelNode->m_Name = it->value.GetString();
+	++it;
+
+	//Get meshes
+	for (rapidjson::Value::ConstValueIterator itr = it->value.Begin(); itr != it->value.End(); ++itr)
+	{
+		Mesh* mesh = App->scene->FindMesh(itr->GetInt());
+		if (mesh == nullptr)
+		{
+			MY_LOG("Error when loading Model");
+			//return;
+		}
+		modelNode->m_Meshes.push_back(mesh);
+	}
+	++it;
+
+	//Get children
+	for (rapidjson::Value::ConstValueIterator itr = it->value.Begin(); itr != it->value.End(); ++itr)
+	{
+		ModelNode* newNode = nullptr;
+		RecusiveNodeFromJson(*itr, newNode);
+		modelNode->m_Children.push_back(newNode);
+	}
+	++it;
+}
+
+void importer::model::Load(const char* fileBuffer, Model* ourModel)
+{
+	rapidjson::Document d;
+	d.Parse(fileBuffer);
+
+	ourModel->m_Name = d["Name"].GetString();
+	ourModel->m_NumVertices = d["NumVertices"].GetInt();
+	ourModel->m_NumTriangles = d["NumTriangles"].GetInt();
+
+	for (rapidjson::Value::ConstValueIterator itr = d["Meshes"].Begin(); itr != d["Meshes"].End(); ++itr)
+	{
+		Mesh* mesh = App->scene->FindMesh(itr->GetInt());
+		if (mesh == nullptr) 
+		{
+			MY_LOG("Error when loading Model");
+			//return;
+		}
+		ourModel->m_Meshes.push_back(mesh);
+	}
+
+	for (rapidjson::Value::ConstValueIterator itr = d["Textures"].Begin(); itr != d["Textures"].End(); ++itr)
+	{
+		Texture* texture = App->scene->FindTexture(itr->GetInt());
+		if (texture == nullptr)
+		{
+			MY_LOG("Error when loading Model");
+			//return;
+		}
+		ourModel->m_Textures.push_back(texture);
+	}
+
+	rapidjson::Value::ConstValueIterator itr = d["Min"].Begin();
+	ourModel->m_Min = float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+
+	itr = d["Max"].Begin();
+	ourModel->m_Max = float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+
+	RecusiveNodeFromJson(d["Root"], ourModel->m_RootStructure);
+	ourModel->m_RootStructure->m_Name = ourModel->m_Name;
 }
 
