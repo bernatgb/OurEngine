@@ -16,6 +16,8 @@ public:
 	void Start();
 	void Update();
 
+	bool IsInFrustum();
+
 	void SetMaterial(Texture* _texture);
 	template<typename T> T* GetComponent();
 	//template<typename T> void AddComponent(T* _newComponent);
@@ -29,6 +31,7 @@ public:
 	char* m_Name;
 	bool m_Active;
 	bool m_Selected;
+	bool m_InFrustum;
 	CTransform* m_Transform;
 	CMaterial* m_Material;
 	std::vector<Component*> m_Components;

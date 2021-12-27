@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "ModuleRender.h"
+#include "ModuleCamera.h"
 #include "GL/glew.h"
 
 #include "imgui.h"
@@ -15,6 +16,7 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 
 	m_Active = true;
 	m_Selected = false;
+	m_InFrustum = IsInFrustum();
 	m_Parent = _parent;
 
 	m_Transform = new CTransform(true, this);
@@ -57,13 +59,65 @@ void GameObject::Update()
 		m_Material->ActivateMaterial();
 	}
 
-	glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
+	// Hierarchical frustum culling
+	bool parentInFrustum = true;
+	if (m_Parent != NULL) 
+		parentInFrustum = m_Parent->m_InFrustum;
+
+	std::vector<bool> childInFrustum;
+	for (unsigned int i = 0; i < m_Children.size(); ++i)
+	{
+		childInFrustum.push_back(m_Children[i]->IsInFrustum());
+	}
+
+	bool allChildrenInFrustum = true;
+	for (int i = 0; i < childInFrustum.size(); ++i)
+		if (childInFrustum[i] == false)
+			allChildrenInFrustum = false;
+
+	m_InFrustum = allChildrenInFrustum;
+
+	if (parentInFrustum && IsInFrustum() && allChildrenInFrustum)
+	{
+		// It keeps painted?
+		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
+	}
+	else
+	{
+		if (m_Parent != NULL && m_Parent->m_Name == "Root")
+			m_InFrustum = false;
+	}
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 		m_Components[i]->Update();
 
 	for (unsigned int i = 0; i < m_Children.size(); ++i)
 		m_Children[i]->Update();
+}
+
+bool GameObject::IsInFrustum()
+{
+	bool inFrustum = false;
+
+	int j = m_Components.size();
+
+	for (int i = 0; i < m_Components.size(); ++i)
+	{
+		if (m_Components[i]->m_Type == ComponentType::MESH)
+		{
+			ImGui::Text("%s", m_Name);
+			CMesh* cMesh = (CMesh*)m_Components[i];
+			inFrustum = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
+			ImGui::SameLine();
+			std::string sb = "no";
+			if (inFrustum)
+				sb = "yes";
+			ImGui::Text("is painted? %s", sb.c_str()); // Supposing it's saying the truth
+			// Better if we do this in another part?
+		}
+	}
+
+	return inFrustum;
 }
 
 void GameObject::SetMaterial(Texture* _texture)
