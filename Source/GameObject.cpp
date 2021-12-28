@@ -11,6 +11,8 @@
 
 GameObject::GameObject(const char* _name, GameObject* _parent)
 {
+	m_GUID = rand();
+
 	m_Name = new char[100];
 	strcpy(m_Name, _name);
 
@@ -95,8 +97,56 @@ void GameObject::Update()
 		m_Children[i]->Update();
 }
 
+void GameObject::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const
+{
+	// Store GUID, Name, Active, Parend GUID
+	node.AddMember("GUID", rapidjson::Value(m_GUID), allocator);
+	node.AddMember("Name", rapidjson::Value(m_Name, allocator), allocator);
+	node.AddMember("Active", rapidjson::Value(m_Active), allocator);
+	node.AddMember("Parent", rapidjson::Value(m_Parent->m_GUID), allocator);
+
+	// Store components
+	rapidjson::Value components(rapidjson::kArrayType);
+	// Transform
+	rapidjson::Value newComponent(rapidjson::kObjectType);
+	m_Transform->OnSave(newComponent, allocator);
+	components.PushBack(newComponent, allocator);
+	// Other components
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
+	{
+		rapidjson::Value newComponent(rapidjson::kObjectType);
+		m_Components[i]->OnSave(newComponent, allocator);
+		components.PushBack(newComponent, allocator);
+	}
+	node.AddMember("Components", components, allocator);
+
+	// CHANGE STORE ONLY THE GUID
+	// Store children
+	rapidjson::Value children(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < m_Children.size(); ++i)
+	{
+		rapidjson::Value newChild(rapidjson::kObjectType);
+		m_Children[i]->OnSave(newChild, allocator);
+		children.PushBack(newChild, allocator);
+	}
+	node.AddMember("Children", children, allocator);
+
+	//bool m_Selected;
+	//bool m_InFrustum;
+	//CMaterial* m_Material; should be with the other components??
+
+	//float3 m_Min;
+	//float3 m_Max;
+}
+
+void GameObject::OnLoad(const rapidjson::Value& node)
+{
+}
+
 bool GameObject::IsInFrustum()
 {
+	//return false;
+
 	bool inFrustum = false;
 
 	int j = m_Components.size();

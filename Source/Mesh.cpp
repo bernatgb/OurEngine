@@ -105,16 +105,17 @@ Mesh::Mesh(aiMesh* _mesh)
 	glDeleteBuffers(1, &m_Ebo);
 	glDeleteVertexArrays(1, &m_Vao);
 
-	importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
+	//importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
 
-	char* storedFile = nullptr;
+	//char* storedFile = nullptr;
 
-	importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);
+	//importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);
 
-	importer::mesh::Load(storedFile, this);
+	//importer::mesh::Load(storedFile, this);
+	importer::mesh::Load(file, this);
 
 	delete[] file;
-	delete[] storedFile;
+	//delete[] storedFile;
 	//////////////////////////////////////////////////////////////
 
 	//CREATING THE BB

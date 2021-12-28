@@ -7,6 +7,10 @@
 
 #include <vector>
 
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
 class GameObject
 {
 public:
@@ -15,6 +19,8 @@ public:
 
 	void Start();
 	void Update();
+	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const;
+	void OnLoad(const rapidjson::Value& node);
 
 	bool IsInFrustum();
 
@@ -28,6 +34,7 @@ public:
 
 	void DrawImGui();
 
+	unsigned int m_GUID;
 	char* m_Name;
 	bool m_Active;
 	bool m_Selected;

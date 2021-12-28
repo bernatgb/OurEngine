@@ -13,6 +13,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+#include "SceneImporter.h"
+
 #include <string>
 
 ModuleScene::ModuleScene()
@@ -43,6 +45,8 @@ bool ModuleScene::Init()
 
 bool ModuleScene::CleanUp()
 {
+    //importer::SaveResources(m_Meshes, m_Textures, m_Models);
+
     delete m_Root;
 
     for (unsigned int i = 0; i < models.size(); ++i)
@@ -151,6 +155,7 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::BulletText("Fix camera movement speed -> effected by fps");
     ImGui::BulletText("Fix mouse clicking");
     ImGui::BulletText("Have two cameras");
+    ImGui::BulletText("Use correctly start and enable of components");
 
     ImGui::Separator();
 
@@ -321,7 +326,8 @@ const GameObject* ModuleScene::GetRoot() const
 
 void ModuleScene::LoadLibraryAssets()
 {
-    m_Models;
-    m_Meshes;
-    m_Textures;
+}
+
+void ModuleScene::SaveLibraryAssets()
+{
 }

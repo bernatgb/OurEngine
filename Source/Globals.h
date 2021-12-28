@@ -23,7 +23,12 @@ enum update_status
 #define VSYNC true
 #define TITLE "Super Awesome Engine"
 
-#define TEXTURES_FOLDER ".\\Assets\\Textures\\"
 #define GITHUB "https://github.com/miquelmiro3/MyEngine"
 #define LICENSE_DIR "..\\LICENSE"
 #define DEFAULT_SCREEN_RATIO 0.8
+
+#define TEXTURES_FOLDER ".\\Assets\\Textures\\"
+#define LIBRARY_MESHES ".\\Assets\\Library\\Meshes\\"
+#define LIBRARY_MATERIALS ".\\Assets\\Library\\Materials\\"
+#define LIBRARY_MODELS ".\\Assets\\Library\\Models\\"
+#define RESOURCES_FILE ".\\Assets\\Library\\Resources.asset"
