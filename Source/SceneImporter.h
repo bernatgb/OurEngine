@@ -7,8 +7,12 @@
 
 #include <map>
 
+#include "rapidjson/document.h"
+//namespace rapidjson { typedef GenericDocument<UTF8<> > Document; }
+
 namespace importer {
 	//void LoadLibraryFiles();
+	bool SaveFile(const char* path, const rapidjson::Document& jsonDocument);
 	bool SaveFile(const char* path, const char* data, const int size);
 	bool LoadFile(const char* path, char*& data);
 

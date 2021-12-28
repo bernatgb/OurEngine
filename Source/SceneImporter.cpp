@@ -3,11 +3,35 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
 
 #include <stdlib.h>
 #include <string>
 #include <filesystem>
 #include <iostream>
+
+bool importer::SaveFile(const char* path, const rapidjson::Document& jsonDocument)
+{
+	FILE* file = nullptr;
+	fopen_s(&file, path, "wb");
+
+	if (file)
+	{
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> pWriter(buffer);
+		jsonDocument.Accept(pWriter);
+
+		const char* jsonFile = buffer.GetString();
+		unsigned int size = strlen(jsonFile);
+
+		fwrite(jsonFile, 1, size, file);
+		fclose(file);
+
+		return true;
+	}
+
+	return false;
+}
 
 bool importer::SaveFile(const char* path, const char* data, const int size)
 {
@@ -115,19 +139,8 @@ void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const
 	}
 	d.AddMember("Models", models, allocator);
 
-	// Store resources file	
-	rapidjson::StringBuffer buffer;
-	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-	d.Accept(writer);
-
-	const char* jsonFile = buffer.GetString();
-	unsigned int size = strlen(jsonFile);
-
-	char* fileBuffer = new char[size + 1];
-	strcpy(fileBuffer, jsonFile);
-
-	importer::SaveFile(RESOURCES_FILE, fileBuffer, size);
-	delete[] fileBuffer;
+	// Store resources file
+	importer::SaveFile(RESOURCES_FILE, d);
 }
 
 void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _materials, std::map<std::string, Model*>& _models)

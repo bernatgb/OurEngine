@@ -45,7 +45,7 @@ bool ModuleScene::Init()
 
 bool ModuleScene::CleanUp()
 {
-    //importer::SaveResources(m_Meshes, m_Textures, m_Models);
+    importer::SaveResources(m_Meshes, m_Textures, m_Models);
 
     delete m_Root;
 
