@@ -145,7 +145,7 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 
 bool GameObject::IsInFrustum()
 {
-	//return false;
+	//return true;
 
 	bool inFrustum = false;
 

@@ -54,7 +54,7 @@ Model::Model(const char* _fileName)
 		RecursiveContructionRoot(scene->mRootNode, m_RootStructure);
 		m_RootStructure->m_Name = m_Name;
 
-		Model* m = new Model();
+		/*Model* m = new Model();
 		importer::model::Import(scene, m, _fileName);
 		char* file = nullptr;
 		importer::model::Save(m, file);
@@ -64,7 +64,7 @@ Model::Model(const char* _fileName)
 
 		delete m;
 		delete m2;
-		delete file;
+		delete file;*/
 	}
 	else
 	{
@@ -82,11 +82,11 @@ void RecursiveDeleteRoot(ModelNode* ourNode)
 
 Model::~Model()
 {
-	for (int i = 0; i < m_Meshes.size(); ++i)
-		delete m_Meshes[i];
+	//for (int i = 0; i < m_Meshes.size(); ++i)
+	//	delete m_Meshes[i];
 
-	for (int i = 0; i < m_Textures.size(); ++i)
-		delete m_Textures[i];
+	//for (int i = 0; i < m_Textures.size(); ++i)
+	//	delete m_Textures[i];
 
 	if (m_RootStructure != nullptr)
 		RecursiveDeleteRoot(m_RootStructure);
