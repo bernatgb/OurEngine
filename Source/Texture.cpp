@@ -85,22 +85,22 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 	MY_LOG("Assimp texture: Texture loaded correctly");
 
 	/////////////////////////////////////////////////////////////////////////////////
-	char* file = nullptr;
+	/*char* file = nullptr;
 	int fileSize = importer::material::Save(this, file);
 
 	App->texture->DeleteTextureData(m_TextureData);
 	glDeleteTextures(1, &m_Texture);
 
-	/*importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
+	//importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
 
-	char* storedFile = nullptr;
+	//char* storedFile = nullptr;
 
-	importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);*/
+	//importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);
 
 	importer::material::Load(file, this);
 
 	delete[] file;
-	//delete[] storedFile;
+	//delete[] storedFile;*/
 	/////////////////////////////////////////////////////////////////////////////////
 
 	glGenerateTextureMipmap(m_Texture);

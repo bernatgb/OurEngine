@@ -98,7 +98,7 @@ Mesh::Mesh(aiMesh* _mesh)
 	glBindVertexArray(0);
 	
 	//////////////////////////////////////////////////////////////
-	char* file = nullptr;
+	/*char* file = nullptr;
 	int fileSize = importer::mesh::Save(this, file);
 
 	glDeleteBuffers(1, &m_Vbo);
@@ -115,10 +115,11 @@ Mesh::Mesh(aiMesh* _mesh)
 	importer::mesh::Load(file, this);
 
 	delete[] file;
-	//delete[] storedFile;
+	//delete[] storedFile;*/
 	//////////////////////////////////////////////////////////////
 
 	//CREATING THE BB
+	m_BB = new float3[8];
 	m_BB[0] = float3(m_Max.x, m_Max.y, m_Max.z);
 	m_BB[1] = float3(m_Min.x, m_Max.y, m_Max.z);
 	m_BB[2] = float3(m_Max.x, m_Min.y, m_Max.z);
@@ -150,7 +151,7 @@ void Mesh::Draw() const
 
 unsigned int* Mesh::MapIndicesBuffer() const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_Ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ebo);
 
 	return (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int) * m_NumIndices, GL_MAP_WRITE_BIT));
 }
@@ -164,7 +165,13 @@ float* Mesh::MapVerticesBuffer() const
 	return (float*)(glMapBufferRange(GL_ARRAY_BUFFER, 0, vertex_size * m_NumVertices, GL_MAP_WRITE_BIT));;
 }
 
-void Mesh::UnMapBuffer() const
+void Mesh::UnMapIndicesBuffer() const
+{
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Mesh::UnMapVerticesBuffer() const
 {
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

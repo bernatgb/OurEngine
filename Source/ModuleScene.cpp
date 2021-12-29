@@ -28,9 +28,12 @@ ModuleScene::~ModuleScene()
 bool ModuleScene::Init()
 {
 	MY_LOG("Model: Model creation");
+    
+    Model* model = importer::LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
+    m_Models[model->m_Name] = model;
 
-    models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
-    activeModel = 0;
+    //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
+    //activeModel = 0;
 
 	m_Root = new GameObject("Root", nullptr);
     m_GOSelected = nullptr;
@@ -38,7 +41,8 @@ bool ModuleScene::Init()
     GameObject* camera = m_Root->AddChild("Camera");
     camera->AddComponent(new CCamera(true, camera));
 
-    SelectGameObject(models[activeModel]->ExportToGO(m_Root));
+    //SelectGameObject(models[activeModel]->ExportToGO(m_Root));
+    SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
 
 	return true;
 }
@@ -49,8 +53,17 @@ bool ModuleScene::CleanUp()
 
     delete m_Root;
 
-    for (unsigned int i = 0; i < models.size(); ++i)
-        delete models[i];
+    for (auto it = m_Meshes.begin(); it != m_Meshes.end(); ++it)
+        delete it->second;
+
+    for (auto it = m_Textures.begin(); it != m_Textures.end(); ++it)
+        delete it->second;
+
+    for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
+        delete it->second;
+
+    //for (unsigned int i = 0; i < models.size(); ++i)
+    //    delete models[i];
 
 	return true;
 }
@@ -107,7 +120,7 @@ void ModuleScene::DrawImGuiHierarchy()
 {
     if (ImGui::Button("Create a new Prefab of the model"))
     {
-        models[activeModel]->ExportToGO(m_Root);
+        //models[activeModel]->ExportToGO(m_Root);
     }
 
     ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
@@ -291,7 +304,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     SelectGameObject(m_Models[modelName]->ExportToGO(m_Root));
     App->camera->AdjustToModel(m_Models[modelName]);*/
 
-    activeModel = -1;
+    /*activeModel = -1;
     for (unsigned int i = 0; i < models.size(); ++i)
     {
         unsigned int j = 0;
@@ -316,7 +329,26 @@ void ModuleScene::LoadModel(const char* _fileName)
 
     SelectGameObject(models[activeModel]->ExportToGO(m_Root));
 
-    App->camera->AdjustToModel(models[activeModel]);
+    App->camera->AdjustToModel(models[activeModel]);*/
+
+    std::string modelName = _fileName;
+    const size_t last_slash_idx = modelName.rfind('\\');
+    if (std::string::npos != last_slash_idx)
+        modelName = modelName.substr(last_slash_idx + 1, modelName.length());
+
+    std::map<std::string, Model*>::iterator it = m_Models.find(modelName.c_str());
+    if (it != m_Models.end()) 
+    {
+        SelectGameObject(it->second->ExportToGO(m_Root));
+        App->camera->AdjustToModel(it->second);
+        return;
+    }
+    
+    Model* model = importer::LoadModel(_fileName);
+    m_Models[model->m_Name] = model;
+
+    SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
+    App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
 
 const GameObject* ModuleScene::GetRoot() const
