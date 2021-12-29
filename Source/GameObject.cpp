@@ -18,7 +18,7 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 
 	m_Active = true;
 	m_Selected = false;
-	m_InFrustum = IsInFrustum();
+	m_InFrustum = true;
 	m_Parent = _parent;
 
 	m_Transform = new CTransform(true, this);
@@ -66,6 +66,7 @@ void GameObject::Update()
 	if (m_Parent != NULL) 
 		parentInFrustum = m_Parent->m_InFrustum;
 
+	/*
 	std::vector<bool> childInFrustum;
 	for (unsigned int i = 0; i < m_Children.size(); ++i)
 	{
@@ -78,16 +79,15 @@ void GameObject::Update()
 			allChildrenInFrustum = false;
 
 	m_InFrustum = allChildrenInFrustum;
+	*/
 
-	if (parentInFrustum && IsInFrustum() && allChildrenInFrustum)
+	if (parentInFrustum && IsInFrustum())
 	{
-		// It keeps painted?
 		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
 	}
 	else
 	{
-		if (m_Parent != NULL && m_Parent->m_Name == "Root")
-			m_InFrustum = false;
+		return;
 	}
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
@@ -145,9 +145,7 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 
 bool GameObject::IsInFrustum()
 {
-	//return false;
-
-	bool inFrustum = false;
+	bool inFrustum = true;
 
 	int j = m_Components.size();
 
@@ -157,12 +155,12 @@ bool GameObject::IsInFrustum()
 		{
 			ImGui::Text("%s", m_Name);
 			CMesh* cMesh = (CMesh*)m_Components[i];
-			inFrustum = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
+			inFrustum = App->camera->BoxInFrustum(*App->camera->GetGameCameraFrustum(), cMesh->m_BB);
 			ImGui::SameLine();
 			std::string sb = "no";
 			if (inFrustum)
 				sb = "yes";
-			ImGui::Text("is painted? %s", sb.c_str()); // Supposing it's saying the truth
+			ImGui::Text("should be painted? %s", sb.c_str());
 			// Better if we do this in another part?
 		}
 	}

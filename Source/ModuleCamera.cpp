@@ -38,18 +38,27 @@ void ModuleCamera::ViewProjectionMatrix()
 	}
 	else 
 	{
-		frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-		frustum.SetViewPlaneDistances(zNear, zFar);
-		frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+		//frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+		//frustum.SetViewPlaneDistances(zNear, zFar);
+		//frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
 
 		//frustum.SetPos(m_CurrentCamera->m_Owner->m_Transform->GetPos());
 		//frustum.SetFront(m_CurrentCamera->m_Owner->m_Transform->GetForward());
 		//frustum.SetUp(m_CurrentCamera->m_Owner->m_Transform->GetUp());
 
-		frustum.SetPos(m_CurrentCamera->pos);
-		frustum.SetFront(m_CurrentCamera->front);
-		frustum.SetUp(m_CurrentCamera->up);
-	}
+		//frustum.SetPos(m_CurrentCamera->pos);
+		//frustum.SetFront(m_CurrentCamera->front);
+		//frustum.SetUp(m_CurrentCamera->up);
+
+		gameCameraFrustum = m_CurrentCamera->frustum;
+
+		gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+		gameCameraFrustum.SetViewPlaneDistances(m_CurrentCamera->zNear, m_CurrentCamera->zFar);
+		gameCameraFrustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+
+		// To visualize what gameCamera sees
+		//frustum = gameCameraFrustum;
+	}	 
 
 	view = float4x4(frustum.ViewMatrix());
 	proj = frustum.ProjectionMatrix();
@@ -238,6 +247,11 @@ Frustum* ModuleCamera::GetFrustum()
 	return &frustum;
 }
 
+Frustum* ModuleCamera::GetGameCameraFrustum()
+{
+	return &gameCameraFrustum;
+}
+
 // false if fully outside, true if inside or intersects
 bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 {
@@ -274,6 +288,8 @@ bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z > box[0].z) ? 1 : 0); if (out == 8) return false;
 	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z < box[6].z) ? 1 : 0); if (out == 8) return false;
 	
+	delete fPoints;
+
 	return true;
 }
 

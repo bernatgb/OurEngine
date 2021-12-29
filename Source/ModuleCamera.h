@@ -26,6 +26,7 @@ public:
 	void SetCurrentCamera(CCamera* _camera);
 	
 	Frustum* GetFrustum();
+	Frustum* GetGameCameraFrustum();
 	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
 	float4x4 view, proj;
@@ -39,7 +40,7 @@ private:
 	Quat m_CameraRotation;
 	float3 m_PitchYawRoll;
 
-	Frustum frustum;
+	Frustum frustum, gameCameraFrustum;
 	float aspect;
 	
 	float initialVerticalFov = 45.0f;

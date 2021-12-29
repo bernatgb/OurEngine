@@ -13,6 +13,11 @@
 CCamera::CCamera(bool _enabled, GameObject* _owner) : Component(ComponentType::CAMERA, _enabled, _owner)
 {
 	m_CurrentCamera = false;
+
+	frustum = *App->camera->GetFrustum();
+	frustum.SetPos(pos);
+	frustum.SetFront(front);
+	frustum.SetUp(up);
 }
 
 CCamera::~CCamera()
@@ -34,6 +39,11 @@ void CCamera::Disable()
 void CCamera::NotifyMovement()
 {
 	App->camera->ViewProjectionMatrix();
+}
+
+Frustum* CCamera::GetCCameraFrustum()
+{
+	return &frustum;
 }
 
 void FindMeshes(const GameObject* gameObject) 

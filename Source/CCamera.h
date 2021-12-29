@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Math/float3.h"
+#include "Geometry/Frustum.h"
 
 class CCamera : public Component
 {
@@ -15,7 +16,17 @@ public:
 	void NotifyMovement() override;
 	void DrawImGui() override;
 
+	Frustum* GetCCameraFrustum();
+
 	bool m_CurrentCamera;
+
+	Frustum frustum;
+	float aspect;
+
+	float initialVerticalFov = 45.0f;
+	float verticalFov = DEGTORAD * initialVerticalFov;
+	float zNear = 0.1f;
+	float zFar = 200.0f;
 
 	float3 pos = float3(6.0f, 1.5f, -4.0f);
 	float3 front = -float3::unitX;
