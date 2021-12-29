@@ -15,6 +15,8 @@
 
 #include "SceneImporter.h"
 
+#include "ImGuiFileDialog.h"
+
 #include <string>
 
 ModuleScene::ModuleScene()
@@ -121,6 +123,26 @@ void ModuleScene::DrawImGuiHierarchy()
     if (ImGui::Button("Create a new Prefab of the model"))
     {
         //models[activeModel]->ExportToGO(m_Root);
+    }
+
+    if (ImGui::Button("Open File Dialog"))
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
+
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+    {
+        // action if OK
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+            // action
+            MY_LOG("File selected");
+            MY_LOG(filePathName.c_str());
+            MY_LOG(filePath.c_str());
+        }
+
+        // close
+        ImGuiFileDialog::Instance()->Close();
     }
 
     ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
