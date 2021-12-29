@@ -1,0 +1,42 @@
+{
+    "Name": "BakerHouse.fbx",
+    "NumVertices": 3075,
+    "NumTriangles": 1025,
+    "Meshes": [
+        41,
+        18467
+    ],
+    "Textures": [
+        6334
+    ],
+    "Min": [
+        -1.5340535640716553,
+        0.012897372245788575,
+        -2.060347080230713
+    ],
+    "Max": [
+        1.5711853504180909,
+        0.012897491455078125,
+        -0.03543161228299141
+    ],
+    "Root": {
+        "Name": "BakerHouse.fbx",
+        "Meshes": [],
+        "Children": [
+            {
+                "Name": "Chimney",
+                "Meshes": [
+                    41
+                ],
+                "Children": []
+            },
+            {
+                "Name": "Baker_house",
+                "Meshes": [
+                    18467
+                ],
+                "Children": []
+            }
+        ]
+    }
+}

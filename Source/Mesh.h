@@ -18,7 +18,8 @@ public:
 
 	unsigned int* MapIndicesBuffer() const;
 	float* MapVerticesBuffer() const;
-	void UnMapBuffer() const;
+	void UnMapIndicesBuffer() const;
+	void UnMapVerticesBuffer() const;
 
 	unsigned int m_GUID;
 
@@ -33,6 +34,6 @@ public:
 	unsigned int m_Vbo;
 	unsigned int m_Ebo;
 
-	float3* m_BB = new float3[8];
+	float3* m_BB;
 };
 

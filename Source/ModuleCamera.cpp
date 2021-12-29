@@ -160,7 +160,9 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		float4 target = App->scene->models[App->scene->activeModel]->GetCenter();
+		// TODO: FIX THIS
+		//float4 target = App->scene->models[App->scene->activeModel]->GetCenter();
+		float4 target = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
 
@@ -195,7 +197,8 @@ update_status ModuleCamera::Update()
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_F)) 
 	{
-		AdjustToModel(App->scene->models[App->scene->activeModel]);
+		// TODO: FIX THIS
+		//AdjustToModel(App->scene->models[App->scene->activeModel]);
 	}
 
 	return UPDATE_CONTINUE;
