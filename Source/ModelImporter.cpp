@@ -1,6 +1,5 @@
 #include "ModelImporter.h"
 
-#include "SceneImporter.h"
 #include "MeshImporter.h"
 #include "MaterialImporter.h"
 
@@ -10,7 +9,6 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-#include "rapidjson/prettywriter.h"
 
 void RecursiveRoot(const Model* ourModel, const aiNode* node, ModelNode* ourNode)
 {
@@ -50,7 +48,6 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		ourModel->m_Meshes[i] = new Mesh();
 		importer::mesh::Import(model->mMeshes[i], ourModel->m_Meshes[i]);
 		//ourModel->m_Meshes[i] = new Mesh(model->mMeshes[i]);
-		App->scene->m_Meshes[ourModel->m_Meshes[i]->m_GUID] = ourModel->m_Meshes[i];
 	}
 
 	MY_LOG("Assimp: Loading the textures");
@@ -58,14 +55,12 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 	ourModel->m_Textures = std::vector<Texture*>(model->mNumMaterials);
 	for (unsigned i = 0; i < model->mNumMaterials; ++i)
 	{
-		MY_LOG("Assimp: Loading the material %i", i);
 		ourModel->m_Textures[i] = new Texture();
 		importer::material::Import(model->mMaterials[i], ourModel->m_Textures[i], fullPath.c_str());
 		/*if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
 			ourModel->m_Textures[i] = new Texture(file.data, fullPath.c_str());
 		}*/
-		App->scene->m_Textures[ourModel->m_Textures[i]->m_GUID] = ourModel->m_Textures[i];
 	}
 
 	ourModel->m_Min = ourModel->m_Meshes[0]->m_Min;
@@ -160,7 +155,7 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 
 	//TEST
 	rapidjson::StringBuffer buffer;
-	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	d.Accept(writer);
 
 	const char* jsonFile = buffer.GetString();

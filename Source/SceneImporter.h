@@ -12,8 +12,6 @@
 
 namespace importer {
 	//void LoadLibraryFiles();
-	Model* LoadModel(const char* path);
-
 	bool SaveFile(const char* path, const rapidjson::Document& jsonDocument);
 	bool SaveFile(const char* path, const char* data, const int size);
 	bool LoadFile(const char* path, char*& data);

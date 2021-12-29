@@ -18,7 +18,6 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &file) != AI_SUCCESS)
 		return;
 
-	ourMaterial->m_GUID = rand();
 	ourMaterial->m_Name = file.data;
 
 	ourMaterial->m_MinFilter = GL_LINEAR;
@@ -66,8 +65,7 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 
 int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 {
-	unsigned int header[9] = {
-		ourMaterial->m_GUID,
+	unsigned int header[8] = {
 		ourMaterial->m_TextureData->width,
 		ourMaterial->m_TextureData->height,
 		ourMaterial->m_TextureData->depth,
@@ -115,16 +113,15 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 		ourMaterial->m_Name += cursor[i + 1];
 	cursor += (bytes + 1);
 
-	unsigned int header[9];
+	unsigned int header[8];
 	bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
 
-	ourMaterial->m_GUID = header[0];
-	ourMaterial->m_TextureData = new TextureData(false, 0, header[1], header[2], header[3], header[4], header[5], nullptr);
-	ourMaterial->m_MinFilter = header[6];
-	ourMaterial->m_MagFilter = header[7];
-	ourMaterial->m_Wrap = header[8];
+	ourMaterial->m_TextureData = new TextureData(false, 0, header[0], header[1], header[2], header[3], header[4], nullptr);
+	ourMaterial->m_MinFilter = header[5];
+	ourMaterial->m_MagFilter = header[6];
+	ourMaterial->m_Wrap = header[7];
 
 	bytes = ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
 	ourMaterial->m_TextureData->data = new byte[bytes];

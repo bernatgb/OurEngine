@@ -1,13 +1,5 @@
 #include "SceneImporter.h"
 
-#include "Model.h"
-#include "ModelImporter.h"
-
-#include "assimp/ai_assert.h"
-#include "assimp/scene.h"
-#include "assimp/cimport.h"
-#include "assimp/postprocess.h"
-
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -17,19 +9,6 @@
 #include <string>
 #include <filesystem>
 #include <iostream>
-
-Model* importer::LoadModel(const char* path)
-{
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
-	if (scene)
-	{
-		Model* model = new Model();
-		importer::model::Import(scene, model, path);
-		return model;
-	}
-
-	return nullptr;
-}
 
 bool importer::SaveFile(const char* path, const rapidjson::Document& jsonDocument)
 {

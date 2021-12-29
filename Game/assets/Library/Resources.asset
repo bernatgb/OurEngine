@@ -1,24 +1,5 @@
 {
-    "Meshes": [
-        {
-            "Id": 41,
-            "Path": ".\\Assets\\Library\\Meshes\\41.asset"
-        },
-        {
-            "Id": 18467,
-            "Path": ".\\Assets\\Library\\Meshes\\18467.asset"
-        }
-    ],
-    "Materials": [
-        {
-            "Id": 6334,
-            "Path": ".\\Assets\\Library\\Materials\\6334.asset"
-        }
-    ],
-    "Models": [
-        {
-            "Id": "BakerHouse.fbx",
-            "Path": ".\\Assets\\Library\\Models\\BakerHouse.fbx.asset"
-        }
-    ]
+    "Meshes": [],
+    "Materials": [],
+    "Models": []
 }

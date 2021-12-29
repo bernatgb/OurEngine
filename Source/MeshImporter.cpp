@@ -86,17 +86,6 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 
 	glBindVertexArray(0);
 	
-	//CREATING THE BB
-	ourMesh->m_BB = new float3[8];
-	ourMesh->m_BB[0] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[4] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
-
 	MY_LOG("Assimp mesh: Create correctly");
 }
 
@@ -144,13 +133,13 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	// Store vertices
 	bytes = sizeof(float) * 8 * ourMesh->m_NumVertices;
 	memcpy(cursor, ourMesh->MapVerticesBuffer(), bytes);
-	ourMesh->UnMapVerticesBuffer();
+	ourMesh->UnMapBuffer();
 	cursor += bytes;
 	
 	// Store indices
 	bytes = sizeof(unsigned int) * ourMesh->m_NumIndices;
 	memcpy(cursor, ourMesh->MapIndicesBuffer(), bytes);
-	ourMesh->UnMapIndicesBuffer();
+	ourMesh->UnMapBuffer();
 	cursor += bytes;
 
 	return size;
@@ -229,17 +218,6 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
 	glBindVertexArray(0);
-
-	//CREATING THE BB
-	ourMesh->m_BB = new float3[8];
-	ourMesh->m_BB[0] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[4] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
 	MY_LOG("MeshImporter_Load: Loading complete");
 }

@@ -31,8 +31,8 @@ public:
 
 	const GameObject* GetRoot() const;
 
-	//std::vector<Model*> models;
-	//int activeModel;
+	std::vector<Model*> models;
+	int activeModel;
 
 	void LoadLibraryAssets();
 	void SaveLibraryAssets();
