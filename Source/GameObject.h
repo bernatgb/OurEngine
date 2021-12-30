@@ -45,7 +45,6 @@ public:
 	GameObject* m_Parent;
 	std::vector<GameObject*> m_Children;
 
-
 	float4 GetMaxPoint() const {
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Max.x, m_Max.y, m_Max.z, 1.0f);
 	};

@@ -10,6 +10,8 @@
 #define new DEBUG_NEW
 #endif
 
+#include <ctime>
+
 #include "SDL/include/SDL.h"
 #pragma comment( lib, "SDL/lib/x64/SDL2.lib" )
 #pragma comment( lib, "SDL/lib/x64/SDL2main.lib" )
@@ -28,6 +30,7 @@ Application* App = NULL;
 int main(int argc, char ** argv)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	srand((unsigned int)time(NULL));
 
 	int main_return = EXIT_FAILURE;
 	main_states state = MAIN_CREATION;

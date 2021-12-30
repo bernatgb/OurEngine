@@ -31,20 +31,18 @@ bool ModuleScene::Init()
 {
 	MY_LOG("Model: Model creation");
     
-    Model* model = importer::LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
-    m_Models[model->m_Name] = model;
-
-    //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
-    //activeModel = 0;
-
-	m_Root = new GameObject("Root", nullptr);
+    m_Root = new GameObject("Root", nullptr);
     m_GOSelected = nullptr;
+
+    importer::LoadResources(m_Meshes, m_Textures, m_Models);
 
     GameObject* camera = m_Root->AddChild("Camera");
     camera->AddComponent(new CCamera(true, camera));
 
-    //SelectGameObject(models[activeModel]->ExportToGO(m_Root));
-    SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
+    LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
+
+    //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
+    //activeModel = 0;   
 
 	return true;
 }

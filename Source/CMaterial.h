@@ -18,6 +18,9 @@ public:
 
 	void DrawImGui() override;
 
+	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
+	void OnLoad(const rapidjson::Value& node) override;
+
 private:
 	Shaders m_Shader;
 	Texture* m_Texture;
