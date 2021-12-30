@@ -21,6 +21,7 @@ private:
 
 	bool inspector;
 	bool hierarchy;
+	bool resources;
 	bool config;
 	bool console;
 	bool about;

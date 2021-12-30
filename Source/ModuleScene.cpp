@@ -118,31 +118,6 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
 
 void ModuleScene::DrawImGuiHierarchy()
 {
-    if (ImGui::Button("Create a new Prefab of the model"))
-    {
-        //models[activeModel]->ExportToGO(m_Root);
-    }
-
-    if (ImGui::Button("Open File Dialog"))
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
-
-    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
-    {
-        // action if OK
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            // action
-            MY_LOG("File selected");
-            MY_LOG(filePathName.c_str());
-            MY_LOG(filePath.c_str());
-        }
-
-        // close
-        ImGuiFileDialog::Instance()->Close();
-    }
-
     ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
     if (ImGui::TreeNode("Root"))
     {
@@ -293,6 +268,35 @@ void ModuleScene::DrawImGuiHierarchy()
         }
         ImGui::TreePop();
     }*/
+}
+
+void ModuleScene::DrawImGuiResources()
+{
+    if (ImGui::Button("Open File Dialog"))
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
+
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+    {
+        // action if OK
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+            // action
+            MY_LOG("File selected");
+            MY_LOG(filePathName.c_str());
+            MY_LOG(filePath.c_str());
+        }
+
+        // close
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
+    {
+        if (ImGui::Button(it->first.c_str())) 
+            SelectGameObject(it->second->ExportToGO(m_Root));
+    }
 }
 
 void ModuleScene::Draw(unsigned int program)
