@@ -41,6 +41,20 @@ void CCamera::NotifyMovement()
 	App->camera->ViewProjectionMatrix();
 }
 
+void CCamera::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const 
+{
+	Component::OnSave(node, allocator);
+
+	//TODO: SAVE VARIABLES
+}
+
+void CCamera::OnLoad(const rapidjson::Value& node)
+{
+	Component::OnLoad(node);
+
+	//TODO: LOAD VARIABLES
+}
+
 Frustum* CCamera::GetCCameraFrustum()
 {
 	return &frustum;

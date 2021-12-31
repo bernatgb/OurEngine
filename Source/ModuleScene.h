@@ -25,6 +25,7 @@ public:
 	void SelectGameObject(GameObject* go);
 	void RecursiveHierarchy(GameObject* go, GameObject*& node_clicked);
 	void DrawImGuiHierarchy();
+	void DrawImGuiResources();
 
 	void Draw(unsigned int program);
 	void LoadModel(const char* _fileName);

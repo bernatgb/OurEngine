@@ -46,8 +46,18 @@ public:
 	{
 	};
 	
-	virtual void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const {};
-	virtual void OnLoad(const rapidjson::Value& node) {};
+	virtual void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const 
+	{
+		node.AddMember("Type", rapidjson::Value((int)m_Type), allocator);
+		node.AddMember("Id", rapidjson::Value(m_GUID), allocator);
+		node.AddMember("Enabled", rapidjson::Value(m_Enabled), allocator);
+	};
+	virtual void OnLoad(const rapidjson::Value& node) 
+	{
+		m_Type = (ComponentType)node["Type"].GetInt();
+		m_GUID = node["Id"].GetInt();
+		m_Enabled = node["Enabled"].GetBool();
+	};
 
 	unsigned int m_GUID;
 	ComponentType m_Type;

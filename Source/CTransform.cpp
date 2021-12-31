@@ -60,6 +60,41 @@ void CTransform::DrawImGui()
 	}
 }
 
+rapidjson::Value Float3ToValue(const float3& value, rapidjson::Document::AllocatorType& allocator) //TODO: MOVE TO A UTILS
+{
+	rapidjson::Value vector(rapidjson::kArrayType);
+	vector.PushBack(value.x, allocator);
+	vector.PushBack(value.y, allocator);
+	vector.PushBack(value.z, allocator);
+	return vector;
+}
+
+void CTransform::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const
+{
+	Component::OnSave(node, allocator);
+
+	node.AddMember("Position", Float3ToValue(m_Position, allocator), allocator);
+	node.AddMember("Rotation", Float3ToValue(m_RotationEuler, allocator), allocator);
+	node.AddMember("Scale", Float3ToValue(m_Scale, allocator), allocator);
+}
+
+float3 ValueToFloat3(const rapidjson::Value& value) //TODO: MOVE TO A UTILS
+{
+	rapidjson::Value::ConstValueIterator itr = value.Begin();
+	return float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+}
+
+void CTransform::OnLoad(const rapidjson::Value& node)
+{
+	Component::OnLoad(node);
+
+	m_Position = ValueToFloat3(node["Position"]);
+	m_RotationEuler = ValueToFloat3(node["Rotation"]);
+	m_Scale = ValueToFloat3(node["Scale"]);
+
+	RecalculateModelMatrix();
+}
+
 void CTransform::RecalculateModelMatrix()
 {
 	m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);

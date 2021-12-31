@@ -47,6 +47,7 @@ bool ModuleImGui::Init()
 
 	inspector = true;
 	hierarchy = true;
+	resources = true;
 	config = false;
 	console = true;
 
@@ -116,6 +117,7 @@ update_status ModuleImGui::PreUpdate()
 			ImGui::MenuItem("Console", NULL, &console);
 			ImGui::MenuItem("Inspector", NULL, &inspector);
 			ImGui::MenuItem("Hierarchy (in progress)", NULL, &hierarchy);
+			ImGui::MenuItem("Resources (in progress)", NULL, &resources);
 			ImGui::EndMenu();
 		}
 	}
@@ -165,6 +167,15 @@ update_status ModuleImGui::Update()
 		if (ImGui::Begin("Hierarchy", &hierarchy))
 		{
 			App->scene->DrawImGuiHierarchy();
+		}
+		ImGui::End();
+	}
+
+	if (resources)
+	{
+		if (ImGui::Begin("Resources", &resources))
+		{
+			App->scene->DrawImGuiResources();
 		}
 		ImGui::End();
 	}

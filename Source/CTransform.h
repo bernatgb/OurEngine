@@ -14,6 +14,9 @@ public:
 
 	void DrawImGui() override;
 
+	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
+	void OnLoad(const rapidjson::Value& node) override;
+
 	float3 GetPos() const;
 	float3 GetForward() const;
 	float3 GetUp() const;

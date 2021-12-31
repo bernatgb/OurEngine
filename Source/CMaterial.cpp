@@ -28,3 +28,17 @@ void CMaterial::DrawImGui()
 {
 	m_Texture->DrawImGui();
 }
+
+void CMaterial::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const
+{
+	Component::OnSave(node, allocator);
+
+	//TODO: SAVE VARIABLES
+}
+
+void CMaterial::OnLoad(const rapidjson::Value& node)
+{
+	Component::OnLoad(node);
+
+	//TODO: LOAD VARIABLES
+}

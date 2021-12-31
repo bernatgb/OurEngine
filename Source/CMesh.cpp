@@ -82,3 +82,17 @@ void CMesh::DrawImGui()
 		m_Mesh->DrawImGui();
 	}
 }
+
+void CMesh::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const
+{
+	Component::OnSave(node, allocator);
+
+	//TODO: SAVE VARIABLES
+}
+
+void CMesh::OnLoad(const rapidjson::Value& node)
+{
+	Component::OnLoad(node);
+
+	//TODO: LOAD VARIABLES
+}
