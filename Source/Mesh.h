@@ -35,5 +35,7 @@ public:
 	unsigned int m_Ebo;
 
 	float3* m_BB;
+
+	std::vector<std::vector<float3>> m_Triangles;
 };
 

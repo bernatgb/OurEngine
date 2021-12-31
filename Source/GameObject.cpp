@@ -23,6 +23,8 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 
 	m_Transform = new CTransform(true, this);
 	m_Material = nullptr;
+
+	m_aabb = AABB(vec(0,0,0), vec(0,0,0));
 }
 
 GameObject::~GameObject()
@@ -59,6 +61,18 @@ void GameObject::Update()
 	if (m_Material != nullptr) 
 	{
 		m_Material->ActivateMaterial();
+	}
+
+	// Better in another place?
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
+	{
+		if (m_Components[i]->m_Type == ComponentType::MESH)
+		{
+			CMesh* cMesh = (CMesh*)m_Components[i];
+			m_aabb = AABB(cMesh->m_MinPoint, cMesh->m_MaxPoint);
+			ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
+				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);
+		}
 	}
 
 	// Hierarchical frustum culling

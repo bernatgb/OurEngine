@@ -44,6 +44,7 @@ public:
 	std::vector<Component*> m_Components;
 	GameObject* m_Parent;
 	std::vector<GameObject*> m_Children;
+	AABB m_aabb;
 
 
 	float4 GetMaxPoint() const {

@@ -18,6 +18,10 @@ CMesh::CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh) : Component(Compone
 	for (unsigned int i = 0; i < 8; ++i)
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
 
+	m_MinPoint = m_BB[6];
+	m_MaxPoint = m_BB[0];
+
+	m_Triangles = _mesh->m_Triangles;
 }
 
 CMesh::~CMesh()
@@ -60,6 +64,11 @@ void CMesh::NotifyMovement()
 {
 	for (unsigned int i = 0; i < 8; ++i)
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
+
+	m_MinPoint = m_BB[6];
+	m_MaxPoint = m_BB[0];
+
+	m_Triangles = m_Mesh->m_Triangles;
 }
 
 void CMesh::DrawImGui()

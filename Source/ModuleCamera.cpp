@@ -296,6 +296,57 @@ bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 	return true;
 }
 
+void ModuleCamera::FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*> &hits)
+{
+	if (ray.Intersects(go->m_aabb))
+	{
+		ImGui::Text("Ray intersects with %s", go->m_Name); 
+		hits.push_back(go);
+	}
+	for (int i = 0; i < go->m_Children.size(); ++i)
+		FindIfRayIntersectsAnAABBandAddToHits(ray, go->m_Children[i], hits);
+}
+
+void ModuleCamera::SortHits(std::vector<GameObject*>& hits)
+{
+	/* With ints
+	std::vector <std::pair<float, int> > hitsDistances(hits.size());
+	for (int i = 0; i < hitsDistances.size(); ++i)
+		hitsDistances[i] = std::pair<float, int> (hits[i]->m_aabb.Distance(frustum.Pos()), i);
+
+	std::sort(hitsDistances.begin(), hitsDistances.end());
+
+	std::vector<GameObject*> hitsCopy = hits;
+	for (int i = 0; i < hitsDistances.size(); ++i)
+		hits[i] = hitsCopy[hitsDistances[i].second];
+	*/
+
+	/* With GameObjects */
+	std::vector <std::pair<float, GameObject*> > hitsDistances(hits.size());
+	for (int i = 0; i < hitsDistances.size(); ++i)
+		hitsDistances[i] = std::pair<float, GameObject*>(hits[i]->m_aabb.Distance(frustum.Pos()), hits[i]);
+
+	std::sort(hitsDistances.begin(), hitsDistances.end());
+
+	for (int i = 0; i < hitsDistances.size(); ++i)
+		hits[i] = hitsDistances[i].second;
+}
+
+void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits)
+{
+	for (int i = 0; i < hits.size(); ++i)
+	{
+		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
+		{
+			if (hits[i]->m_Components[i]->m_Type == ComponentType::MESH)
+			{
+				CMesh* cMesh = (CMesh*)hits[i]->m_Components[i];
+				//math::Triangle tri = (Triangle)cMesh->m_Triangles[];
+				//bool hit = ray_local_space.Intersects(tri, &distance, &hit_point);
+			}
+		}
+	}
+}
 
 void ModuleCamera::DrawImGui()
 {
@@ -331,19 +382,18 @@ void ModuleCamera::DrawImGui()
 			float y = 1.0f - (2.0f * mouse_y) / height;
 			float z = 1.0f;
 			vec ray_nds = vec(x, y, z);
-			ImGui::Text("ray = (%f, %f, %f)", x, y, z);
+			ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
 
-			float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
-
-			float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
-
-			ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
-
-			float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
-			ray_world = ray_world.Normalized();
-
-			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
-			// This sould work, but does not
+			LineSegment ray = frustum.UnProjectLineSegment(x, y);
+			const GameObject* root = App->scene->GetRoot();
+			std::vector<GameObject*> hits;
+			for (int i = 0; i < root->m_Children.size(); ++i)
+				FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
+			if (!hits.empty())
+			{
+				SortHits(hits); // With ray.length?
+				FindIfRayIntersectsATriangle(ray, hits);
+			}
 		}
 		
 		ViewProjectionMatrix();

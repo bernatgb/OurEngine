@@ -29,6 +29,10 @@ public:
 	Frustum* GetGameCameraFrustum();
 	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
+	void FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*> &hits);
+	void SortHits(std::vector<GameObject*> &hits);
+	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits);
+
 	float4x4 view, proj;
 	float3 eye;
 
