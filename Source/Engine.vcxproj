@@ -540,6 +540,7 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Game\assets\Shaders\fragment_shader_single_color.frag" />
     <None Include="assimp-4.1.0\include\assimp\color4.inl" />
     <None Include="assimp-4.1.0\include\assimp\config.h.in" />
     <None Include="assimp-4.1.0\include\assimp\material.inl" />

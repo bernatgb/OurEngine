@@ -212,6 +212,7 @@ update_status ModuleRender::Update()
 	}
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
+	ImGui::Text("x=%f, y=%f", viewportPanelSize.x, viewportPanelSize.y);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
@@ -262,6 +263,32 @@ update_status ModuleRender::Update()
 	cubeMap->Draw(0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	/*
+	//Selection highlighting
+	glEnable(GL_DEPTH_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glStencilMask(0x00); // make sure we don't update the stencil buffer while drawing the floor
+	//normalShader.use();
+	//DrawFloor()
+
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
+	//DrawTwoContainers();
+
+	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	glDisable(GL_DEPTH_TEST);
+	unsigned singleColorProgram = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader_single_color.frag");
+	//".\\assets\\Shaders\\fragment_shader_single_color.frag".use();
+	//DrawTwoScaledUpContainers();
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+	// End selection highlighting */
 
 	ImGui::Image((void*)fbo_texture, ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 	ImGui::End();

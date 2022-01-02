@@ -376,13 +376,19 @@ void ModuleCamera::DrawImGui()
 			
 			mouse_x -= 280;
 			mouse_y -= 45;
-			float width = 870 - 280;
-			float height = 530 - 45;
+			float width = 870 - 280; // App->render->viewportPanelSize.x
+			float height = 530 - 45; // App->render->viewportPanelSize.y
 			float x = (2.0f * mouse_x) / width - 1.0f;
 			float y = 1.0f - (2.0f * mouse_y) / height;
 			float z = 1.0f;
 			vec ray_nds = vec(x, y, z);
 			ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
+			float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
+			float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
+			ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
+			float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
+			ray_world = ray_world.Normalized();
+			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
 
 			LineSegment ray = frustum.UnProjectLineSegment(x, y);
 			const GameObject* root = App->scene->GetRoot();
