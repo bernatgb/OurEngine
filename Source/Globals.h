@@ -32,3 +32,4 @@ enum update_status
 #define LIBRARY_MATERIALS ".\\Assets\\Library\\Materials\\"
 #define LIBRARY_MODELS ".\\Assets\\Library\\Models\\"
 #define RESOURCES_FILE ".\\Assets\\Library\\Resources.asset"
+#define CONFIG_FILE ".\\Assets\\Library\\Config.asset"

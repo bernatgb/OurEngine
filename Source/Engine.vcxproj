@@ -223,6 +223,7 @@
     <ClCompile Include="CCamera.cpp" />
     <ClCompile Include="CMaterial.cpp" />
     <ClCompile Include="CMesh.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="CTransform.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -422,6 +423,7 @@
     <ClInclude Include="CMaterial.h" />
     <ClInclude Include="CMesh.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="CTransform.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="debug_draw\debugdraw.h" />

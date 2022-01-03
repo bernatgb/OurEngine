@@ -15,9 +15,11 @@ CCamera::CCamera(bool _enabled, GameObject* _owner) : Component(ComponentType::C
 	m_CurrentCamera = false;
 
 	frustum = *App->camera->GetFrustum();
-	frustum.SetPos(pos);
-	frustum.SetFront(front);
-	frustum.SetUp(up);
+	frustum.SetPos(m_Owner->m_Transform->GetPos());
+	frustum.SetFront(m_Owner->m_Transform->GetForward());
+	frustum.SetUp(m_Owner->m_Transform->GetUp());
+	frustum.SetViewPlaneDistances(zNear, zFar);
+	frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
 }
 
 CCamera::~CCamera()
@@ -38,6 +40,10 @@ void CCamera::Disable()
 
 void CCamera::NotifyMovement()
 {
+	frustum.SetPos(m_Owner->m_Transform->GetPos());
+	frustum.SetFront(m_Owner->m_Transform->GetForward());
+	frustum.SetUp(m_Owner->m_Transform->GetUp());
+
 	App->camera->ViewProjectionMatrix();
 }
 
@@ -93,6 +99,20 @@ void CCamera::DrawImGui()
 			if (m_CurrentCamera) App->camera->SetCurrentCamera(this);
 			else App->camera->SetCurrentCamera(nullptr);
 		}
+
+		//initialVerticalFov = 45.0f;
+		if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
+			if (aspect >= 1)
+				verticalFov = DEGTORAD * initialVerticalFov;
+			else
+				verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+		}
+			
+		if (ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f"))
+			frustum.SetViewPlaneDistances(zNear, zFar);
+
+		if (ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f"))
+			frustum.SetViewPlaneDistances(zNear, zFar);
 
 		ImGui::Separator();	
 

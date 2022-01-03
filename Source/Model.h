@@ -13,11 +13,13 @@ class GameObject;
 struct ModelNode {
 public:
 	std::string m_Name;
+	float4x4 m_Transform;
 	std::vector<ModelNode*> m_Children;
 	std::vector<Mesh*> m_Meshes;
 
 	ModelNode() {
 		m_Name = "";
+		m_Transform = float4x4::identity;
 		m_Children = std::vector<ModelNode*>(0);
 		m_Meshes = std::vector<Mesh*>(0);
 	}
@@ -52,7 +54,7 @@ public:
 
 	std::string m_Name;
 
-	ModelNode* m_RootStructure;
+	ModelNode* m_RootStructure = nullptr;
 
 	std::vector<Mesh*> m_Meshes;
 	std::vector<Texture*> m_Textures;

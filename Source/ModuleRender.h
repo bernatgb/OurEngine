@@ -30,6 +30,12 @@ public:
 	void* context;
 	unsigned int program;
 
+	//Gets
+	float2 GetSizeSceneWindow() const 
+	{
+		return viewportPanelSize;
+	};
+
 private:
 
 	unsigned int fbo;

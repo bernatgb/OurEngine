@@ -14,7 +14,16 @@
 
 void RecursiveRoot(const Model* ourModel, const aiNode* node, ModelNode* ourNode)
 {
+	//Store node name
 	ourNode->m_Name = node->mName.C_Str();
+
+	//Store node transform
+	ourNode->m_Transform = float4x4(
+		(float)node->mTransformation[0][0], (float)node->mTransformation[0][1], (float)node->mTransformation[0][2], (float)node->mTransformation[0][3],
+		(float)node->mTransformation[1][0], (float)node->mTransformation[1][1], (float)node->mTransformation[1][2], (float)node->mTransformation[1][3],
+		(float)node->mTransformation[2][0], (float)node->mTransformation[2][1], (float)node->mTransformation[2][2], (float)node->mTransformation[2][3],
+		(float)node->mTransformation[3][0], (float)node->mTransformation[3][1], (float)node->mTransformation[3][2], (float)node->mTransformation[3][3]
+	);
 
 	for (unsigned int i = 0; i < node->mNumMeshes; ++i) 
 	{
@@ -36,6 +45,7 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 	//ourModel->m_Name = new char[strlen(model->GetShortFilename()) + 1];
 	//strcpy(ourModel->m_Name, model->GetShortFilename());
 	
+	MY_LOG("Assimp (%s): Loading the model", fullPath);
 	ourModel->m_Name = fullPath;
 	const size_t last_slash_idx = ourModel->m_Name.rfind('\\');
 	if (std::string::npos != last_slash_idx)
@@ -94,6 +104,13 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 void RecusiveNodeToJson(rapidjson::Value& node, const ModelNode* modelNode, rapidjson::Document::AllocatorType& allocator) {
 	rapidjson::Value nodeName(modelNode->m_Name.c_str(), allocator);
 
+	rapidjson::Value transform(rapidjson::kArrayType);
+	for (unsigned int i = 0; i < 4; ++i) 
+	{
+		for (unsigned int j = 0; j < 4; ++j)
+			transform.PushBack(modelNode->m_Transform[i][j], allocator);
+	}
+
 	rapidjson::Value meshes(rapidjson::kArrayType);
 	for (unsigned int i = 0; i < modelNode->m_Meshes.size(); ++i)
 		meshes.PushBack(modelNode->m_Meshes[i]->m_GUID, allocator);
@@ -107,6 +124,7 @@ void RecusiveNodeToJson(rapidjson::Value& node, const ModelNode* modelNode, rapi
 	}
 
 	node.AddMember("Name", nodeName, allocator);
+	node.AddMember("Transform", transform, allocator);
 	node.AddMember("Meshes", meshes, allocator);
 	node.AddMember("Children", children, allocator);
 }
@@ -179,6 +197,16 @@ void RecusiveNodeFromJson(const rapidjson::Value& node, ModelNode*& modelNode) {
 	//Get name
 	rapidjson::Value::ConstMemberIterator it = node.MemberBegin();
 	modelNode->m_Name = it->value.GetString();
+	++it;
+
+	//Get transform
+	rapidjson::Value::ConstValueIterator transItr = it->value.Begin();
+	modelNode->m_Transform = float4x4(
+		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
+		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
+		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
+		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat()
+	);
 	++it;
 
 	//Get meshes

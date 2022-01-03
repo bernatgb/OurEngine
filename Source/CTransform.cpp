@@ -2,6 +2,8 @@
 
 #include "GameObject.h"
 
+#include "SceneImporter.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -21,22 +23,23 @@ CTransform::~CTransform()
 {
 }
 
-void CTransform::ParentTransformUpdate(const float4x4& _parentAccumulativeTransform)
-{
-	m_AccumulativeModelMatrix = _parentAccumulativeTransform * m_ModelMatrix;
-
-	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)
-	{
-		m_Owner->m_Children[i]->m_Transform->ParentTransformUpdate(m_AccumulativeModelMatrix);
-	}
-
-	NotifyMovement();
-}
-
 void CTransform::NotifyMovement()
 {
+	//Change AccumulativeModelMatrix
+	if (m_Owner->m_Parent != nullptr)
+		m_AccumulativeModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_ModelMatrix;
+	else
+		m_AccumulativeModelMatrix = m_ModelMatrix;
+
+	//TODO: NOTIFY GO OWNER
+
+	//Notify other components
 	for (unsigned int i = 0; i < m_Owner->m_Components.size(); ++i)
 		m_Owner->m_Components[i]->NotifyMovement();
+
+	//Notify owner children
+	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)
+		m_Owner->m_Children[i]->m_Transform->NotifyMovement();
 }
 
 void CTransform::DrawImGui()
@@ -60,37 +63,22 @@ void CTransform::DrawImGui()
 	}
 }
 
-rapidjson::Value Float3ToValue(const float3& value, rapidjson::Document::AllocatorType& allocator) //TODO: MOVE TO A UTILS
-{
-	rapidjson::Value vector(rapidjson::kArrayType);
-	vector.PushBack(value.x, allocator);
-	vector.PushBack(value.y, allocator);
-	vector.PushBack(value.z, allocator);
-	return vector;
-}
-
 void CTransform::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const
 {
 	Component::OnSave(node, allocator);
 
-	node.AddMember("Position", Float3ToValue(m_Position, allocator), allocator);
-	node.AddMember("Rotation", Float3ToValue(m_RotationEuler, allocator), allocator);
-	node.AddMember("Scale", Float3ToValue(m_Scale, allocator), allocator);
-}
-
-float3 ValueToFloat3(const rapidjson::Value& value) //TODO: MOVE TO A UTILS
-{
-	rapidjson::Value::ConstValueIterator itr = value.Begin();
-	return float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+	node.AddMember("Position", importer::Float3ToValue(m_Position, allocator), allocator);
+	node.AddMember("Rotation", importer::Float3ToValue(m_RotationEuler, allocator), allocator);
+	node.AddMember("Scale", importer::Float3ToValue(m_Scale, allocator), allocator);
 }
 
 void CTransform::OnLoad(const rapidjson::Value& node)
 {
 	Component::OnLoad(node);
 
-	m_Position = ValueToFloat3(node["Position"]);
-	m_RotationEuler = ValueToFloat3(node["Rotation"]);
-	m_Scale = ValueToFloat3(node["Scale"]);
+	m_Position = importer::ValueToFloat3(node["Position"]);
+	m_RotationEuler = importer::ValueToFloat3(node["Rotation"]);
+	m_Scale = importer::ValueToFloat3(node["Scale"]);
 
 	RecalculateModelMatrix();
 }
@@ -98,17 +86,6 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 void CTransform::RecalculateModelMatrix()
 {
 	m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
-
-	GameObject* parent = m_Owner->m_Parent;
-	if (parent == nullptr) 
-		m_AccumulativeModelMatrix = m_ModelMatrix;
-	else
-		m_AccumulativeModelMatrix = parent->m_Transform->m_AccumulativeModelMatrix * m_ModelMatrix;
-
-	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i) 
-	{
-		m_Owner->m_Children[i]->m_Transform->ParentTransformUpdate(m_AccumulativeModelMatrix);
-	}
 
 	NotifyMovement();
 }

@@ -11,11 +11,14 @@
 #include "ModuleCamera.h"
 #include "ModuleScene.h"
 #include "SDL.h"
+#include "Config.h"
 
 using namespace std;
 
 Application::Application()
 {
+	Config::LoadConfig();
+
 	// Order matters: they will Init/start/update in this order
 	modules.push_back(window = new ModuleWindow());
 	modules.push_back(camera = new ModuleCamera());
@@ -86,6 +89,8 @@ bool Application::CleanUp()
 
 	for(list<Module*>::reverse_iterator it = modules.rbegin(); it != modules.rend() && ret; ++it)
 		ret = (*it)->CleanUp();
+
+	Config::SaveConfig();
 
 	return ret;
 }

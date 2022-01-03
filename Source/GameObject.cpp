@@ -44,7 +44,7 @@ GameObject::~GameObject()
 void GameObject::Start()
 {
 	if (m_Parent != nullptr) 
-		m_Transform->ParentTransformUpdate(m_Parent->m_Transform->m_AccumulativeModelMatrix);
+		m_Transform->NotifyMovement();
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
@@ -63,7 +63,7 @@ void GameObject::Update()
 		m_Material->ActivateMaterial();
 	}
 
-	// Better in another place?
+	// Better in another place? Start / addComponent / notify movement
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
 		if (m_Components[i]->m_Type == ComponentType::MESH)

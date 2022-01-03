@@ -364,7 +364,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     if (it != m_Models.end()) 
     {
         SelectGameObject(it->second->ExportToGO(m_Root));
-        App->camera->AdjustToModel(it->second);
+        //App->camera->AdjustToModel(it->second);
         return;
     }
     
@@ -372,7 +372,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     m_Models[model->m_Name] = model;
 
     SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
-    App->camera->AdjustToModel(m_Models[model->m_Name]);
+    //App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
 
 const GameObject* ModuleScene::GetRoot() const

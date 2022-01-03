@@ -9,7 +9,6 @@ public:
 	CTransform(bool _enabled, GameObject* _owner);
 	~CTransform() override;
 
-	void ParentTransformUpdate(const float4x4& _parentAccumulativeTransform);
 	void NotifyMovement();
 
 	void DrawImGui() override;

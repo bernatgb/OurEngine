@@ -91,6 +91,30 @@ bool importer::LoadFile(const char* path, char*& data)
 	return false;
 }
 
+bool importer::LoadFile(const char* path, rapidjson::Document& jsonDocument)
+{
+	FILE* file = nullptr;
+	fopen_s(&file, path, "rb");
+
+	if (file)
+	{
+		fseek(file, 0, SEEK_END);
+		int size = ftell(file);
+		char* data = (char*)malloc(size + 1);
+		fseek(file, 0, SEEK_SET);
+		fread(data, 1, size, file);
+		data[size] = 0;
+		fclose(file);
+
+		jsonDocument.Parse(data);
+		free(data);
+
+		return true;
+	}
+
+	return false;
+}
+
 void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _materials, const std::map<std::string, Model*>& _models)
 {
 	rapidjson::Document d;
@@ -253,4 +277,48 @@ void importer::LoadTextures(std::map<unsigned int, Texture*>& _textures)
 
 void importer::LoadModels(std::map<std::string, Model*>& _models)
 {
+}
+
+// UTILS
+
+float3 importer::ValueToFloat3(const rapidjson::Value& value)
+{
+	rapidjson::Value::ConstValueIterator itr = value.Begin();
+	float x = (itr++)->GetFloat();
+	float y = (itr++)->GetFloat();
+	float z = (itr++)->GetFloat();
+	return float3(x, y, z);
+	
+	//return float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+}
+
+rapidjson::Value importer::Float3ToValue(const float3& value, rapidjson::Document::AllocatorType& allocator)
+{
+	rapidjson::Value vector(rapidjson::kArrayType);
+	vector.PushBack(value.x, allocator);
+	vector.PushBack(value.y, allocator);
+	vector.PushBack(value.z, allocator);
+	return vector;
+}
+
+Quat importer::ValueToQuat(const rapidjson::Value& value)
+{
+	rapidjson::Value::ConstValueIterator itr = value.Begin();
+	float x = (itr++)->GetFloat();
+	float y = (itr++)->GetFloat();
+	float z = (itr++)->GetFloat();
+	float w = (itr++)->GetFloat();
+	return Quat(x, y, z, w);
+
+	//return Quat((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+}
+
+rapidjson::Value importer::QuatToValue(const Quat& value, rapidjson::Document::AllocatorType& allocator)
+{
+	rapidjson::Value quat(rapidjson::kArrayType);
+	quat.PushBack(value.x, allocator);
+	quat.PushBack(value.y, allocator);
+	quat.PushBack(value.z, allocator);
+	quat.PushBack(value.w, allocator);
+	return quat;
 }

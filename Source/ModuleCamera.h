@@ -34,23 +34,23 @@ public:
 	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits);
 
 	float4x4 view, proj;
-	float3 eye;
+	//float3 eye;
 
 private:
 	void Rotate(float _deltaPitch, float _deltaYaw);
 
 	CCamera* m_CurrentCamera;
 
-	Quat m_CameraRotation;
+	//Quat m_CameraRotation;
 	float3 m_PitchYawRoll;
 
 	Frustum frustum, gameCameraFrustum;
 	float aspect;
 	
-	float initialVerticalFov = 45.0f;
-	float verticalFov = DEGTORAD * initialVerticalFov;
-	float zNear = 0.1f;
-	float zFar = 200.0f;
+	//float initialVerticalFov = 45.0f;
+	float verticalFov = DEGTORAD * 45.0f;
+	//float zNear = 0.1f;
+	//float zFar = 200.0f;
 
 	float speed = 10.0f;
 	float mouseSpeedForRotation = 5.0f;

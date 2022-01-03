@@ -7,6 +7,7 @@
 #include "SDL.h"
 
 #include "CCamera.h"
+#include "Config.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -22,34 +23,17 @@ ModuleCamera::~ModuleCamera()
 
 void ModuleCamera::ViewProjectionMatrix()
 {
-	if (m_CurrentCamera == nullptr) 
+	frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+	frustum.SetViewPlaneDistances(Config::m_ZNear, Config::m_ZFar);
+	frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+	//TODO: setHoritzontal
+
+	frustum.SetPos(Config::m_CamPosition);
+	frustum.SetFront(Config::m_CamRotation.WorldZ());
+	frustum.SetUp(Config::m_CamRotation.WorldY());
+
+	if (m_CurrentCamera != nullptr) 
 	{
-		frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-		frustum.SetViewPlaneDistances(zNear, zFar);
-		frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
-		//TODO: setHoritzontal
-
-		frustum.SetPos(eye);
-		frustum.SetFront(m_CameraRotation.WorldZ());
-		frustum.SetUp(m_CameraRotation.WorldY());
-		/*frustum.SetPos(m_RotationMatrix.Col3(3));
-		frustum.SetFront(m_RotationMatrix.WorldZ());
-		frustum.SetUp(m_RotationMatrix.WorldY());*/
-	}
-	else 
-	{
-		//frustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-		//frustum.SetViewPlaneDistances(zNear, zFar);
-		//frustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
-
-		//frustum.SetPos(m_CurrentCamera->m_Owner->m_Transform->GetPos());
-		//frustum.SetFront(m_CurrentCamera->m_Owner->m_Transform->GetForward());
-		//frustum.SetUp(m_CurrentCamera->m_Owner->m_Transform->GetUp());
-
-		//frustum.SetPos(m_CurrentCamera->pos);
-		//frustum.SetFront(m_CurrentCamera->front);
-		//frustum.SetUp(m_CurrentCamera->up);
-
 		gameCameraFrustum = m_CurrentCamera->frustum;
 
 		gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
@@ -69,17 +53,17 @@ void ModuleCamera::Rotate(float _deltaPitch, float _deltaYaw)
 	m_PitchYawRoll.x += _deltaPitch;
 	m_PitchYawRoll.y += _deltaYaw;
 
-	m_CameraRotation =
+	Config::m_CamRotation =
 		Quat::RotateAxisAngle(float3::unitY, _deltaYaw) *
-		m_CameraRotation *
+		Config::m_CamRotation *
 		Quat::RotateAxisAngle(float3::unitX, _deltaPitch);
 }
 
 bool ModuleCamera::Init()
 {
-	eye = float3(0.0f, 3.0f, -8.0f);
+	//Config::m_CamPosition = float3(0.0f, 3.0f, -8.0f);
 	m_PitchYawRoll = float3(DEGTORAD * 15.0f, 0.0f, 0.0f);
-	m_CameraRotation = float3x3::FromEulerXYZ(DEGTORAD * 15.0f, 0.0f, 0.0f).ToQuat();
+	//Config::m_CamRotation = float3x3::FromEulerXYZ(DEGTORAD * 15.0f, 0.0f, 0.0f).ToQuat();
 
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 	//LookAt(camera forward(right), target dir, local up, world up)
@@ -87,9 +71,9 @@ bool ModuleCamera::Init()
 	aspect = (float)App->window->width / (float)App->window->height;
 
 	if (aspect >= 1.0f)
-		verticalFov = DEGTORAD * initialVerticalFov;
+		verticalFov = DEGTORAD * Config::m_Fov;
 	else
-		verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+		verticalFov = math::Atan(math::Tan(DEGTORAD * Config::m_Fov) / aspect);
 
 	ViewProjectionMatrix();
 
@@ -116,7 +100,7 @@ update_status ModuleCamera::Update()
 
 		if (App->input->GetKey(SDL_SCANCODE_LALT))
 		{
-			eye += m_CameraRotation.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
+			Config::m_CamPosition += Config::m_CamRotation.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 		}
 		else
 		{
@@ -130,17 +114,17 @@ update_status ModuleCamera::Update()
 				multiplier = 3.0f;
 
 			if (App->input->GetKey(SDL_SCANCODE_W))
-				eye += m_CameraRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition += Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_S))
-				eye -= m_CameraRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition -= Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_A))
-				eye += m_CameraRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition += Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_D))
-				eye -= m_CameraRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition -= Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_Q))
-				eye += m_CameraRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition += Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
 			if (App->input->GetKey(SDL_SCANCODE_E))
-				eye -= m_CameraRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
+				Config::m_CamPosition -= Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
 		}
 
 		ViewProjectionMatrix();
@@ -150,8 +134,8 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		eye += m_CameraRotation.WorldX() * deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
-			m_CameraRotation.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
+		Config::m_CamPosition += Config::m_CamRotation.WorldX() * deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
+			Config::m_CamRotation.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 
 		ViewProjectionMatrix();
 	}
@@ -164,11 +148,11 @@ update_status ModuleCamera::Update()
 		//float4 target = App->scene->models[App->scene->activeModel]->GetCenter();
 		float4 target = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-		float4 vector = float4(eye.x - target.x, eye.y - target.y, eye.z - target.z, 0);
+		float4 vector = float4(Config::m_CamPosition.x - target.x, Config::m_CamPosition.y - target.y, Config::m_CamPosition.z - target.z, 0);
 
 		vector = 
 			Quat(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-			Quat(m_CameraRotation.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+			Quat(Config::m_CamRotation.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
 			vector;
 
 		/*float aux = Dot(vector, float4::unitY);
@@ -176,13 +160,13 @@ update_status ModuleCamera::Update()
 		{
 		}*/
 
-		eye = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
+		Config::m_CamPosition = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
 
-		float3 front = (float3(target.x, target.y, target.z) - eye).Normalized();
+		float3 front = (float3(target.x, target.y, target.z) - Config::m_CamPosition).Normalized();
 		float3 right = Cross(float3::unitY, front).Normalized();
 		float3 up = Cross(front, right).Normalized();
 
-		m_CameraRotation = float3x3(right, up, front).ToQuat();
+		Config::m_CamRotation = float3x3(right, up, front).ToQuat();
 
 		ViewProjectionMatrix();
 	}
@@ -191,7 +175,7 @@ update_status ModuleCamera::Update()
 		int wheelX, wheelY;
 		App->input->GetMouseWheel(wheelX, wheelY);
 
-		eye += m_CameraRotation.WorldZ() * wheelY * Time::GetDeltaTime() * mouseWheelSpeed;
+		Config::m_CamPosition += Config::m_CamRotation.WorldZ() * wheelY * Time::GetDeltaTime() * mouseWheelSpeed;
 
 		ViewProjectionMatrix();
 	}
@@ -209,9 +193,9 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 	aspect = (float)width / (float)height;
 
 	if (aspect >= 1.0f)
-		verticalFov = DEGTORAD * initialVerticalFov;
+		verticalFov = DEGTORAD * Config::m_Fov;
 	else
-		verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+		verticalFov = math::Atan(math::Tan(DEGTORAD * Config::m_Fov) / aspect);
 
 	ViewProjectionMatrix();
 }
@@ -219,7 +203,7 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 void ModuleCamera::AdjustToModel(Model* _model)
 {
 	float4 newPos = _model->GetCenter();
-	eye = float3(newPos.x, newPos.y, newPos.z) - m_CameraRotation.WorldZ().Normalized() * _model->GetDiameter();
+	Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _model->GetDiameter();
 
 	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
 
@@ -353,17 +337,17 @@ void ModuleCamera::DrawImGui()
 	if (ImGui::CollapsingHeader("Camera"))
 	{
 		ImGui::Text("Variables");
-		if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
+		if (ImGui::DragFloat("Vertical FOV", &Config::m_Fov, 1.0f, 10.0f, 160.0f, "%.2f")) {
 			if (aspect >= 1)
-				verticalFov = DEGTORAD * initialVerticalFov;
+				verticalFov = DEGTORAD * Config::m_Fov;
 			else
-				verticalFov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+				verticalFov = math::Atan(math::Tan(DEGTORAD * Config::m_Fov) / aspect);
 		}
-		ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f");
-		ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f");
+		ImGui::DragFloat("Z-near", &Config::m_ZNear, 1.0f, 0.1f, 5.0f, "%.2f");
+		ImGui::DragFloat("Z-far", &Config::m_ZNear, 5.0f, 6.0f, 400.0f, "%.2f");
 	
 		ImGui::Text("Vectors");
-		ImGui::DragFloat3("Cam pos", &eye[0], 1.0f, -25.0f, 25.0f, "%.2f");
+		ImGui::DragFloat3("Cam pos", &Config::m_CamPosition[0], 1.0f, -25.0f, 25.0f, "%.2f");
 		
 		if (App->input->GetMouseButton(SDL_BUTTON_LEFT))
 		{
