@@ -66,30 +66,6 @@ Frustum* CCamera::GetCCameraFrustum()
 	return &frustum;
 }
 
-void FindMeshes(const GameObject* gameObject) 
-{
-	for (int i = 0; i < gameObject->m_Components.size(); ++i)
-	{
-		if (gameObject->m_Components[i]->m_Type == ComponentType::MESH)
-		{
-			ImGui::Text("%s", "Mesh");
-			CMesh* cMesh = (CMesh*)gameObject->m_Components[i];
-			bool b = App->camera->BoxInFrustum(*App->camera->GetFrustum(), cMesh->m_BB);
-			ImGui::SameLine();
-			std::string sb = "no";
-			if (b)
-				sb = "yes";
-			ImGui::Text("<- in frustum? %s", sb.c_str());
-			// Call a function to draw the mesh, better if we do this in another part?
-		}
-	}
-
-	for (int i = 0; i < gameObject->m_Children.size(); ++i)
-	{
-		FindMeshes(gameObject->m_Children[i]);	
-	}
-}
-
 void CCamera::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Camera"))
@@ -100,7 +76,6 @@ void CCamera::DrawImGui()
 			else App->camera->SetCurrentCamera(nullptr);
 		}
 
-		//initialVerticalFov = 45.0f;
 		if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
 			if (aspect >= 1)
 				verticalFov = DEGTORAD * initialVerticalFov;
@@ -113,11 +88,5 @@ void CCamera::DrawImGui()
 
 		if (ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f"))
 			frustum.SetViewPlaneDistances(zNear, zFar);
-
-		ImGui::Separator();	
-
-		FindMeshes(App->scene->GetRoot());
-
-		ImGui::Separator();
 	}
 }

@@ -82,9 +82,6 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::Update()
 {
-	if (m_CurrentCamera != nullptr)
-		return UPDATE_CONTINUE;
-
 	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
 	{
 		int deltaX, deltaY;

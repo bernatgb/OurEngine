@@ -135,7 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LOGGING_SUPPORT_DISABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3;.\ImGuizmo-1.83</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
@@ -185,7 +185,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LOGGING_SUPPORT_DISABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3;.\ImGuizmo-1.83</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
@@ -205,7 +205,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;LOGGING_SUPPORT_DISABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\SDL\include;.\glew-2.1.0\include;.\ImGui;.\MathGeoLib_Source;.\debug_draw;.\DevIL\include\;.\assimp\include;.\rapidjson-1.1.0\include;.\ImGuiFileDialog-0.6.3;.\ImGuizmo-1.83</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
@@ -228,6 +228,11 @@
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="ImGuiFileDialog-0.6.3\ImGuiFileDialog.cpp" />
+    <ClCompile Include="ImGuizmo-1.83\GraphEditor.cpp" />
+    <ClCompile Include="ImGuizmo-1.83\ImCurveEdit.cpp" />
+    <ClCompile Include="ImGuizmo-1.83\ImGradient.cpp" />
+    <ClCompile Include="ImGuizmo-1.83\ImGuizmo.cpp" />
+    <ClCompile Include="ImGuizmo-1.83\ImSequencer.cpp" />
     <ClCompile Include="MaterialImporter.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK2D.cpp" />
@@ -434,6 +439,12 @@
     <ClInclude Include="ImGuiFileDialog-0.6.3\ImGuiFileDialogConfig.h" />
     <ClInclude Include="ImGuiFileDialog-0.6.3\stb\stb_image.h" />
     <ClInclude Include="ImGuiFileDialog-0.6.3\stb\stb_image_resize.h" />
+    <ClInclude Include="ImGuizmo-1.83\GraphEditor.h" />
+    <ClInclude Include="ImGuizmo-1.83\ImCurveEdit.h" />
+    <ClInclude Include="ImGuizmo-1.83\ImGradient.h" />
+    <ClInclude Include="ImGuizmo-1.83\ImGuizmo.h" />
+    <ClInclude Include="ImGuizmo-1.83\ImSequencer.h" />
+    <ClInclude Include="ImGuizmo-1.83\ImZoomSlider.h" />
     <ClInclude Include="MaterialImporter.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK2D.h" />
