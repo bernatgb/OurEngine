@@ -6,6 +6,7 @@
 class CMesh : public Component
 {
 public:
+	CMesh(bool _enabled, GameObject* _owner);
 	CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh);
 	~CMesh() override;
 
@@ -26,6 +27,5 @@ public:
 private:
 	Mesh* m_Mesh;
 
-
-	bool m_ShowBoundingBox; // work in progress
+	bool m_ShowBoundingBox;
 };

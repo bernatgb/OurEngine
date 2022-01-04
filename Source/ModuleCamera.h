@@ -23,7 +23,7 @@ public:
 	void ViewProjectionMatrix();
 	void AdjustToModel(Model* _model);
 
-	void SetCurrentCamera(CCamera* _camera);
+	void SetCullingCamera(CCamera* _camera);
 	
 	Frustum* GetFrustum();
 	Frustum* GetGameCameraFrustum();
@@ -39,7 +39,7 @@ public:
 private:
 	void Rotate(float _deltaPitch, float _deltaYaw);
 
-	CCamera* m_CurrentCamera;
+	CCamera* m_CullingCamera;
 
 	//Quat m_CameraRotation;
 	float3 m_PitchYawRoll;

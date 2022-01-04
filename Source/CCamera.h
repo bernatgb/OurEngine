@@ -21,20 +21,12 @@ public:
 
 	Frustum* GetCCameraFrustum();
 
-	bool m_CurrentCamera;
+	bool m_MainCamera = false;
+	bool m_CullingCamera = false;
 
 	Frustum frustum;
-	//TODO: ASPECT SHOULDNT BE HERE
-	float aspect;
 
 	float initialVerticalFov = 45.0f;
-	//TODO: verticalFov SHOULDNT BE A VARIABLE
-	float verticalFov = DEGTORAD * initialVerticalFov;
 	float zNear = 0.1f;
 	float zFar = 200.0f;
-
-	//TODO: USE POS FRONT AND UP FROM THE CTRANSFORM
-	float3 pos = float3(6.0f, 1.5f, -4.0f);
-	float3 front = -float3::unitX;
-	float3 up = float3::unitY;
 };

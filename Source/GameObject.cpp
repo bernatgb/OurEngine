@@ -5,6 +5,8 @@
 #include "ModuleCamera.h"
 #include "GL/glew.h"
 
+#include "SceneImporter.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -121,11 +123,18 @@ void GameObject::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorTy
 
 	// Store components
 	rapidjson::Value components(rapidjson::kArrayType);
-	// Transform
+	//  Transform
 	rapidjson::Value newComponent(rapidjson::kObjectType);
 	m_Transform->OnSave(newComponent, allocator);
 	components.PushBack(newComponent, allocator);
-	// Other components
+	//  Material // TODO: should it be with the other components??
+	if (m_Material != nullptr)
+	{
+		rapidjson::Value newComponent(rapidjson::kObjectType);
+		m_Material->OnSave(newComponent, allocator);
+		components.PushBack(newComponent, allocator);
+	}
+	//  Other components
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
 		rapidjson::Value newComponent(rapidjson::kObjectType);
@@ -134,27 +143,82 @@ void GameObject::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorTy
 	}
 	node.AddMember("Components", components, allocator);
 
-	// CHANGE STORE ONLY THE GUID
 	// Store children
 	rapidjson::Value children(rapidjson::kArrayType);
 	for (unsigned int i = 0; i < m_Children.size(); ++i)
 	{
+		//children.PushBack(m_Children[i]->m_GUID, allocator); //TODO: SHOULD ONLY STORE THE GUID
 		rapidjson::Value newChild(rapidjson::kObjectType);
 		m_Children[i]->OnSave(newChild, allocator);
 		children.PushBack(newChild, allocator);
 	}
 	node.AddMember("Children", children, allocator);
 
+	// Store Min & Max
+	node.AddMember("Min", importer::Float3ToValue(m_Min, allocator), allocator);
+	node.AddMember("Max", importer::Float3ToValue(m_Max, allocator), allocator);
+
 	//bool m_Selected;
 	//bool m_InFrustum;
-	//CMaterial* m_Material; should be with the other components??
-
-	//float3 m_Min;
-	//float3 m_Max;
 }
 
 void GameObject::OnLoad(const rapidjson::Value& node)
 {
+	// Load GUID, Name, Active, Parend GUID
+	m_GUID = node["GUID"].GetInt();
+	strcpy(m_Name, node["Name"].GetString());
+	m_Active = node["Active"].GetBool();
+	unsigned int parentId = node["Parent"].GetInt();
+
+	// Load Components
+	rapidjson::Value::ConstValueIterator itr = node["Components"].Begin();
+	//  Transform
+	m_Transform->OnLoad(*itr);
+	++itr;
+	//  Material
+	if ((*itr)["Type"].GetInt() == (int)ComponentType::MATERIAL)
+	{
+		m_Material->OnLoad(*itr);
+		++itr;
+	}
+	//  Other components
+	for (itr; itr != node["Components"].End(); ++itr)
+	{
+		switch ((ComponentType)(*itr)["Type"].GetInt())
+		{
+		case ComponentType::MESH:
+		{
+			CMesh* newCMesh = new CMesh(true, this);
+			newCMesh->OnLoad(*itr);
+			AddComponent(newCMesh);
+			break;
+		}
+		case ComponentType::MATERIAL:
+		{
+			CMaterial* newCMaterial = new CMaterial(true, this);
+			newCMaterial->OnLoad(*itr);
+			AddComponent(newCMaterial);
+			break;
+		}
+		case ComponentType::CAMERA:
+		{
+			CCamera* newCCamera = new CCamera(true, this);
+			newCCamera->OnLoad(*itr);
+			AddComponent(newCCamera);
+			break;
+		}
+		}
+	}
+
+	// Load children
+	for (rapidjson::Value::ConstValueIterator itr = node["Children"].Begin(); itr != node["Children"].End(); ++itr)
+	{
+		AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
+	}
+
+	// Load Min & Max
+	m_Min = importer::ValueToFloat3(node["Min"]);
+	m_Max = importer::ValueToFloat3(node["Max"]);
 }
 
 bool GameObject::IsInFrustum()
@@ -219,6 +283,7 @@ void GameObject::DeleteChild(GameObject* _go)
 
 void GameObject::DrawImGui()
 {
+
 	ImGui::InputText("Name", m_Name, 100);
 	ImGui::Checkbox("Active", &m_Active);
 	//header
@@ -243,6 +308,12 @@ T* GameObject::GetComponent()
 		break;
 	case CMesh:
 		type = ComponentType::MESH;
+		break;
+	case CMaterial:
+		type = ComponentType::MATERIAL;
+		break;
+	case CCamera:
+		type = ComponentType::CAMERA;
 		break;
 	default:
 		return nullptr;

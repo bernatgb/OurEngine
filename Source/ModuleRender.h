@@ -31,9 +31,13 @@ public:
 	unsigned int program;
 
 	//Gets
-	float2 GetSizeSceneWindow() const 
+	float2 GetSceneWindowSize() const
 	{
 		return viewportPanelSize;
+	};
+	float GetSceneWindowAspect() const
+	{
+		return viewportPanelSize.x / viewportPanelSize.y;
 	};
 
 private:

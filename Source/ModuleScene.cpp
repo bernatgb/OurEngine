@@ -32,6 +32,7 @@ bool ModuleScene::Init()
 	MY_LOG("Model: Model creation");
     
     m_Root = new GameObject("Root", nullptr);
+    m_Root->m_GUID = 0;
     m_GOSelected = nullptr;
 
     importer::LoadResources(m_Meshes, m_Textures, m_Models);
@@ -145,21 +146,16 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::Separator();
 
     ImGui::Text("Things to ask to the teacher");
-    ImGui::BulletText("Exporting model gameObject structre - Do it from assimp nodes");
     ImGui::BulletText("Mesh BB - destroy it");
     ImGui::BulletText("Shader in materials - yep");
     ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
     ImGui::BulletText("Time and skybox images in ImGui");
-    ImGui::BulletText("Binaries GUI (rand)");
-    ImGui::BulletText("Binaries for texture");
-    ImGui::BulletText("Json library");
     ImGui::BulletText("Where to do the FindMeshes & co");
 
     ImGui::Separator();
 
     ImGui::Text("TODO");
     ImGui::BulletText("Fix the f to work with gameobjects");
-    ImGui::BulletText("GUIDs");
     ImGui::BulletText("Fix camera movement speed -> effected by fps");
     ImGui::BulletText("Fix mouse clicking");
     ImGui::BulletText("Have two cameras");
@@ -175,6 +171,24 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::BulletText("const & parameters");
     ImGui::BulletText("function names start with verbs");
     ImGui::BulletText("initialize in .h");
+
+    /*
+    MIQUEL:
+    -SCENE SERIALIZATION
+    -FILE SYSTEM
+
+    -ASSIMP TRANSFORMS
+    -ASPECTS (WINDOW/IMGUI)
+    -GAME VIEW
+    -FIX F / ORBIT
+    -FIX ENABLED / START
+    -SERIALIZATION OF GAMEOBJECTS USING GUID
+
+    BERNAT:
+    -MOUSE/GIZMOS
+    -PBR
+    */
+
 
     /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
     {
@@ -272,6 +286,7 @@ void ModuleScene::DrawImGuiHierarchy()
 
 void ModuleScene::DrawImGuiResources()
 {
+    //// TEST
     if (ImGui::Button("Open File Dialog"))
         ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
 
@@ -291,6 +306,43 @@ void ModuleScene::DrawImGuiResources()
         // close
         ImGuiFileDialog::Instance()->Close();
     }
+    ////
+
+    // Load and save scenes
+    if (ImGui::Button("Load Scene"))
+        ImGuiFileDialog::Instance()->OpenDialog("LoadScene", "Load Scene", ".scene", ".");
+
+    if (ImGuiFileDialog::Instance()->Display("LoadScene"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+            MY_LOG("Loading scene: %s", filePathName.c_str());
+        }
+
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // Save scene
+    if (ImGui::Button("Save Scene"))
+        ImGuiFileDialog::Instance()->OpenDialog("SaveScene", "Save Scene", ".scene", ".");
+
+    if (ImGuiFileDialog::Instance()->Display("SaveScene"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+            MY_LOG("Saving scene at: %s", filePathName.c_str());
+        }
+
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    ImGui::Separator();
 
     for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
     {
@@ -380,10 +432,27 @@ const GameObject* ModuleScene::GetRoot() const
     return m_Root;
 }
 
-void ModuleScene::LoadLibraryAssets()
+void ModuleScene::LoadScene(const rapidjson::Document& d)
 {
+    delete m_Root;
+    m_Root = new GameObject("Root", nullptr);
+    m_Root->m_GUID = 0;
+
+    for (rapidjson::Value::ConstValueIterator itr = d.Begin(); itr != d.End(); ++itr)
+    {
+        m_Root->AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
+    }
 }
 
-void ModuleScene::SaveLibraryAssets()
+void ModuleScene::SaveScene(rapidjson::Document& d)
 {
+    d.SetArray();
+    rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
+
+    for (unsigned int i = 0; i < m_Root->m_Children.size(); ++i) 
+    {
+        rapidjson::Value go;
+        m_Root->m_Children[i]->OnSave(go, allocator);
+        d.PushBack(go, allocator);
+    }
 }

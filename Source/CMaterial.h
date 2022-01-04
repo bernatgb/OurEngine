@@ -7,6 +7,7 @@
 class CMaterial : public Component
 {
 public:
+	CMaterial(bool _enabled, GameObject* _owner);
 	CMaterial(bool _enabled, GameObject* _owner, Texture* _texture);
 	~CMaterial() override;
 

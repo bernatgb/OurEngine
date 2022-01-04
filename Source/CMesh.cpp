@@ -5,11 +5,16 @@
 #include "GL/glew.h"
 
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleDebugDraw.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+
+CMesh::CMesh(bool _enabled, GameObject* _owner) : Component(ComponentType::MESH, _enabled, _owner)
+{
+}
 
 CMesh::CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh) : Component(ComponentType::MESH, _enabled, _owner)
 {
@@ -41,19 +46,7 @@ void CMesh::Update()
 	m_Mesh->Draw();
 
 	if (m_ShowBoundingBox)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDisable(GL_CULL_FACE);
-
-		//glBindBuffer(GL_ARRAY_BUFFER, m_VboBB);
-		//glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 		App->debugDraw->DrawBB(m_BB);
-
-		glEnable(GL_CULL_FACE);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
 }
 
 void CMesh::Disable()
@@ -87,12 +80,24 @@ void CMesh::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& a
 {
 	Component::OnSave(node, allocator);
 
-	//TODO: SAVE VARIABLES
+	node.AddMember("MeshId", rapidjson::Value(m_Mesh->m_GUID), allocator);
+	node.AddMember("ShowBB", rapidjson::Value(m_ShowBoundingBox), allocator);
 }
 
 void CMesh::OnLoad(const rapidjson::Value& node)
 {
 	Component::OnLoad(node);
 
-	//TODO: LOAD VARIABLES
+	unsigned int meshId = node["MeshId"].GetInt();
+	m_Mesh = App->scene->m_Meshes[meshId];
+	m_ShowBoundingBox = node["ShowBB"].GetInt();
+
+	// Mesh initialization
+	for (unsigned int i = 0; i < 8; ++i)
+		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
+
+	m_MinPoint = m_BB[6];
+	m_MaxPoint = m_BB[0];
+
+	m_Triangles = m_Mesh->m_Triangles;
 }

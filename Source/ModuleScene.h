@@ -35,8 +35,8 @@ public:
 	//std::vector<Model*> models;
 	//int activeModel;
 
-	void LoadLibraryAssets();
-	void SaveLibraryAssets();
+	void LoadScene(const rapidjson::Document& d);
+	void SaveScene(rapidjson::Document& d);
 
 	Model* FindModel(std::string _modelName) {
 		std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);

@@ -32,13 +32,13 @@ void ModuleCamera::ViewProjectionMatrix()
 	frustum.SetFront(Config::m_CamRotation.WorldZ());
 	frustum.SetUp(Config::m_CamRotation.WorldY());
 
-	if (m_CurrentCamera != nullptr) 
+	if (m_CullingCamera != nullptr)
 	{
-		gameCameraFrustum = m_CurrentCamera->frustum;
+		gameCameraFrustum = m_CullingCamera->frustum;
 
-		gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-		gameCameraFrustum.SetViewPlaneDistances(m_CurrentCamera->zNear, m_CurrentCamera->zFar);
-		gameCameraFrustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);
+		/*gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
+		gameCameraFrustum.SetViewPlaneDistances(m_CullingCamera->zNear, m_CullingCamera->zFar);
+		gameCameraFrustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);*/
 
 		// To visualize what gameCamera sees
 		//frustum = gameCameraFrustum;
@@ -207,20 +207,20 @@ void ModuleCamera::AdjustToModel(Model* _model)
 	ViewProjectionMatrix();
 }
 
-void ModuleCamera::SetCurrentCamera(CCamera* _camera)
+void ModuleCamera::SetCullingCamera(CCamera* _camera)
 {
 	if (_camera == nullptr) 
 	{
-		m_CurrentCamera = nullptr;
+		m_CullingCamera = nullptr;
 	}
-	else if (m_CurrentCamera == nullptr)
+	else if (m_CullingCamera == nullptr)
 	{
-		m_CurrentCamera = _camera;
+		m_CullingCamera = _camera;
 	}
 	else 
 	{
-		m_CurrentCamera->m_CurrentCamera = false;
-		m_CurrentCamera = _camera;
+		m_CullingCamera->m_CullingCamera = false;
+		m_CullingCamera = _camera;
 	}
 
 	ViewProjectionMatrix();

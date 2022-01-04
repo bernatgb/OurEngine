@@ -4,6 +4,7 @@
 #include "CTransform.h"
 #include "CMaterial.h"
 #include "CMesh.h"
+#include "CCamera.h"
 
 #include <vector>
 
@@ -64,4 +65,35 @@ public:
 
 	float3 m_Min;
 	float3 m_Max;
+
+
+	template<typename T> ComponentType TypeToComponentType(T type) {
+		switch (T)
+		{
+		case CTransform:
+			return ComponentType::TRANSFORM;
+		case CMesh:
+			return ComponentType::MESH;
+		case CMaterial:
+			return ComponentType::MATERIAL;
+		case CCamera:
+			return ComponentType::CAMERA;
+		}
+		return ComponentType::UNDEFINED;
+	}
+
+	template<typename T> T TypeToComponentType(ComponentType componentType) {
+		switch (componentType)
+		{
+		case ComponentType::TRANSFORM:
+			return CTransform;
+		case ComponentType::MESH:
+			return CMesh;
+		case ComponentType::MATERIAL:
+			return CMaterial;
+		case ComponentType::CAMERA:
+			return CCamera;
+		}
+		return Component;
+	}
 };
