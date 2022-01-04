@@ -308,7 +308,7 @@ void ModuleScene::DrawImGuiResources()
     }
     ////
 
-    // Load and save scenes
+    // Load scene
     if (ImGui::Button("Load Scene"))
         ImGuiFileDialog::Instance()->OpenDialog("LoadScene", "Load Scene", ".scene", ".");
 
@@ -320,6 +320,15 @@ void ModuleScene::DrawImGuiResources()
             std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
             MY_LOG("Loading scene: %s", filePathName.c_str());
+            m_GOSelected = nullptr;
+            rapidjson::Document d;
+            if (importer::LoadFile(filePathName.c_str(), d))
+            {
+                LoadScene(d);
+                MY_LOG("Scene Loaded");
+            }
+            else
+                MY_LOG("Error while loading scene: %s", filePathName.c_str());
         }
 
         ImGuiFileDialog::Instance()->Close();
@@ -337,6 +346,10 @@ void ModuleScene::DrawImGuiResources()
             std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
             MY_LOG("Saving scene at: %s", filePathName.c_str());
+            rapidjson::Document d;
+            SaveScene(d);
+            importer::SaveFile(filePathName.c_str(), d);
+            MY_LOG("Scene Saved");
         }
 
         ImGuiFileDialog::Instance()->Close();
@@ -452,6 +465,7 @@ void ModuleScene::SaveScene(rapidjson::Document& d)
     for (unsigned int i = 0; i < m_Root->m_Children.size(); ++i) 
     {
         rapidjson::Value go;
+        go.SetObject();
         m_Root->m_Children[i]->OnSave(go, allocator);
         d.PushBack(go, allocator);
     }

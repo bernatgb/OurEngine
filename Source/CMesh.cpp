@@ -90,7 +90,7 @@ void CMesh::OnLoad(const rapidjson::Value& node)
 
 	unsigned int meshId = node["MeshId"].GetInt();
 	m_Mesh = App->scene->m_Meshes[meshId];
-	m_ShowBoundingBox = node["ShowBB"].GetInt();
+	m_ShowBoundingBox = node["ShowBB"].GetBool();
 
 	// Mesh initialization
 	for (unsigned int i = 0; i < 8; ++i)

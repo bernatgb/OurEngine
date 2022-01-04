@@ -153,6 +153,15 @@ update_status ModuleImGui::Update()
 		ImGui::End();
 	}
 
+	if (resources)
+	{
+		if (ImGui::Begin("Resources", &resources))
+		{
+			App->scene->DrawImGuiResources();
+		}
+		ImGui::End();
+	}
+
 	if (inspector)
 	{
 		if (ImGui::Begin("Inspector", &inspector))
@@ -167,15 +176,6 @@ update_status ModuleImGui::Update()
 		if (ImGui::Begin("Hierarchy", &hierarchy))
 		{
 			App->scene->DrawImGuiHierarchy();
-		}
-		ImGui::End();
-	}
-
-	if (resources)
-	{
-		if (ImGui::Begin("Resources", &resources))
-		{
-			App->scene->DrawImGuiResources();
 		}
 		ImGui::End();
 	}

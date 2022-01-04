@@ -80,6 +80,8 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 	m_RotationEuler = importer::ValueToFloat3(node["Rotation"]);
 	m_Scale = importer::ValueToFloat3(node["Scale"]);
 
+	m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
+
 	RecalculateModelMatrix();
 }
 

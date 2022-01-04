@@ -176,8 +176,9 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 	m_Transform->OnLoad(*itr);
 	++itr;
 	//  Material
-	if ((*itr)["Type"].GetInt() == (int)ComponentType::MATERIAL)
+	if (itr != node["Components"].End() && (*itr)["Type"].GetInt() == (int)ComponentType::MATERIAL)
 	{
+		m_Material = new CMaterial(true, this);
 		m_Material->OnLoad(*itr);
 		++itr;
 	}
@@ -209,6 +210,8 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 		}
 		}
 	}
+	// Load the transform component at the end
+	//m_Transform->OnLoad(*node["Components"].Begin());
 
 	// Load children
 	for (rapidjson::Value::ConstValueIterator itr = node["Children"].Begin(); itr != node["Children"].End(); ++itr)
@@ -283,7 +286,6 @@ void GameObject::DeleteChild(GameObject* _go)
 
 void GameObject::DrawImGui()
 {
-
 	ImGui::InputText("Name", m_Name, 100);
 	ImGui::Checkbox("Active", &m_Active);
 	//header
