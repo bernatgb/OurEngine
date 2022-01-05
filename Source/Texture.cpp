@@ -122,131 +122,128 @@ void Texture::ActivateTexture(const unsigned int& program)
 
 void Texture::DrawImGui()
 {
-	if (ImGui::CollapsingHeader(m_Name.c_str()))
+	ImGui::Text("Witdh: %i", m_TextureData->width);
+	ImGui::Text("Height: %i", m_TextureData->height);
+	ImGui::Text("Depth: %i", m_TextureData->depth);
+
+	switch (m_TextureData->format)
 	{
-		ImGui::Text("Witdh: %i", m_TextureData->width);
-		ImGui::Text("Height: %i", m_TextureData->height);
-		ImGui::Text("Depth: %i", m_TextureData->depth);
+	case GL_COLOR_INDEX:
+		ImGui::Text("Format: COLOUR_INDEX");
+		break;
+	case GL_RGB:
+		ImGui::Text("Format: RGB");
+		break;
+	case GL_RGBA:
+		ImGui::Text("Format: RGBA");
+		break;
+	case GL_BGR:
+		ImGui::Text("Format: BGR");
+		break;
+	case GL_BGRA:
+		ImGui::Text("Format: BGRA");
+		break;
+	case GL_LUMINANCE:
+		ImGui::Text("Format: LUMINANCE");
+		break;
+	}
 
-		switch (m_TextureData->format)
-		{
-		case GL_COLOR_INDEX:
-			ImGui::Text("Format: COLOUR_INDEX");
-			break;
-		case GL_RGB:
-			ImGui::Text("Format: RGB");
-			break;
-		case GL_RGBA:
-			ImGui::Text("Format: RGBA");
-			break;
-		case GL_BGR:
-			ImGui::Text("Format: BGR");
-			break;
-		case GL_BGRA:
-			ImGui::Text("Format: BGRA");
-			break;
-		case GL_LUMINANCE:
-			ImGui::Text("Format: LUMINANCE");
-			break;
-		}
+	ImGui::Image((void*)m_Texture, ImVec2(100, 100));
 
-		ImGui::Image((void*)m_Texture, ImVec2(100, 100));
+	ImGui::Separator();
 
+	bool change = false;
+
+	if (ImGui::Button("Select Min filter.."))
+		ImGui::OpenPopup("min_filter_popup");
+	ImGui::SameLine();
+	ImGui::TextUnformatted(ConfigToString(m_MinFilter));
+	if (ImGui::BeginPopup("min_filter_popup"))
+	{
+		ImGui::Text("Min Filter");
 		ImGui::Separator();
-
-		bool change = false;
-
-		if (ImGui::Button("Select Min filter.."))
-			ImGui::OpenPopup("min_filter_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(ConfigToString(m_MinFilter));
-		if (ImGui::BeginPopup("min_filter_popup"))
+		if (ImGui::Selectable("GL_NEAREST"))
 		{
-			ImGui::Text("Min Filter");
-			ImGui::Separator();
-			if (ImGui::Selectable("GL_NEAREST"))
-			{
-				m_MinFilter = GL_NEAREST;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_LINEAR"))
-			{
-				m_MinFilter = GL_LINEAR;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_NEAREST_MIPMAP_NEAREST"))
-			{
-				m_MinFilter = GL_NEAREST_MIPMAP_NEAREST;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_LINEAR_MIPMAP_NEAREST"))
-			{
-				m_MinFilter = GL_LINEAR_MIPMAP_NEAREST;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_NEAREST_MIPMAP_LINEAR"))
-			{
-				m_MinFilter = GL_NEAREST_MIPMAP_LINEAR;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_LINEAR_MIPMAP_LINEAR"))
-			{
-				m_MinFilter = GL_LINEAR_MIPMAP_LINEAR;
-				change = true;
-			}
-			ImGui::EndPopup();
+			m_MinFilter = GL_NEAREST;
+			change = true;
 		}
-
-		if (ImGui::Button("Select Mag filter.."))
-			ImGui::OpenPopup("mag_filter_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(ConfigToString(m_MagFilter));
-		if (ImGui::BeginPopup("mag_filter_popup"))
+		if (ImGui::Selectable("GL_LINEAR"))
 		{
-			ImGui::Text("Mag Filter");
-			ImGui::Separator();
-			if (ImGui::Selectable("GL_NEAREST"))
-			{
-				m_MagFilter = GL_NEAREST;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_LINEAR"))
-			{
-				m_MagFilter = GL_LINEAR;
-				change = true;
-			}
-			ImGui::EndPopup();
+			m_MinFilter = GL_LINEAR;
+			change = true;
 		}
-
-		if (ImGui::Button("Select Wrap.."))
-			ImGui::OpenPopup("wrap_popup");
-		ImGui::SameLine();
-		ImGui::TextUnformatted(ConfigToString(m_Wrap));
-		if (ImGui::BeginPopup("wrap_popup"))
+		if (ImGui::Selectable("GL_NEAREST_MIPMAP_NEAREST"))
 		{
-			ImGui::Text("Wrap");
-			ImGui::Separator();
-			if (ImGui::Selectable("GL_CLAMP"))
-			{
-				m_Wrap = GL_CLAMP;
-				change = true;
-			}
-			if (ImGui::Selectable("GL_REPEAT"))
-			{
-				m_Wrap = GL_REPEAT;
-				change = true;
-			}
-			ImGui::EndPopup();
+			m_MinFilter = GL_NEAREST_MIPMAP_NEAREST;
+			change = true;
 		}
-
-		if (change) 
+		if (ImGui::Selectable("GL_LINEAR_MIPMAP_NEAREST"))
 		{
-			glBindTexture(GL_TEXTURE_2D, m_Texture);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_MinFilter);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_MagFilter);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
+			m_MinFilter = GL_LINEAR_MIPMAP_NEAREST;
+			change = true;
 		}
+		if (ImGui::Selectable("GL_NEAREST_MIPMAP_LINEAR"))
+		{
+			m_MinFilter = GL_NEAREST_MIPMAP_LINEAR;
+			change = true;
+		}
+		if (ImGui::Selectable("GL_LINEAR_MIPMAP_LINEAR"))
+		{
+			m_MinFilter = GL_LINEAR_MIPMAP_LINEAR;
+			change = true;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::Button("Select Mag filter.."))
+		ImGui::OpenPopup("mag_filter_popup");
+	ImGui::SameLine();
+	ImGui::TextUnformatted(ConfigToString(m_MagFilter));
+	if (ImGui::BeginPopup("mag_filter_popup"))
+	{
+		ImGui::Text("Mag Filter");
+		ImGui::Separator();
+		if (ImGui::Selectable("GL_NEAREST"))
+		{
+			m_MagFilter = GL_NEAREST;
+			change = true;
+		}
+		if (ImGui::Selectable("GL_LINEAR"))
+		{
+			m_MagFilter = GL_LINEAR;
+			change = true;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::Button("Select Wrap.."))
+		ImGui::OpenPopup("wrap_popup");
+	ImGui::SameLine();
+	ImGui::TextUnformatted(ConfigToString(m_Wrap));
+	if (ImGui::BeginPopup("wrap_popup"))
+	{
+		ImGui::Text("Wrap");
+		ImGui::Separator();
+		if (ImGui::Selectable("GL_CLAMP"))
+		{
+			m_Wrap = GL_CLAMP;
+			change = true;
+		}
+		if (ImGui::Selectable("GL_REPEAT"))
+		{
+			m_Wrap = GL_REPEAT;
+			change = true;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (change) 
+	{
+		glBindTexture(GL_TEXTURE_2D, m_Texture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_MinFilter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_MagFilter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 	}
 }
 

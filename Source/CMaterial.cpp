@@ -22,15 +22,43 @@ CMaterial::~CMaterial()
 {
 }
 
-
 void CMaterial::ActivateMaterial()
 {
+	if (m_Texture == nullptr)
+		return;
+
 	m_Texture->ActivateTexture(App->renderer->program);
 }
 
 void CMaterial::DrawImGui()
 {
-	m_Texture->DrawImGui();
+	if (ImGui::CollapsingHeader("Material"))
+	{
+		// Select material
+		if (ImGui::Button("Select Material..."))
+			ImGui::OpenPopup("select_material");
+		ImGui::SameLine();
+		if (m_Texture != nullptr) ImGui::TextUnformatted(std::to_string(m_Texture->m_GUID).c_str());
+		else ImGui::TextUnformatted("No material selected");
+
+		if (ImGui::BeginPopup("select_material"))
+		{
+			ImGui::Text("Material");
+			ImGui::Separator();
+			for (auto it = App->scene->m_Textures.begin(); it != App->scene->m_Textures.end(); ++it)
+			{
+				if (ImGui::Selectable(std::to_string(it->first).c_str()))
+					m_Texture = it->second;
+			}
+			ImGui::EndPopup();
+		}
+
+		// If a material is selected
+		if (m_Texture != nullptr)
+		{
+			m_Texture->DrawImGui();
+		}
+	}
 }
 
 void CMaterial::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const

@@ -40,11 +40,18 @@ void CMesh::Enable()
 
 void CMesh::Update()
 {
+	// Return if component is not enabled
 	if (!m_Enabled)
 		return;
 
+	// Return if mesh is not selected
+	if (m_Mesh == nullptr)
+		return;
+	
+	// Draw mesh
 	m_Mesh->Draw();
 
+	// Draw bounding box if needed
 	if (m_ShowBoundingBox)
 		App->debugDraw->DrawBB(m_BB);
 }
@@ -55,12 +62,15 @@ void CMesh::Disable()
 
 void CMesh::NotifyMovement()
 {
+	// If there has been a movement recalculate the bounding box
 	for (unsigned int i = 0; i < 8; ++i)
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
 
+	// Store new min and max point
 	m_MinPoint = m_BB[6];
 	m_MaxPoint = m_BB[0];
 
+	// TODO: CORRECT THIS
 	m_Triangles = m_Mesh->m_Triangles;
 }
 
@@ -68,11 +78,38 @@ void CMesh::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Mesh"))
 	{
+		// Show enabled variable
 		ImGui::Checkbox("Enabled", &m_Enabled);
 
-		ImGui::Checkbox("Show BB", &m_ShowBoundingBox);
+		// Selected mesh
+		if (ImGui::Button("Select Mesh..."))
+			ImGui::OpenPopup("select_mesh");
+		ImGui::SameLine();
+		if (m_Mesh != nullptr) ImGui::TextUnformatted(std::to_string(m_Mesh->m_GUID).c_str());
+		else ImGui::TextUnformatted("No mesh selected");
 
-		m_Mesh->DrawImGui();
+		if (ImGui::BeginPopup("select_mesh"))
+		{
+			ImGui::Text("Mesh");
+			ImGui::Separator();
+			for (auto it = App->scene->m_Meshes.begin(); it != App->scene->m_Meshes.end(); ++it)
+			{
+				if (ImGui::Selectable(std::to_string(it->first).c_str()))
+					m_Mesh = it->second;
+			}
+			ImGui::EndPopup();
+		}
+
+		// If a mesh is selected
+		if (m_Mesh != nullptr) 
+		{
+			// Show bounding box
+			ImGui::Checkbox("Show BB", &m_ShowBoundingBox);
+
+			// Show mesh info
+			m_Mesh->DrawImGui();
+		}
+
 	}
 }
 

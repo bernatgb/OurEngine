@@ -119,6 +119,12 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
 
 void ModuleScene::DrawImGuiHierarchy()
 {
+    // Create empty gameobject button
+    if (ImGui::Button("Create empty gameobject"))
+    {
+        m_Root->AddChild("Empty GameObject");
+    }
+
     ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
     if (ImGui::TreeNode("Root"))
     {
@@ -183,6 +189,12 @@ void ModuleScene::DrawImGuiHierarchy()
     -FIX F / ORBIT
     -FIX ENABLED / START
     -SERIALIZATION OF GAMEOBJECTS USING GUID
+    -GO MIN & MAX
+    -MESH AND MATERIAL SELECTION
+    -COPY GO
+    -CREATION OF EMPTY GO
+    -WORKING HIERARCHY
+
 
     BERNAT:
     -MOUSE/GIZMOS

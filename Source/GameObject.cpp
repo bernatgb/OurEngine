@@ -297,6 +297,33 @@ void GameObject::DrawImGui()
 
 	if (m_Material != nullptr)
 		m_Material->DrawImGui();
+
+	// Add component button
+	ImGui::Spacing();
+	if (ImGui::Button("Add component..."))
+		ImGui::OpenPopup("add_component");
+	ImGui::SameLine();
+	if (ImGui::BeginPopup("add_component"))
+	{
+		ImGui::Text("Add Component");
+		ImGui::Separator();
+		if (ImGui::Selectable("Mesh"))
+		{
+			CMesh* newCMesh = new CMesh(true, this);
+			AddComponent(newCMesh);
+		}
+		if (ImGui::Selectable("Material"))
+		{
+			CMaterial* newCMaterial = new CMaterial(true, this);
+			AddComponent(newCMaterial);
+		}
+		if (ImGui::Selectable("Camera"))
+		{
+			CCamera* newCCamera = new CCamera(true, this);
+			AddComponent(newCCamera);
+		}
+		ImGui::EndPopup();
+	}
 }
 
 template<typename T>

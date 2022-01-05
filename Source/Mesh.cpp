@@ -183,6 +183,6 @@ void Mesh::DrawImGui()
 	ImGui::Text("Num vertices: %i", m_NumVertices);
 	ImGui::Text("Num indices: %i", m_NumIndices);
 
-	ImGui::Text("Min point: %f %f %f", m_Min.x, m_Min.y, m_Min.z);
-	ImGui::Text("Max point: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
+	ImGui::Text("Min point (local): %f %f %f", m_Min.x, m_Min.y, m_Min.z);
+	ImGui::Text("Max point (local): %f %f %f", m_Max.x, m_Max.y, m_Max.z);
 }
