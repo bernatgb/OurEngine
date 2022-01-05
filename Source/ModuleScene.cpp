@@ -69,6 +69,11 @@ bool ModuleScene::CleanUp()
 	return true;
 }
 
+GameObject* ModuleScene::CreateGameObject(const char* _name)
+{
+    return m_Root->AddChild(_name);
+}
+
 void ModuleScene::DrawImGuiModel()
 {
     if (m_GOSelected != nullptr) 
@@ -121,10 +126,9 @@ void ModuleScene::DrawImGuiHierarchy()
 {
     // Create empty gameobject button
     if (ImGui::Button("Create empty gameobject"))
-    {
-        m_Root->AddChild("Empty GameObject");
-    }
+        CreateGameObject("Empty GameObject");
 
+    // Draw hierarchy
     ImGui::SetNextItemOpen(ImGuiTreeNodeFlags_DefaultOpen);
     if (ImGui::TreeNode("Root"))
     {
@@ -149,6 +153,7 @@ void ModuleScene::DrawImGuiHierarchy()
         ImGui::TreePop();
     }
 
+    //// NOTEBOOK PROPOUSE
     ImGui::Separator();
 
     ImGui::Text("Things to ask to the teacher");
@@ -161,11 +166,12 @@ void ModuleScene::DrawImGuiHierarchy()
     ImGui::Separator();
 
     ImGui::Text("TODO");
-    ImGui::BulletText("Fix the f to work with gameobjects");
+    ImGui::BulletText("Corrections to f (not calculating the distance properly) & orbit (errors in pols)");
     ImGui::BulletText("Fix camera movement speed -> effected by fps");
     ImGui::BulletText("Fix mouse clicking");
     ImGui::BulletText("Have two cameras");
     ImGui::BulletText("Use correctly start and enable of components");
+    ImGui::BulletText("Currently not using pitch & yawn");
 
     ImGui::Separator();
 
@@ -186,7 +192,6 @@ void ModuleScene::DrawImGuiHierarchy()
     -ASSIMP TRANSFORMS
     -ASPECTS (WINDOW/IMGUI)
     -GAME VIEW
-    -FIX F / ORBIT
     -FIX ENABLED / START
     -SERIALIZATION OF GAMEOBJECTS USING GUID
     -GO MIN & MAX
@@ -200,7 +205,7 @@ void ModuleScene::DrawImGuiHierarchy()
     -MOUSE/GIZMOS
     -PBR
     */
-
+    ////
 
     /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
     {
@@ -450,11 +455,6 @@ void ModuleScene::LoadModel(const char* _fileName)
 
     SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
     //App->camera->AdjustToModel(m_Models[model->m_Name]);
-}
-
-const GameObject* ModuleScene::GetRoot() const
-{
-    return m_Root;
 }
 
 void ModuleScene::LoadScene(const rapidjson::Document& d)

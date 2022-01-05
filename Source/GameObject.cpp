@@ -71,6 +71,10 @@ void GameObject::Update()
 		if (m_Components[i]->m_Type == ComponentType::MESH)
 		{
 			CMesh* cMesh = (CMesh*)m_Components[i];
+
+			m_Min = cMesh->m_MinPoint;
+			m_Max = cMesh->m_MaxPoint;
+
 			m_aabb = AABB(cMesh->m_MinPoint, cMesh->m_MaxPoint);
 			ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
 				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);

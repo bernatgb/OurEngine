@@ -19,21 +19,16 @@ public:
 	bool Init();
 	bool CleanUp();
 
-	GameObject* CreateGameObject();
-	void DrawImGuiModel();
+	GameObject* CreateGameObject(const char* _name);
 
 	void SelectGameObject(GameObject* go);
 	void RecursiveHierarchy(GameObject* go, GameObject*& node_clicked);
 	void DrawImGuiHierarchy();
+	void DrawImGuiModel();
 	void DrawImGuiResources();
 
 	void Draw(unsigned int program);
 	void LoadModel(const char* _fileName);
-
-	const GameObject* GetRoot() const;
-
-	//std::vector<Model*> models;
-	//int activeModel;
 
 	void LoadScene(const rapidjson::Document& d);
 	void SaveScene(rapidjson::Document& d);
@@ -63,8 +58,17 @@ public:
 	std::map<unsigned int, Mesh*> m_Meshes;
 	std::map<unsigned int, Texture*> m_Textures;
 
+	// Gets
+	const GameObject* GetRoot() const
+	{
+		return m_Root;
+	};
+	GameObject* GetSelectedGO() const
+	{
+		return m_GOSelected;
+	};
+
 private:
-	
 	GameObject* m_Root;
 	GameObject* m_GOSelected;
 };

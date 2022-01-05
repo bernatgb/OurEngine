@@ -141,9 +141,10 @@ update_status ModuleCamera::Update()
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		// TODO: FIX THIS
-		//float4 target = App->scene->models[App->scene->activeModel]->GetCenter();
 		float4 target = float4(0.0f, 0.0f, 0.0f, 1.0f);
+		GameObject* selectedGO = App->scene->GetSelectedGO();
+		if (selectedGO != nullptr)
+			target = selectedGO->GetCenter();
 
 		float4 vector = float4(Config::m_CamPosition.x - target.x, Config::m_CamPosition.y - target.y, Config::m_CamPosition.z - target.z, 0);
 
@@ -178,8 +179,9 @@ update_status ModuleCamera::Update()
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_F)) 
 	{
-		// TODO: FIX THIS
-		//AdjustToModel(App->scene->models[App->scene->activeModel]);
+		GameObject* selectedGO = App->scene->GetSelectedGO();
+		if (selectedGO != nullptr)
+			AdjustToGO(selectedGO);
 	}
 
 	return UPDATE_CONTINUE;
@@ -197,11 +199,12 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 	ViewProjectionMatrix();
 }
 
-void ModuleCamera::AdjustToModel(Model* _model)
+void ModuleCamera::AdjustToGO(GameObject* _go)
 {
-	float4 newPos = _model->GetCenter();
-	Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _model->GetDiameter();
+	float4 newPos = _go->GetCenter();
+	Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _go->GetDiameter();
 
+	// TODO: USE THE FOLLOWING FORMULA FOR THE DISTANCE
 	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
 
 	ViewProjectionMatrix();

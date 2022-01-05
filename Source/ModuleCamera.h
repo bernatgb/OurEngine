@@ -21,7 +21,7 @@ public:
 	void DrawImGui();
 
 	void ViewProjectionMatrix();
-	void AdjustToModel(Model* _model);
+	void AdjustToGO(GameObject* _go);
 
 	void SetCullingCamera(CCamera* _camera);
 	
