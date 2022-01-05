@@ -9,12 +9,14 @@ public:
 	CTransform(bool _enabled, GameObject* _owner);
 	~CTransform() override;
 
-	void NotifyMovement();
-
+	Component* GetAClone(GameObject* _owner) override;
+	void NotifyMovement() override;
 	void DrawImGui() override;
 
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;
+
+	void Copy(const CTransform* _transform);
 
 	float3 GetPos() const;
 	float3 GetForward() const;

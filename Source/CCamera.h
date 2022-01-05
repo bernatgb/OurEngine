@@ -13,6 +13,7 @@ public:
 	void Update() override;
 	void Disable() override;
 
+	Component* GetAClone(GameObject* _owner) override;
 	void NotifyMovement() override;
 	void DrawImGui() override;
 
@@ -20,6 +21,10 @@ public:
 	void OnLoad(const rapidjson::Value& node) override;
 
 	Frustum* GetCCameraFrustum();
+
+	// Sets
+	void SetFov(float _fov);
+	void SetZNearAndFar(float _zNear, float _zFar);
 
 	bool m_MainCamera = false;
 	bool m_CullingCamera = false;

@@ -43,6 +43,16 @@ void CCamera::Disable()
 {
 }
 
+Component* CCamera::GetAClone(GameObject* _owner)
+{
+	CCamera* newCCamera = new CCamera(m_Enabled, _owner);
+
+	newCCamera->SetFov(initialVerticalFov);
+	newCCamera->SetZNearAndFar(zNear, zFar);
+
+	return newCCamera;
+}
+
 void CCamera::NotifyMovement()
 {
 	frustum.SetPos(m_Owner->m_Transform->GetPos());
@@ -92,6 +102,8 @@ Frustum* CCamera::GetCCameraFrustum()
 	return &frustum;
 }
 
+
+
 void CCamera::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Camera"))
@@ -137,5 +149,23 @@ void CCamera::DrawImGui()
 		App->debugDraw->DrawBB(frustumPoints);
 		delete[] frustumPoints;
 	}
+}
 
+void CCamera::SetFov(float _fov)
+{
+	initialVerticalFov = _fov;
+
+	float aspect = App->renderer->GetSceneWindowAspect();
+	float fov = DEGTORAD * initialVerticalFov;
+	if (aspect < 1)
+		fov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
+	frustum.SetVerticalFovAndAspectRatio(fov, aspect);
+}
+
+void CCamera::SetZNearAndFar(float _zNear, float _zFar)
+{
+	zNear = _zNear;
+	zFar = _zFar;
+
+	frustum.SetViewPlaneDistances(zNear, zFar);
 }

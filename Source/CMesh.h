@@ -14,6 +14,7 @@ public:
 	void Update() override;
 	void Disable() override;
 
+	Component* GetAClone(GameObject* _owner) override;
 	void NotifyMovement() override;
 	void DrawImGui() override;
 

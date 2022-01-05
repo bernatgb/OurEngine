@@ -189,16 +189,15 @@ void ModuleScene::DrawImGuiHierarchy()
     -SCENE SERIALIZATION
     -FILE SYSTEM
 
+
     -ASSIMP TRANSFORMS
     -ASPECTS (WINDOW/IMGUI)
     -GAME VIEW
     -FIX ENABLED / START
     -SERIALIZATION OF GAMEOBJECTS USING GUID
-    -GO MIN & MAX
-    -MESH AND MATERIAL SELECTION
-    -COPY GO
-    -CREATION OF EMPTY GO
+    -FIX GO MIN & MAX
     -WORKING HIERARCHY
+    -IMPORVE INPUT MODULE TO WORK AS THE 2D EXERCISE
 
 
     BERNAT:
@@ -389,6 +388,11 @@ void ModuleScene::Draw(unsigned int program)
     {
         m_GOSelected->m_Parent->DeleteChild(m_GOSelected);
         m_GOSelected = nullptr;
+    }
+
+    if (App->input->GetKey(SDL_SCANCODE_LCTRL) && App->input->GetKey(SDL_SCANCODE_D)  && m_GOSelected != nullptr)
+    {
+        m_GOSelected->Clone(m_GOSelected->m_Parent);
     }
 }
 

@@ -23,6 +23,8 @@ public:
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const;
 	void OnLoad(const rapidjson::Value& node);
 
+	GameObject* Clone(GameObject* _parent);
+
 	bool IsInFrustum();
 
 	void SetMaterial(Texture* _texture);

@@ -60,6 +60,13 @@ void CMesh::Disable()
 {
 }
 
+Component* CMesh::GetAClone(GameObject* _owner)
+{
+	CMesh* newCMesh = new CMesh(m_Enabled, _owner, m_Mesh);
+
+	return newCMesh;
+}
+
 void CMesh::NotifyMovement()
 {
 	// If there has been a movement recalculate the bounding box

@@ -39,6 +39,10 @@ public:
 	{
 	};
 
+	virtual Component* GetAClone(GameObject* _owner)
+	{
+		return nullptr;
+	};
 	virtual void NotifyMovement()
 	{
 	};

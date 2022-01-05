@@ -228,6 +228,28 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 	m_Max = importer::ValueToFloat3(node["Max"]);
 }
 
+GameObject* GameObject::Clone(GameObject* _parent)
+{
+	GameObject* newGO = _parent->AddChild(m_Name);
+
+	newGO->m_Active = m_Active;
+	newGO->m_Transform->Copy(m_Transform);
+	if (m_Material != nullptr)
+		newGO->m_Material = (CMaterial*)m_Material->GetAClone(newGO);
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
+		newGO->AddComponent(m_Components[i]->GetAClone(newGO));
+
+	for (unsigned int i = 0; i < m_Children.size(); ++i)
+		m_Children[i]->Clone(newGO);
+
+	newGO->m_aabb = m_aabb;
+
+	newGO->m_Min = m_Min;
+	newGO->m_Max = m_Max;
+
+	return newGO;
+}
+
 bool GameObject::IsInFrustum()
 {
 	bool inFrustum = true;

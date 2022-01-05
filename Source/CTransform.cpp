@@ -23,6 +23,21 @@ CTransform::~CTransform()
 {
 }
 
+Component* CTransform::GetAClone(GameObject* _owner)
+{
+	CTransform* newCCTransform = new CTransform(m_Enabled, _owner);
+
+	newCCTransform->m_AccumulativeModelMatrix = m_AccumulativeModelMatrix;
+
+	newCCTransform->m_ModelMatrix = m_ModelMatrix;
+	newCCTransform->m_Position = m_Position;
+	newCCTransform->m_RotationEuler = m_RotationEuler;
+	newCCTransform->m_Scale = m_Scale;
+	newCCTransform->m_Rotation = m_Rotation;
+
+	return newCCTransform;
+}
+
 void CTransform::NotifyMovement()
 {
 	//Change AccumulativeModelMatrix
@@ -83,6 +98,17 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 	m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
 
 	RecalculateModelMatrix();
+}
+
+void CTransform::Copy(const CTransform* _transform)
+{
+	m_AccumulativeModelMatrix = _transform->m_AccumulativeModelMatrix;
+
+	m_ModelMatrix = _transform->m_ModelMatrix;
+	m_Position = _transform->m_Position;
+	m_RotationEuler = _transform->m_RotationEuler;
+	m_Scale = _transform->m_Scale;
+	m_Rotation = _transform->m_Rotation;
 }
 
 void CTransform::RecalculateModelMatrix()

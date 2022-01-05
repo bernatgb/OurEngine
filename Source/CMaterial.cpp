@@ -30,6 +30,13 @@ void CMaterial::ActivateMaterial()
 	m_Texture->ActivateTexture(App->renderer->program);
 }
 
+Component* CMaterial::GetAClone(GameObject* _owner)
+{
+	CMaterial* newCMaterial = new CMaterial(m_Enabled, _owner, m_Texture);
+
+	return newCMaterial;
+}
+
 void CMaterial::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Material"))
