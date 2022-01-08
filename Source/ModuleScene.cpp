@@ -461,8 +461,15 @@ void ModuleScene::LoadModel(const char* _fileName)
     //App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
 
+void ModuleScene::LoadTempScene()
+{
+    LoadScene(m_TempScene);
+}
+
 void ModuleScene::LoadScene(const rapidjson::Document& d)
 {
+    m_GOSelected = nullptr;
+
     delete m_Root;
     m_Root = new GameObject("Root", nullptr);
     m_Root->m_GUID = 0;
@@ -471,6 +478,11 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
     {
         m_Root->AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
     }
+}
+
+void ModuleScene::SaveTempScene()
+{
+    SaveScene(m_TempScene);
 }
 
 void ModuleScene::SaveScene(rapidjson::Document& d)

@@ -11,6 +11,7 @@
 
 #include "Application.h"
 #include "ModuleTexture.h"
+#include "ModuleScene.h"
 
 unsigned long int Time::m_FrameCount = 0;
 double Time::m_Time = 0;
@@ -32,7 +33,7 @@ std::vector<float> Time::m_DeltaTimeGraph = std::vector<float>(100);
 
 double Time::m_pause = 0;
 double Time::m_pausedTime = 0;
-bool Time::m_gamePaused = false;
+bool Time::m_gamePaused = true;
 int Time::m_stepFrame = 0;
 
 void Time::NewFrame()
@@ -182,15 +183,22 @@ void Time::DrawImGui()
 
 		if (ImGui::Button("Play |>"))
 		{
-			if (m_gamePaused)
+			if (m_gamePaused) 
+			{
+				App->scene->SaveTempScene();
 				PlayButton();
+			}
+			else
+			{
+				App->scene->LoadTempScene();
+			}
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Pause ||"))
 		{
-			if (!m_gamePaused)
+			if (!m_gamePaused) 
 				PauseButton();
 		}
 

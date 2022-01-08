@@ -30,6 +30,8 @@ public:
 	void Draw(unsigned int program);
 	void LoadModel(const char* _fileName);
 
+	void LoadTempScene();
+	void SaveTempScene();
 	void LoadScene(const rapidjson::Document& d);
 	void SaveScene(rapidjson::Document& d);
 
@@ -71,4 +73,6 @@ public:
 private:
 	GameObject* m_Root;
 	GameObject* m_GOSelected;
+
+	rapidjson::Document m_TempScene;
 };
