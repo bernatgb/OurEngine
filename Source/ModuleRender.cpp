@@ -123,8 +123,9 @@ bool ModuleRender::Init()
 	// Framebuffer
 
 	MY_LOG("Shaders: Creating program");
-	program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
+	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
 	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag");
+	program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phongBRDF.vert", ".\\assets\\Shaders\\fragment_shader_phongBRDF.frag");
 
 	MY_LOG("Framebuffer: Creating framebuffer");
 	//FBO
@@ -212,14 +213,37 @@ update_status ModuleRender::Update()
 	}
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
+	/*
 	ImGui::Text("x=%f, y=%f", viewportPanelSize.x, viewportPanelSize.y);
+	int mx, my;
+	ImVec2 v2 = ImGui::GetMousePos();
+	ImGui::Text("mx = %f, my = %f", v2.x, v2.y);
+	ImGuiViewport* v1 = ImGui::GetMainViewport();
+	ImVec2 v = v1->GetCenter();
+	//v = v1->GetWorkCenter();
+	ImGui::Text("vx = %f, vy = %f", v.x, v.y);
+	ImGuiViewport* vp = ImGui::GetWindowViewport();
+	ImVec2 vpp = ImGui::GetWindowPos(); 
+	ImVec2 vpi = vpp;
+	//vpp = vp->DrawData->DisplaySize;
+	ImGui::Text("vpx = %f, vpy = %f", vpp.x, vpp.y);
+	//ImGui::Text("dx = %f, dy = %f", dd.DisplaySize.x, dd.DisplaySize.y);
+
+	ImGui::Text("rx = %f, ry = %f", viewportPanelSize.x / 2 + vpi.x, viewportPanelSize.y / 2 + vpi.y);
+	*/
+	sceneWindowPos = float2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
-	
-	/*unsigned int loc;
+	// Model?
+	//GLfloat camPos = App->camera->GetFrustum()->Pos()[0];
+	//const GLfloat* constCamPos = &camPos;
+	//glUniform3fv(glGetUniformLocation(program, "cameraPosition"), 1, constCamPos);
 
+
+	unsigned int loc;
+	/*
 	float3 light_pos = float3(5.0f, 5.0f, 5.0f);
 	loc = glGetUniformLocation(program, "light_pos");
 	if (loc < 0) MY_LOG("Uniform location not found: light_pos");
@@ -255,6 +279,31 @@ update_status ModuleRender::Update()
 	if (loc < 0) MY_LOG("Uniform location not found: n");
 	glUniform1f(loc, n);
 	*/
+	float3 lightDirection = float3(0.0, -1.0, 1.0);
+	loc = glGetUniformLocation(program, "lightDirection");
+	if (loc < 0) MY_LOG("Uniform location not found: lightDirection");
+	glUniform3fv(loc, 1, &lightDirection[0]);
+
+	float3 ambientColor = float3(0.01, 0.01, 0.01);
+	loc = glGetUniformLocation(program, "ambientColor");
+	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
+	glUniform3fv(loc, 1, &ambientColor[0]);
+
+	float3 specularColor = float3(1.0, 1.0, 1.0);
+	loc = glGetUniformLocation(program, "specularColor");
+	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
+	glUniform3fv(loc, 1, &specularColor[0]);
+
+	float shininess = 20.0;
+	loc = glGetUniformLocation(program, "shininess");
+	if (loc < 0) MY_LOG("Uniform location not found: shininess");
+	glUniform1f(loc, shininess);
+
+	float3 lightColor = float3(1.0, 1.0, 1.0);
+	loc = glGetUniformLocation(program, "lightColor");
+	if (loc < 0) MY_LOG("Uniform location not found: lightColor");
+	glUniform3fv(loc, 1, &lightColor[0]);
+
 
 	App->scene->Draw(program);
 	App->debugDraw->Draw(App->camera->view, App->camera->proj, viewportPanelSize.x, viewportPanelSize.y);

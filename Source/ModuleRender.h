@@ -39,6 +39,10 @@ public:
 	{
 		return viewportPanelSize.x / viewportPanelSize.y;
 	};
+	float2 GetSceneWindowStartPos() const
+	{
+		return sceneWindowPos;
+	};
 
 private:
 
@@ -49,4 +53,6 @@ private:
 	CubeMap* cubeMap;
 
 	float2 viewportPanelSize;
+
+	float2 sceneWindowPos;
 };

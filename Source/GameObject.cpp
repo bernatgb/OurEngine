@@ -76,8 +76,8 @@ void GameObject::Update()
 			m_Max = cMesh->m_MaxPoint;
 
 			m_aabb = AABB(cMesh->m_MinPoint, cMesh->m_MaxPoint);
-			ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
-				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);
+			/*ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
+				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);*/
 		}
 	}
 
@@ -260,14 +260,14 @@ bool GameObject::IsInFrustum()
 	{
 		if (m_Components[i]->m_Type == ComponentType::MESH)
 		{
-			ImGui::Text("%s", m_Name);
+			//ImGui::Text("%s", m_Name);
 			CMesh* cMesh = (CMesh*)m_Components[i];
 			inFrustum = App->camera->BoxInFrustum(*App->camera->GetGameCameraFrustum(), cMesh->m_BB);
-			ImGui::SameLine();
-			std::string sb = "no";
-			if (inFrustum)
-				sb = "yes";
-			ImGui::Text("should be painted? %s", sb.c_str());
+			//ImGui::SameLine();
+			//std::string sb = "no";
+			//if (inFrustum)
+				//sb = "yes";
+			//ImGui::Text("should be painted? %s", sb.c_str());
 			// Better if we do this in another part?
 		}
 	}

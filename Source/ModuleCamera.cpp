@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleWindow.h"
+#include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "SDL.h"
 
@@ -353,15 +354,23 @@ void ModuleCamera::DrawImGui()
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMousePosition(mouse_x, mouse_y);
-			ImGui::Text("x=%i, y=%i", mouse_x, mouse_y);
-			// x = 280, y = 45	|	x = 870, y = 45
-			// x = 280, y = 530	|	x = 870, y = 530
-			// When it's not in fullscreen (in my PC works XD)
+			ImGui::Text("x clicked = %i, y clicked = %i", mouse_x, mouse_y);
+
+			ImVec2 v2 = ImGui::GetMousePos();
+			ImGui::Text("mouse x = %i, mouse y = %i", (int)v2.x, (int)v2.y);
 			
-			mouse_x -= 280;
-			mouse_y -= 45;
-			float width = 870 - 280; // App->render->viewportPanelSize.x
-			float height = 530 - 45; // App->render->viewportPanelSize.y
+			// 8 & 37 are magic numbers to correct the position
+			mouse_x -= App->renderer->GetSceneWindowStartPos().x + 8;
+			mouse_y -= App->renderer->GetSceneWindowStartPos().y + 37;
+
+			ImGui::Text("scene starts at:");
+			ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
+
+			float width = App->renderer->GetSceneWindowSize().x; 
+			float height = App->renderer->GetSceneWindowSize().y; 
+
+			ImGui::Text("width = %i, height = %i", (int)width, (int)height);
+
 			float x = (2.0f * mouse_x) / width - 1.0f;
 			float y = 1.0f - (2.0f * mouse_y) / height;
 			float z = 1.0f;
