@@ -289,12 +289,12 @@ update_status ModuleRender::Update()
 	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
 	glUniform3fv(loc, 1, &ambientColor[0]);
 
-	float3 specularColor = float3(1.0, 1.0, 1.0);
+	float3 specularColor = float3(0.08, 0.08, 0.08);
 	loc = glGetUniformLocation(program, "specularColor");
 	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
 	glUniform3fv(loc, 1, &specularColor[0]);
 
-	float shininess = 20.0;
+	float shininess = 300.0;
 	loc = glGetUniformLocation(program, "shininess");
 	if (loc < 0) MY_LOG("Uniform location not found: shininess");
 	glUniform1f(loc, shininess);
