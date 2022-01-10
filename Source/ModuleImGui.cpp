@@ -81,9 +81,6 @@ update_status ModuleImGui::PreUpdate()
 	ImGuizmo::BeginFrame();
 	ImGuizmo::Enable(true);
 
-	float3x3 mat = float3x3::identity;
-	ImGuizmo::DrawCubes(&App->camera->view[0][0], &App->camera->proj[0][0], &mat[0][0], 1);
-
 	//dockerspace
 	constexpr ImGuiWindowFlags dockspace_flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |

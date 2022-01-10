@@ -20,7 +20,7 @@
 
 Model* importer::LoadModel(const char* path)
 {
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
+	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_Triangulate);
 	if (scene)
 	{
 		Model* model = new Model();

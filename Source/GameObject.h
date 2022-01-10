@@ -27,6 +27,9 @@ public:
 
 	bool IsInFrustum();
 
+	void NotifyMovement();
+	void NotifySonMovement();
+
 	void SetMaterial(Texture* _texture);
 	template<typename T> T* GetComponent();
 	//template<typename T> void AddComponent(T* _newComponent);
@@ -50,15 +53,19 @@ public:
 	AABB m_aabb;
 
 	float4 GetMaxPoint() const {
+		return float4(m_Max.x, m_Max.y, m_Max.z, 1.0f);
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Max.x, m_Max.y, m_Max.z, 1.0f);
 	};
 	float4 GetMinPoint() const {
+		return float4(m_Min.x, m_Min.y, m_Min.z, 1.0f);
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Min.x, m_Min.y, m_Min.z, 1.0f);
 	};
 	float4 GetCenter() const {
+		return float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y + (m_Max.y - m_Min.y) / 2.0f, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y + (m_Max.y - m_Min.y) / 2.0f, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 	};
 	float4 GetBase() const {
+		return float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 	};
 	float GetDiameter() const {

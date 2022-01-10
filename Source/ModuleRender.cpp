@@ -15,6 +15,7 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "ImGuizmo.h"
 
 void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -211,6 +212,21 @@ update_status ModuleRender::Update()
 		
 		App->camera->WindowResized(viewportPanelSize.x, viewportPanelSize.y);
 	}
+
+
+	const ImVec2 newViewportPosition = ImGui::GetWindowPos();
+
+
+	float4x4 mat4 = float4x4::identity;
+	float4x4 view = App->camera->view.Transposed();
+	float4x4 proj = App->camera->proj.Transposed();
+
+	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+	//ImGuizmo::DrawCubes(&App->camera->view[0][0], &App->camera->proj[0][0], &mat[0][0], 1);
+	ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
+	ImGuizmo::Manipulate(&view[0][0], &proj[0][0], ImGuizmo::TRANSLATE, ImGuizmo::WORLD, &mat4[0][0], NULL, NULL);
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
 	/*
