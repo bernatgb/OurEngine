@@ -16,6 +16,7 @@ public:
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;
 
+	void GizmoTransformChange(float4x4 _newAccumulativeModelMatrix);
 	void Copy(const CTransform* _transform);
 
 	float3 GetPos() const;

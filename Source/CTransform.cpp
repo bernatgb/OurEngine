@@ -100,6 +100,33 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 	RecalculateModelMatrix();
 }
 
+void CTransform::GizmoTransformChange(float4x4 _newAccumulativeModelMatrix)
+{
+	// TODO: calculate the new modelMatrix and call NotifyMovement();
+	//m_AccumulativeModelMatrix
+	m_ModelMatrix = _newAccumulativeModelMatrix * m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted();
+
+	//todo: get position rotation and scale
+	m_Position = m_ModelMatrix.Col3(3);
+	m_RotationEuler = m_ModelMatrix.ToEulerXYZ();
+	m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x, m_RotationEuler.y, m_RotationEuler.z);
+	m_RotationEuler.x = RadToDeg(m_RotationEuler.x);
+	m_RotationEuler.y = RadToDeg(m_RotationEuler.y);
+	m_RotationEuler.z = RadToDeg(m_RotationEuler.z);
+	m_Scale = m_ModelMatrix.GetScale();
+
+	NotifyMovement();
+
+	/*m_AccumulativeModelMatrix = _newAccumulativeModelMatrix;
+
+	for (unsigned int i = 0; i < m_Owner->m_Components.size(); ++i)
+		m_Owner->m_Components[i]->NotifyMovement();
+
+	//Notify owner children
+	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)
+		m_Owner->m_Children[i]->m_Transform->NotifyMovement();*/
+}
+
 void CTransform::Copy(const CTransform* _transform)
 {
 	m_AccumulativeModelMatrix = _transform->m_AccumulativeModelMatrix;

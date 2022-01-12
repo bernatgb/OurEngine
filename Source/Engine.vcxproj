@@ -221,7 +221,6 @@
     <ClCompile Include="AccuratedTimer.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="CCamera.cpp" />
-    <ClCompile Include="CMaterial.cpp" />
     <ClCompile Include="CMesh.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="CTransform.cpp" />
@@ -425,7 +424,6 @@
     <ClInclude Include="Assimp\include\assimp\XMLTools.h" />
     <ClInclude Include="Assimp\include\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="CCamera.h" />
-    <ClInclude Include="CMaterial.h" />
     <ClInclude Include="CMesh.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Config.h" />

@@ -24,7 +24,6 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 	m_Parent = _parent;
 
 	m_Transform = new CTransform(true, this);
-	m_Material = nullptr;
 
 	m_aabb = AABB(vec(0,0,0), vec(0,0,0));
 }
@@ -34,7 +33,6 @@ GameObject::~GameObject()
 	delete[] m_Name;
 
 	delete m_Transform;
-	delete m_Material;
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 		delete m_Components[i];
@@ -59,11 +57,6 @@ void GameObject::Update()
 {
 	if (!m_Active)
 		return;
-
-	if (m_Material != nullptr) 
-	{
-		m_Material->ActivateMaterial();
-	}
 
 	// Better in another place? Start / addComponent / notify movement
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
@@ -131,13 +124,6 @@ void GameObject::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorTy
 	rapidjson::Value newComponent(rapidjson::kObjectType);
 	m_Transform->OnSave(newComponent, allocator);
 	components.PushBack(newComponent, allocator);
-	//  Material // TODO: should it be with the other components??
-	if (m_Material != nullptr)
-	{
-		rapidjson::Value newComponent(rapidjson::kObjectType);
-		m_Material->OnSave(newComponent, allocator);
-		components.PushBack(newComponent, allocator);
-	}
 	//  Other components
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
@@ -179,13 +165,6 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 	//  Transform
 	m_Transform->OnLoad(*itr);
 	++itr;
-	//  Material
-	if (itr != node["Components"].End() && (*itr)["Type"].GetInt() == (int)ComponentType::MATERIAL)
-	{
-		m_Material = new CMaterial(true, this);
-		m_Material->OnLoad(*itr);
-		++itr;
-	}
 	//  Other components
 	for (itr; itr != node["Components"].End(); ++itr)
 	{
@@ -196,13 +175,6 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 			CMesh* newCMesh = new CMesh(true, this);
 			newCMesh->OnLoad(*itr);
 			AddComponent(newCMesh);
-			break;
-		}
-		case ComponentType::MATERIAL:
-		{
-			CMaterial* newCMaterial = new CMaterial(true, this);
-			newCMaterial->OnLoad(*itr);
-			AddComponent(newCMaterial);
 			break;
 		}
 		case ComponentType::CAMERA:
@@ -234,8 +206,6 @@ GameObject* GameObject::Clone(GameObject* _parent)
 
 	newGO->m_Active = m_Active;
 	newGO->m_Transform->Copy(m_Transform);
-	if (m_Material != nullptr)
-		newGO->m_Material = (CMaterial*)m_Material->GetAClone(newGO);
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 		newGO->AddComponent(m_Components[i]->GetAClone(newGO));
 
@@ -273,11 +243,6 @@ bool GameObject::IsInFrustum()
 	}
 
 	return inFrustum;
-}
-
-void GameObject::SetMaterial(Texture* _texture)
-{
-	m_Material = new CMaterial(true, this, _texture);
 }
 
 GameObject* GameObject::AddChild(const char* _name)
@@ -321,9 +286,6 @@ void GameObject::DrawImGui()
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 
 		m_Components[i]->DrawImGui();
 
-	if (m_Material != nullptr)
-		m_Material->DrawImGui();
-
 	// Add component button
 	ImGui::Spacing();
 	if (ImGui::Button("Add component..."))
@@ -337,11 +299,6 @@ void GameObject::DrawImGui()
 		{
 			CMesh* newCMesh = new CMesh(true, this);
 			AddComponent(newCMesh);
-		}
-		if (ImGui::Selectable("Material"))
-		{
-			CMaterial* newCMaterial = new CMaterial(true, this);
-			AddComponent(newCMaterial);
 		}
 		if (ImGui::Selectable("Camera"))
 		{
@@ -363,9 +320,6 @@ T* GameObject::GetComponent()
 		break;
 	case CMesh:
 		type = ComponentType::MESH;
-		break;
-	case CMaterial:
-		type = ComponentType::MATERIAL;
 		break;
 	case CCamera:
 		type = ComponentType::CAMERA;

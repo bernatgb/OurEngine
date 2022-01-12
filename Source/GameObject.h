@@ -2,7 +2,6 @@
 #include "Globals.h"
 #include "Component.h"
 #include "CTransform.h"
-#include "CMaterial.h"
 #include "CMesh.h"
 #include "CCamera.h"
 
@@ -30,7 +29,6 @@ public:
 	void NotifyMovement();
 	void NotifySonMovement();
 
-	void SetMaterial(Texture* _texture);
 	template<typename T> T* GetComponent();
 	//template<typename T> void AddComponent(T* _newComponent);
 	void AddComponent(Component* _newComponent);
@@ -46,7 +44,6 @@ public:
 	bool m_Selected;
 	bool m_InFrustum;
 	CTransform* m_Transform;
-	CMaterial* m_Material;
 	std::vector<Component*> m_Components;
 	GameObject* m_Parent;
 	std::vector<GameObject*> m_Children;
@@ -83,8 +80,6 @@ public:
 			return ComponentType::TRANSFORM;
 		case CMesh:
 			return ComponentType::MESH;
-		case CMaterial:
-			return ComponentType::MATERIAL;
 		case CCamera:
 			return ComponentType::CAMERA;
 		}
@@ -98,8 +93,6 @@ public:
 			return CTransform;
 		case ComponentType::MESH:
 			return CMesh;
-		case ComponentType::MATERIAL:
-			return CMaterial;
 		case ComponentType::CAMERA:
 			return CCamera;
 		}

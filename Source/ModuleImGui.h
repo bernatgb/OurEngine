@@ -18,7 +18,6 @@ private:
 	void About(bool& show);
 	void Console(bool& show);
 	void SoftwareAndHardware();
-	void EditTransform();
 
 	bool inspector;
 	bool hierarchy;

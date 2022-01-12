@@ -214,19 +214,30 @@ update_status ModuleRender::Update()
 	}
 
 
-	const ImVec2 newViewportPosition = ImGui::GetWindowPos();
+	// Gizmos
+	if (App->scene->GetSelectedGO() != nullptr) 
+	{
+		ImGuizmo::OPERATION currentGizmoOperation(ImGuizmo::TRANSLATE);
+		if (App->input->GetKey(SDL_SCANCODE_T))
+			currentGizmoOperation = ImGuizmo::TRANSLATE;
+		if (App->input->GetKey(SDL_SCANCODE_R))
+			currentGizmoOperation = ImGuizmo::ROTATE;
+		if (App->input->GetKey(SDL_SCANCODE_Y))
+			currentGizmoOperation = ImGuizmo::SCALE;
 
+		float4x4 mat4 = App->scene->GetSelectedGO()->m_Transform->m_AccumulativeModelMatrix.Transposed();
+		float4x4 view = App->camera->view.Transposed();
+		float4x4 proj = App->camera->proj.Transposed();
 
-	float4x4 mat4 = float4x4::identity;
-	float4x4 view = App->camera->view.Transposed();
-	float4x4 proj = App->camera->proj.Transposed();
+		const ImVec2 newViewportPosition = ImGui::GetWindowPos();
+		const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+		const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
-	ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-	ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-
-	//ImGuizmo::DrawCubes(&App->camera->view[0][0], &App->camera->proj[0][0], &mat[0][0], 1);
-	ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
-	ImGuizmo::Manipulate(&view[0][0], &proj[0][0], ImGuizmo::TRANSLATE, ImGuizmo::WORLD, &mat4[0][0], NULL, NULL);
+		ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
+		if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], currentGizmoOperation, ImGuizmo::LOCAL, &mat4[0][0], NULL, NULL))
+			App->scene->GetSelectedGO()->m_Transform->GizmoTransformChange(mat4.Transposed());
+	}
+	
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
 	/*
@@ -402,3 +413,68 @@ CubeMap* ModuleRender::GetCubeMap()
 {
 	return cubeMap;
 }
+
+
+/*
+void ModuleImGui::EditTransform() // (const Camera& camera, matrix_t& matrix)
+{
+	static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+	static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+	if (ImGui::IsKeyPressed(90))
+		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	if (ImGui::IsKeyPressed(69))
+		mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	if (ImGui::IsKeyPressed(82)) // r Key
+		mCurrentGizmoOperation = ImGuizmo::SCALE;
+	if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+		mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+		mCurrentGizmoOperation = ImGuizmo::SCALE;
+	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+
+	float4x4 matrix = float4x4::identity;
+
+	ImGuizmo::DecomposeMatrixToComponents(&matrix[0][0], matrixTranslation, matrixRotation, matrixScale);
+	ImGui::InputFloat3("Tr", matrixTranslation, "%.3f");
+	ImGui::InputFloat3("Rt", matrixRotation, "%.3f");
+	ImGui::InputFloat3("Sc", matrixScale, "%.3f");
+	ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, &matrix[0][0]);
+
+	if (mCurrentGizmoOperation != ImGuizmo::SCALE)
+	{
+		if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
+			mCurrentGizmoMode = ImGuizmo::LOCAL;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
+			mCurrentGizmoMode = ImGuizmo::WORLD;
+	}
+	static bool useSnap(false);
+	if (ImGui::IsKeyPressed(83))
+		useSnap = !useSnap;
+	ImGui::Checkbox("", &useSnap);
+	ImGui::SameLine();
+	vec snap; // WTF is this?
+	switch (mCurrentGizmoOperation)
+	{
+	case ImGuizmo::TRANSLATE:
+		//snap = config.mSnapTranslation;
+		ImGui::InputFloat3("Snap", &snap.x);
+		break;
+	case ImGuizmo::ROTATE:
+		//snap = config.mSnapRotation;
+		ImGui::InputFloat("Angle Snap", &snap.x);
+		break;
+	case ImGuizmo::SCALE:
+		//snap = config.mSnapScale;
+		ImGui::InputFloat("Scale Snap", &snap.x);
+		break;
+	}
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+	ImGuizmo::Manipulate(&App->camera->view[0][0], &App->camera->proj[0][0], mCurrentGizmoOperation, mCurrentGizmoMode, &matrix[0][0], NULL, useSnap ? &snap.x : NULL);
+}
+*/
