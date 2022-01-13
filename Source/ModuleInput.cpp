@@ -27,16 +27,18 @@ bool ModuleInput::Init()
 		ret = false;
 	}
     
-    keyboard = SDL_GetKeyboardState(NULL);
+    memset(keyboard, KEY_IDLE, sizeof(KeyState) * MAX_KEYS);
+    memset(mouse_buttons, KEY_IDLE, sizeof(KeyState) * NUM_MOUSE_BUTTONS);
 
-    for (int i = 0; i < NUM_MOUSE_BUTTONS; i++)
-        mouse_buttons[i] = false;
+    keys = SDL_GetKeyboardState(NULL);
 
 	return ret;
 }
 
 update_status ModuleInput::PreUpdate()
 {
+    OPTICK_CATEGORY("ModuleInput::PreUpdate", Optick::Category::Input);
+
     //SDL_PumpEvents();
 
     SDL_Event sdlEvent;
@@ -44,6 +46,33 @@ update_status ModuleInput::PreUpdate()
     mouse_motion_x = mouse_motion_y = 0;
     mouse_wheel = false;
     mouse_wheel_x = mouse_wheel_y = 0;
+
+    for (int i = 0; i < MAX_KEYS; ++i)
+    {
+        if (keys[i] == 1)
+        {
+            if (keyboard[i] == KEY_IDLE)
+                keyboard[i] = KEY_DOWN;
+            else
+                keyboard[i] = KEY_REPEAT;
+        }
+        else
+        {
+            if (keyboard[i] == KEY_REPEAT || keyboard[i] == KEY_DOWN)
+                keyboard[i] = KEY_UP;
+            else
+                keyboard[i] = KEY_IDLE;
+        }
+    }
+
+    for (int i = 0; i < NUM_MOUSE_BUTTONS; ++i)
+    {
+        if (mouse_buttons[i] == KEY_DOWN)
+            mouse_buttons[i] = KEY_REPEAT;
+
+        if (mouse_buttons[i] == KEY_UP)
+            mouse_buttons[i] = KEY_IDLE;
+    }
 
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
@@ -67,14 +96,14 @@ update_status ModuleInput::PreUpdate()
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:     
-                mouse_buttons[sdlEvent.button.button - 1] = true;
-                mouse_position_x = sdlEvent.button.x;
-                mouse_position_y = sdlEvent.button.y;
+                mouse_buttons[sdlEvent.button.button - 1] = KEY_DOWN;
                 break;
             case SDL_MOUSEBUTTONUP:
-                mouse_buttons[sdlEvent.button.button - 1] = false;
+                mouse_buttons[sdlEvent.button.button - 1] = KEY_UP;
                 break;
             case SDL_MOUSEMOTION:
+                mouse_position_x = sdlEvent.button.x;
+                mouse_position_y = sdlEvent.button.y;
                 mouse_motion_x = sdlEvent.motion.xrel;
                 mouse_motion_y = sdlEvent.motion.yrel;
                 break;
@@ -101,20 +130,4 @@ bool ModuleInput::CleanUp()
 	MY_LOG("Quitting SDL input event subsystem");
 	SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	return true;
-}
-
-const Uint8 ModuleInput::GetKey(SDL_Scancode key) const
-{
-    return keyboard[key];
-}
-
-const bool ModuleInput::GetMouseButton(unsigned int key) const
-{
-    return mouse_buttons[key - 1];
-}
-
-const void ModuleInput::GetMouseMotion(int& x, int& y) const
-{
-    x = mouse_motion_x;
-    y = mouse_motion_y;
 }

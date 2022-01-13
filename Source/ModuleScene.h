@@ -3,6 +3,11 @@
 
 #include "GameObject.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+#include "ImGuizmo.h"
+
 #include <map>
 #include <vector>
 
@@ -71,8 +76,9 @@ public:
 	};
 
 private:
-	GameObject* m_Root;
-	GameObject* m_GOSelected;
+	GameObject* m_Root = nullptr;
+	GameObject* m_GOSelected = nullptr;
 
+	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 	rapidjson::Document m_TempScene;
 };

@@ -15,7 +15,6 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include "ImGuizmo.h"
 
 void __stdcall OurOpenGLErrorFunction(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
@@ -178,6 +177,8 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate()
 {
+	OPTICK_CATEGORY("ModuleRender::PreUpdate", Optick::Category::Rendering);
+
 	int w;
 	int h;
 	SDL_GetWindowSize(App->window->window, &w, &h);
@@ -191,6 +192,8 @@ update_status ModuleRender::PreUpdate()
 // Called every draw update
 update_status ModuleRender::Update()
 {
+	OPTICK_CATEGORY("ModuleRender::Update", Optick::Category::Rendering);
+
 	ImGui::Begin("Scene");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -212,32 +215,6 @@ update_status ModuleRender::Update()
 		
 		App->camera->WindowResized(viewportPanelSize.x, viewportPanelSize.y);
 	}
-
-
-	// Gizmos
-	if (App->scene->GetSelectedGO() != nullptr) 
-	{
-		ImGuizmo::OPERATION currentGizmoOperation(ImGuizmo::TRANSLATE);
-		if (App->input->GetKey(SDL_SCANCODE_T))
-			currentGizmoOperation = ImGuizmo::TRANSLATE;
-		if (App->input->GetKey(SDL_SCANCODE_R))
-			currentGizmoOperation = ImGuizmo::ROTATE;
-		if (App->input->GetKey(SDL_SCANCODE_Y))
-			currentGizmoOperation = ImGuizmo::SCALE;
-
-		float4x4 mat4 = App->scene->GetSelectedGO()->m_Transform->m_AccumulativeModelMatrix.Transposed();
-		float4x4 view = App->camera->view.Transposed();
-		float4x4 proj = App->camera->proj.Transposed();
-
-		const ImVec2 newViewportPosition = ImGui::GetWindowPos();
-		const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
-		const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
-
-		ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
-		if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], currentGizmoOperation, ImGuizmo::LOCAL, &mat4[0][0], NULL, NULL))
-			App->scene->GetSelectedGO()->m_Transform->GizmoTransformChange(mat4.Transposed());
-	}
-	
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
 	/*
@@ -374,6 +351,8 @@ update_status ModuleRender::Update()
 
 update_status ModuleRender::PostUpdate()
 {
+	OPTICK_CATEGORY("ModuleRender::PostUpdate", Optick::Category::Rendering);
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

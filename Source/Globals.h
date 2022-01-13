@@ -1,6 +1,8 @@
 #pragma once
 #include <stdio.h>
 #include <windows.h>
+#include "optick.h"
+#include "optick.config.h"
 
 //Prepocesador: LOGGING_SUPPORT_DISABLED
 

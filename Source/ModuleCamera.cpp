@@ -83,20 +83,14 @@ bool ModuleCamera::Init()
 
 update_status ModuleCamera::Update()
 {
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT))
+	OPTICK_CATEGORY("ModuleCamera::Update", Optick::Category::Camera);
+
+	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KeyState::KEY_REPEAT)
 	{
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
 
-		/*if (App->input->GetKey(SDL_SCANCODE_W) || App->input->GetKey(SDL_SCANCODE_S) ||
-			App->input->GetKey(SDL_SCANCODE_A) || App->input->GetKey(SDL_SCANCODE_D) ||
-			App->input->GetKey(SDL_SCANCODE_Q) || App->input->GetKey(SDL_SCANCODE_E))
-		{
-			deltaX *= -1;
-			deltaY *= -1;
-		}*/
-
-		if (App->input->GetKey(SDL_SCANCODE_LALT))
+		if (App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
 		{
 			Config::m_CamPosition += Config::m_CamRotation.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 		}
@@ -108,26 +102,26 @@ update_status ModuleCamera::Update()
 			Rotate(deltaPitch, deltaYaw);
 
 			float multiplier = 1.0f;
-			if (App->input->GetKey(SDL_SCANCODE_LSHIFT))
+			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KeyState::KEY_REPEAT)
 				multiplier = 3.0f;
 
-			if (App->input->GetKey(SDL_SCANCODE_W))
+			if (App->input->GetKey(SDL_SCANCODE_W) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition += Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_S))
+			if (App->input->GetKey(SDL_SCANCODE_S) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition -= Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_A))
+			if (App->input->GetKey(SDL_SCANCODE_A) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition += Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_D))
+			if (App->input->GetKey(SDL_SCANCODE_D) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition -= Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_Q))
+			if (App->input->GetKey(SDL_SCANCODE_Q) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition += Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_E))
+			if (App->input->GetKey(SDL_SCANCODE_E) == KeyState::KEY_REPEAT)
 				Config::m_CamPosition -= Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
 		}
 
 		ViewProjectionMatrix();
 	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE))
+	else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KeyState::KEY_REPEAT)
 	{
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
@@ -137,7 +131,7 @@ update_status ModuleCamera::Update()
 
 		ViewProjectionMatrix();
 	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) && App->input->GetKey(SDL_SCANCODE_LALT))
+	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
 	{
 		int deltaX, deltaY;
 		App->input->GetMouseMotion(deltaX, deltaY);
@@ -178,7 +172,7 @@ update_status ModuleCamera::Update()
 
 		ViewProjectionMatrix();
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_F)) 
+	else if (App->input->GetKey(SDL_SCANCODE_F) == KeyState::KEY_REPEAT)
 	{
 		GameObject* selectedGO = App->scene->GetSelectedGO();
 		if (selectedGO != nullptr)
@@ -350,7 +344,7 @@ void ModuleCamera::DrawImGui()
 		ImGui::Text("Vectors");
 		ImGui::DragFloat3("Cam pos", &Config::m_CamPosition[0], 1.0f, -25.0f, 25.0f, "%.2f");
 		
-		if (App->input->GetMouseButton(SDL_BUTTON_LEFT))
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT)
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMousePosition(mouse_x, mouse_y);

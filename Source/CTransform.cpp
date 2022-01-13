@@ -103,8 +103,10 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 void CTransform::GizmoTransformChange(float4x4 _newAccumulativeModelMatrix)
 {
 	// TODO: calculate the new modelMatrix and call NotifyMovement();
-	//m_AccumulativeModelMatrix
-	m_ModelMatrix = _newAccumulativeModelMatrix * m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted();
+	//m_ModelMatrix = _newAccumulativeModelMatrix * m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted();
+
+	//m_ModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * _newAccumulativeModelMatrix.Inverted();
+	m_ModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted() * _newAccumulativeModelMatrix;
 
 	//todo: get position rotation and scale
 	m_Position = m_ModelMatrix.Col3(3);

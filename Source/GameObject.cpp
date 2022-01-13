@@ -281,6 +281,9 @@ void GameObject::DrawImGui()
 	ImGui::Checkbox("Active", &m_Active);
 	//header
 
+	ImGui::Text("Min: %f %f %f", m_Min.x, m_Min.y, m_Min.z);
+	ImGui::Text("Max: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
+
 	m_Transform->DrawImGui();
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 

@@ -75,6 +75,8 @@ bool ModuleImGui::Init()
 
 update_status ModuleImGui::PreUpdate()
 {
+	OPTICK_CATEGORY("ModuleImGui::PreUpdate", Optick::Category::UI);
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
@@ -133,6 +135,8 @@ update_status ModuleImGui::PreUpdate()
 
 update_status ModuleImGui::Update()
 {
+	OPTICK_CATEGORY("ModuleImGui::Update", Optick::Category::UI);
+
 	//ImGui::ShowDemoWindow();
 
 	//ImageButton()
@@ -190,6 +194,8 @@ update_status ModuleImGui::Update()
 
 update_status ModuleImGui::PostUpdate()
 {
+	OPTICK_CATEGORY("ModuleImGui::PostUpdate", Optick::Category::UI);
+
 	/*ImGuiIO& io = ImGui::GetIO();
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)

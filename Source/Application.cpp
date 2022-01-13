@@ -62,6 +62,7 @@ bool Application::Init()
 
 update_status Application::Update()
 {
+	OPTICK_FRAME("NewFrame");
 	Time::NewFrame();
 
 	update_status ret = UPDATE_CONTINUE;

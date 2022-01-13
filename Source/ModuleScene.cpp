@@ -3,6 +3,9 @@
 #include "Application.h"
 #include "ModuleCamera.h"
 #include "ModuleInput.h"
+#include "ModuleRender.h"
+
+#include "SceneImporter.h"
 
 #include "Model.h"
 
@@ -12,9 +15,6 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-
-#include "SceneImporter.h"
-
 #include "ImGuiFileDialog.h"
 
 #include <string>
@@ -44,6 +44,8 @@ bool ModuleScene::Init()
 
     //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
     //activeModel = 0;   
+
+    currentGizmoOperation = ImGuizmo::TRANSLATE;
 
 	return true;
 }
@@ -382,15 +384,39 @@ void ModuleScene::DrawImGuiResources()
 
 void ModuleScene::Draw(unsigned int program)
 {
+    // Gizmos
+    if (m_GOSelected != nullptr)
+    {
+        if (App->input->GetKey(SDL_SCANCODE_T) == KeyState::KEY_DOWN)
+            currentGizmoOperation = ImGuizmo::TRANSLATE;
+        if (App->input->GetKey(SDL_SCANCODE_R) == KeyState::KEY_DOWN)
+            currentGizmoOperation = ImGuizmo::ROTATE;
+        if (App->input->GetKey(SDL_SCANCODE_Y) == KeyState::KEY_DOWN)
+            currentGizmoOperation = ImGuizmo::SCALE;
+
+        float4x4 mat4 = App->scene->GetSelectedGO()->m_Transform->m_AccumulativeModelMatrix.Transposed();
+        float4x4 view = App->camera->view.Transposed();
+        float4x4 proj = App->camera->proj.Transposed();
+
+        const ImVec2 newViewportPosition = ImGui::GetWindowPos();
+        const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+        const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+
+        float2 viewportPanelSize = App->renderer->GetSceneWindowSize();
+        ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
+        if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], currentGizmoOperation, ImGuizmo::LOCAL, &mat4[0][0], NULL, NULL))
+            m_GOSelected->m_Transform->GizmoTransformChange(mat4.Transposed());
+    }
+
     m_Root->Update();
 
-    if (App->input->GetKey(SDL_SCANCODE_DELETE) && m_GOSelected != nullptr)
+    if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN && m_GOSelected != nullptr)
     {
         m_GOSelected->m_Parent->DeleteChild(m_GOSelected);
         m_GOSelected = nullptr;
     }
 
-    if (App->input->GetKey(SDL_SCANCODE_LCTRL) && App->input->GetKey(SDL_SCANCODE_D)  && m_GOSelected != nullptr)
+    if (App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_D) == KEY_DOWN && m_GOSelected != nullptr)
     {
         m_GOSelected->Clone(m_GOSelected->m_Parent);
     }
