@@ -39,8 +39,8 @@ vec3 phongBRDF(vec3 lightDir, vec3 viewDir, vec3 normal, vec3 phongDiffuseCol, v
 
 void main()
 {
-    vec3 diffuseColor = vec3(texture2D(texture, uv0));
-    //vec3 diffuseColor = vec3(pow(texture2D(texture, uv0).rgb, 2.2));
+    //vec3 diffuseColor = vec3(texture2D(texture, uv0));
+    vec3 diffuseColor = vec3(pow(texture2D(texture, uv0).r, 2.2), pow(texture2D(texture, uv0).g, 2.2), pow(texture2D(texture, uv0).b, 2.2));
 
     vec3 lightDir = normalize(-lightDirection);
     vec3 viewDir = normalize(cameraPosition - position);

@@ -3,6 +3,7 @@
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleCamera.h"
+#include "ModuleDebugDraw.h"
 #include "GL/glew.h"
 
 #include "SceneImporter.h"
@@ -26,6 +27,7 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 	m_Transform = new CTransform(true, this);
 
 	m_aabb = AABB(vec(0,0,0), vec(0,0,0));
+	m_showAABB = false;
 }
 
 GameObject::~GameObject()
@@ -72,6 +74,32 @@ void GameObject::Update()
 			/*ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
 				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);*/
 		}
+	}
+
+	if (m_Name != "Root" && m_Min.x == m_Max.x && m_Min.y == m_Max.y && m_Min.z == m_Max.z) // TODO: Revise this if
+	{
+		if (!m_Children.empty())
+		{
+			m_Min = m_Children[0]->m_Min;
+			m_Max = m_Children[0]->m_Max;
+
+			for (int i = 1; i < m_Children.size(); ++i)
+			{
+				if (m_Min.x > m_Children[i]->m_Min.x)
+					m_Min.x = m_Children[i]->m_Min.x;
+				if (m_Min.y > m_Children[i]->m_Min.y)
+					m_Min.y = m_Children[i]->m_Min.y;
+				if (m_Min.z > m_Children[i]->m_Min.z)
+					m_Min.z = m_Children[i]->m_Min.z;
+				if (m_Max.x < m_Children[i]->m_Max.x)
+					m_Max.x = m_Children[i]->m_Max.x;
+				if (m_Max.y < m_Children[i]->m_Max.y)
+					m_Max.y = m_Children[i]->m_Max.y;
+				if (m_Max.z < m_Children[i]->m_Max.z)
+					m_Max.z = m_Children[i]->m_Max.z;
+			}
+		}
+		m_aabb = AABB(m_Min, m_Max);
 	}
 
 	// Hierarchical frustum culling
@@ -285,6 +313,16 @@ void GameObject::DrawImGui()
 	ImGui::Text("Max: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
 
 	m_Transform->DrawImGui();
+
+	if (ImGui::Checkbox("Show AABB", &m_showAABB))
+	{
+		//Draw GameObject BB
+		float3* aabbPoints = new float3[8];
+		m_aabb.GetCornerPoints(aabbPoints);
+		App->debugDraw->DrawBB(aabbPoints);
+		delete[] aabbPoints;
+	}
+
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 
 		m_Components[i]->DrawImGui();
