@@ -109,8 +109,13 @@ Texture::Texture(const char* _fileName, const char* _fullPath)
 Texture::~Texture()
 {
 	App->texture->DeleteTextureData(m_TextureData);
-
 	glDeleteTextures(1, &m_Texture);
+
+	if (m_SpecularTextureData != nullptr)
+	{
+		App->texture->DeleteTextureData(m_SpecularTextureData);
+		glDeleteTextures(1, &m_SpecularTexture);
+	}
 }
 
 void Texture::ActivateTexture(const unsigned int& program) 

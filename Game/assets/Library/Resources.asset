@@ -1,18 +1,18 @@
 {
     "Meshes": [
         {
-            "Id": 27298,
-            "Path": ".\\Assets\\Library\\Meshes\\27298.asset"
+            "Id": 9205,
+            "Path": ".\\Assets\\Library\\Meshes\\9205.asset"
         },
         {
-            "Id": 30171,
-            "Path": ".\\Assets\\Library\\Meshes\\30171.asset"
+            "Id": 26359,
+            "Path": ".\\Assets\\Library\\Meshes\\26359.asset"
         }
     ],
     "Materials": [
         {
-            "Id": 2233,
-            "Path": ".\\Assets\\Library\\Materials\\2233.asset"
+            "Id": 22243,
+            "Path": ".\\Assets\\Library\\Materials\\22243.asset"
         }
     ],
     "Models": [

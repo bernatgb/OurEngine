@@ -295,6 +295,12 @@ float3 importer::ValueToFloat3(const rapidjson::Value& value)
 rapidjson::Value importer::Float3ToValue(const float3& value, rapidjson::Document::AllocatorType& allocator)
 {
 	rapidjson::Value vector(rapidjson::kArrayType);
+
+	/*minPoint.Reserve(3, allocator);
+	minPoint[0] = ourModel->m_Min.x;
+	minPoint[1] = ourModel->m_Min.y;
+	minPoint[2] = ourModel->m_Min.z;*/
+
 	vector.PushBack(value.x, allocator);
 	vector.PushBack(value.y, allocator);
 	vector.PushBack(value.z, allocator);

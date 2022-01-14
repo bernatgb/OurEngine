@@ -62,7 +62,7 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 	glTexImage2D(GL_TEXTURE_2D, 0, ourMaterial->m_TextureData->format, ourMaterial->m_TextureData->width, ourMaterial->m_TextureData->height, 0, ourMaterial->m_TextureData->format, GL_UNSIGNED_BYTE, ourMaterial->m_TextureData->data);
 
 	// SPECULAR
-	if (material->GetTexture(aiTextureType_SPECULAR, 0, &file) != AI_SUCCESS) 
+	if (material->GetTexture(aiTextureType_SPECULAR, 0, &file) == AI_SUCCESS) 
 	{
 		glGenTextures(1, &ourMaterial->m_SpecularTexture);
 		glBindTexture(GL_TEXTURE_2D, ourMaterial->m_SpecularTexture);

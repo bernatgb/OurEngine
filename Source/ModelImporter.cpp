@@ -152,21 +152,8 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 		textures.PushBack(ourModel->m_Textures[i]->m_GUID, allocator);
 	d.AddMember("Textures", textures, allocator);
 
-	rapidjson::Value minPoint(rapidjson::kArrayType);
-	/*minPoint.Reserve(3, allocator);
-	minPoint[0] = ourModel->m_Min.x;
-	minPoint[1] = ourModel->m_Min.y;
-	minPoint[2] = ourModel->m_Min.z;*/
-	minPoint.PushBack(ourModel->m_Min.x, allocator);
-	minPoint.PushBack(ourModel->m_Min.y, allocator);
-	minPoint.PushBack(ourModel->m_Min.z, allocator);
-	d.AddMember("Min", minPoint, allocator);
-
-	rapidjson::Value maxPoint(rapidjson::kArrayType);
-	maxPoint.PushBack(ourModel->m_Max.x, allocator);
-	maxPoint.PushBack(ourModel->m_Max.y, allocator);
-	maxPoint.PushBack(ourModel->m_Max.z, allocator);
-	d.AddMember("Max", maxPoint, allocator);
+	d.AddMember("Min", Float3ToValue(ourModel->m_Min, allocator), allocator);
+	d.AddMember("Max", Float3ToValue(ourModel->m_Max, allocator), allocator);
 
 	//rapidjson::StringBuffer buffer;
 	//rapidjson::Writer<char*> writer(fileBuffer);
@@ -263,11 +250,8 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 		ourModel->m_Textures.push_back(texture);
 	}
 
-	rapidjson::Value::ConstValueIterator itr = d["Min"].Begin();
-	ourModel->m_Min = float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
-
-	itr = d["Max"].Begin();
-	ourModel->m_Max = float3((itr++)->GetFloat(), (itr++)->GetFloat(), (itr++)->GetFloat());
+	ourModel->m_Min = ValueToFloat3(d["Min"]);
+	ourModel->m_Max = ValueToFloat3(d["Max"]);
 
 	RecusiveNodeFromJson(d["Root"], ourModel->m_RootStructure);
 	ourModel->m_RootStructure->m_Name = ourModel->m_Name;
