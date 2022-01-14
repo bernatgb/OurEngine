@@ -122,6 +122,7 @@ void Texture::ActivateTexture(const unsigned int& program)
 
 void Texture::DrawImGui()
 {
+	ImGui::Text("Name: %s", m_Name.c_str());
 	ImGui::Text("Witdh: %i", m_TextureData->width);
 	ImGui::Text("Height: %i", m_TextureData->height);
 	ImGui::Text("Depth: %i", m_TextureData->depth);

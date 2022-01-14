@@ -20,6 +20,9 @@ public:
 	unsigned int m_Texture;
 	TextureData* m_TextureData;
 
+	unsigned int m_SpecularTexture;
+	TextureData* m_SpecularTextureData;
+
 	unsigned int m_MinFilter;
 	unsigned int m_MagFilter;
 	unsigned int m_Wrap;
