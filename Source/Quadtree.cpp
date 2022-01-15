@@ -6,7 +6,9 @@ QuadtreeNode::QuadtreeNode(GameObject* go)
 {
 	if (go != nullptr)
 	{
-		m_nodeName = go->m_Name;
+		m_nodeName = new char[strlen(go->m_Name) + 1];
+		strcpy(m_nodeName, go->m_Name);
+		//m_nodeName = go->m_Name;
 		m_nodeAABB = go->m_aabb;
 		for (int i = 0; i < 4; ++i)
 		{
@@ -17,8 +19,8 @@ QuadtreeNode::QuadtreeNode(GameObject* go)
 
 QuadtreeNode::~QuadtreeNode()
 {
-	delete m_nodeName;
-	delete m_parent;
+	delete[] m_nodeName;
+	//delete m_parent;
 	for (int i = 0; i < 4; ++i)
 	{
 		if (m_children[i] != nullptr)
@@ -30,8 +32,11 @@ void QuadtreeNode::AddChild(GameObject* go)
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		if (m_children[i] != nullptr)
+		if (m_children[i] == nullptr) 
+		{
 			m_children[i] = new QuadtreeNode(go);
+			break;
+		}
 	}
 
 	RedistributeChildren();
@@ -41,8 +46,10 @@ void QuadtreeNode::DeleteChild(GameObject* go) // TODO: Revise
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		if (m_children[i]->m_nodeGUID == go->m_GUID)
+		if (m_children[i]->m_nodeGUID == go->m_GUID) {
+			delete m_children[i];
 			m_children[i] = nullptr;
+		}
 	}
 
 	RedistributeChildren();
@@ -57,7 +64,7 @@ void QuadtreeNode::RedistributeChildren()
 		if (m_children[i] != nullptr)
 			++numChildren;
 	}
-		
+	
 	std::vector <std::pair<float, QuadtreeNode*> > zCenter(numChildren);
 	for (int i = 0; i < numChildren; ++i)
 		zCenter[i] = std::pair<float, QuadtreeNode*>(m_children[i]->m_nodeAABB.CenterPoint().z, m_children[i]);

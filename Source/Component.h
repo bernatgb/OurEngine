@@ -11,7 +11,8 @@ enum class ComponentType {
 	UNDEFINED,
 	TRANSFORM, 
 	MESH,
-	CAMERA
+	CAMERA,
+	LIGHT
 };
 
 class Component

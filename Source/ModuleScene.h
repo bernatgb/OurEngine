@@ -80,7 +80,7 @@ private:
 	GameObject* m_Root = nullptr;
 	GameObject* m_GOSelected = nullptr;
 
-	Quadtree* qt = new Quadtree(nullptr);
+	Quadtree* qt = nullptr;
 
 	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 	rapidjson::Document m_TempScene;

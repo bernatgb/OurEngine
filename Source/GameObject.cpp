@@ -314,7 +314,7 @@ void GameObject::DrawImGui()
 
 	m_Transform->DrawImGui();
 
-	if (ImGui::Checkbox("Show AABB", &m_showAABB))
+	if (ImGui::Checkbox("Show AABB", &m_showAABB)) // DEBUG NEEDS FIXING
 	{
 		//Draw GameObject BB
 		float3* aabbPoints = new float3[8];

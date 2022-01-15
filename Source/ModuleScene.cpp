@@ -58,7 +58,7 @@ bool ModuleScene::CleanUp()
 {
     importer::SaveResources(m_Meshes, m_Textures, m_Models);
 
-    //delete qt;
+    delete qt;
 
     delete m_Root;
 
