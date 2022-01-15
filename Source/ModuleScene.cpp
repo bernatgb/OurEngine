@@ -42,6 +42,10 @@ bool ModuleScene::Init()
 
     LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
+    qt = new Quadtree(m_Root);
+    qt->AddNode(camera);
+
+
     //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
     //activeModel = 0;   
 
@@ -53,6 +57,8 @@ bool ModuleScene::Init()
 bool ModuleScene::CleanUp()
 {
     importer::SaveResources(m_Meshes, m_Textures, m_Models);
+
+    //delete qt;
 
     delete m_Root;
 

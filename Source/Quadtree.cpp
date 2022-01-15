@@ -4,11 +4,14 @@
 
 QuadtreeNode::QuadtreeNode(GameObject* go)
 {
-	m_nodeName = go->m_Name;
-	m_nodeAABB = go->m_aabb;
-	for (int i = 0; i < 4; ++i)
+	if (go != nullptr)
 	{
-		m_children[i] = nullptr;
+		m_nodeName = go->m_Name;
+		m_nodeAABB = go->m_aabb;
+		for (int i = 0; i < 4; ++i)
+		{
+			m_children[i] = nullptr;
+		}
 	}
 }
 
@@ -16,7 +19,11 @@ QuadtreeNode::~QuadtreeNode()
 {
 	delete m_nodeName;
 	delete m_parent;
-	delete m_children[4];
+	for (int i = 0; i < 4; ++i)
+	{
+		if (m_children[i] != nullptr)
+			delete m_children[i];
+	}
 }
 
 void QuadtreeNode::AddChild(GameObject* go)
@@ -24,7 +31,7 @@ void QuadtreeNode::AddChild(GameObject* go)
 	for (int i = 0; i < 4; ++i)
 	{
 		if (m_children[i] != nullptr)
-			m_children[i] = &QuadtreeNode(go);
+			m_children[i] = new QuadtreeNode(go);
 	}
 
 	RedistributeChildren();
@@ -34,7 +41,7 @@ void QuadtreeNode::DeleteChild(GameObject* go) // TODO: Revise
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		if (m_children[i] == &QuadtreeNode(go))
+		if (m_children[i]->m_nodeGUID == go->m_GUID)
 			m_children[i] = nullptr;
 	}
 
@@ -43,40 +50,27 @@ void QuadtreeNode::DeleteChild(GameObject* go) // TODO: Revise
 
 void QuadtreeNode::RedistributeChildren()
 {
-	float auxMinX, auxMinZ, auxMaxX, auxMaxZ;
-	bool childFound = false;
-	QuadtreeNode* auxChildren[4];
+	int numChildren = 0;
 
 	for (int i = 0; i < 4; ++i)
 	{
 		if (m_children[i] != nullptr)
-		{
-			if (!childFound)
-			{
-				auxMinX = m_children[i]->m_nodeAABB.minPoint.x;
-				auxMinZ = m_children[i]->m_nodeAABB.minPoint.z;
-				auxMaxX = m_children[i]->m_nodeAABB.maxPoint.x;
-				auxMaxZ = m_children[i]->m_nodeAABB.maxPoint.z;
-
-				auxChildren[0] = m_children[i];
-			}
-			else
-			{
-				for (int j = 0; j < i; ++j)
-				{
-					if (m_children[i]->m_nodeAABB.minPoint.x < auxChildren[j]->m_nodeAABB.minPoint.x); // Western than aux
-					if (m_children[i]->m_nodeAABB.minPoint.x > auxChildren[j]->m_nodeAABB.minPoint.x); // Eastern than aux
-					if (m_children[i]->m_nodeAABB.minPoint.z < auxChildren[j]->m_nodeAABB.minPoint.z); // Nothern than aux
-					if (m_children[i]->m_nodeAABB.minPoint.x < auxChildren[j]->m_nodeAABB.minPoint.x); // Southern than aux
-				}
-			}
-		}
+			++numChildren;
 	}
+		
+	std::vector <std::pair<float, QuadtreeNode*> > zCenter(numChildren);
+	for (int i = 0; i < numChildren; ++i)
+		zCenter[i] = std::pair<float, QuadtreeNode*>(m_children[i]->m_nodeAABB.CenterPoint().z, m_children[i]);
 
-	for (int i = 0; i < 4; ++i)
+	std::sort(zCenter.begin(), zCenter.end()); // Ordered from North to South
+			
+	for (int i = 0; i < numChildren; ++i)
 	{
-		m_children[i] = auxChildren[i];
-	};
+		m_children[i] = zCenter[i].second;
+
+		if (i % 2 == 1 && m_children[i - 1]->m_nodeAABB.CenterPoint().x < m_children[i]->m_nodeAABB.CenterPoint().x)
+				std::swap(m_children[i - 1], m_children[i]); // Ordered from West to East
+	}
 }
 
 QuadtreeNode* QuadtreeNode::GetParent()
@@ -86,24 +80,61 @@ QuadtreeNode* QuadtreeNode::GetParent()
 
 QuadtreeNode* QuadtreeNode::GetBetterLocationForNewNode(GameObject* go)
 {
-	QuadtreeNode* qtn = nullptr;
-	//Find it 
-	return qtn;
+	float3 centerPoint = go->m_aabb.CenterPoint();
+	
+	if (IsFull())
+	{
+		std::vector <std::pair<int, int> > dist(4);
+		for (int i = 0; i < 4; ++i)
+			dist[i] = std::pair<int, int>(m_children[i]->m_nodeAABB.Distance(centerPoint), i);
+
+		std::sort(dist.begin(), dist.end());
+		
+		return m_children[dist[0].second]->GetBetterLocationForNewNode(go);
+	}
+	else
+		return this;
 }
 
 QuadtreeNode* QuadtreeNode::FindNode(GameObject* go)
 {
-	QuadtreeNode* qtn = nullptr;
-	//Find it 
-	return qtn;
+	for (int i = 0; i < 4; ++i)
+	{
+		if (go->m_GUID == m_children[i]->m_nodeGUID)
+			return m_children[i];
+		else
+		{
+			// Assuming this branch is full because otherwise we would have already found it.
+			float3 centerPoint = go->m_aabb.CenterPoint();
+			std::vector <std::pair<int, int> > dist(4);
+			for (int i = 0; i < 4; ++i)
+				dist[i] = std::pair<int, int>(m_children[i]->m_nodeAABB.Distance(centerPoint), i);
+
+			std::sort(dist.begin(), dist.end());
+
+			return m_children[dist[0].second]->FindNode(go);
+		}
+	}
+}
+
+bool QuadtreeNode::IsFull()
+{
+	int numChildren = 0;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		if (m_children[i] != nullptr)
+			++numChildren;
+	}
+
+	return numChildren == 4;
 }
 
 /* QUADTREE */
 
-Quadtree::Quadtree()
+Quadtree::Quadtree(GameObject* root)
 {
-	GameObject* gg;
-	m_root = &QuadtreeNode(gg);
+	m_root = new QuadtreeNode(root);
 }
 
 Quadtree::~Quadtree()
@@ -113,7 +144,7 @@ Quadtree::~Quadtree()
 
 void Quadtree::AddNode(GameObject* go)
 {
-	if (!m_root->m_full)
+	if (!m_root->IsFull())
 	{
 		m_root->AddChild(go);
 	}

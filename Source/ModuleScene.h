@@ -2,6 +2,7 @@
 #include "Module.h"
 
 #include "GameObject.h"
+#include "Quadtree.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -78,6 +79,8 @@ public:
 private:
 	GameObject* m_Root = nullptr;
 	GameObject* m_GOSelected = nullptr;
+
+	Quadtree* qt = new Quadtree(nullptr);
 
 	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 	rapidjson::Document m_TempScene;

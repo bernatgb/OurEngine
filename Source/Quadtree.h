@@ -16,9 +16,10 @@ public:
 	QuadtreeNode* GetBetterLocationForNewNode(GameObject* go);
 	QuadtreeNode* FindNode(GameObject* go);
 
-	bool m_full = false;
+	bool IsFull();
 
 private:
+	unsigned int m_nodeGUID;
 	char* m_nodeName;
 	AABB m_nodeAABB;
 	QuadtreeNode* m_parent;
@@ -28,7 +29,7 @@ private:
 class Quadtree
 {
 public:
-	Quadtree();
+	Quadtree(GameObject* root);
 	~Quadtree();
 
 	void AddNode(GameObject* go);
