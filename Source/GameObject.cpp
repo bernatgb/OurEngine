@@ -75,7 +75,7 @@ void GameObject::Update()
 				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);*/
 		}
 	}
-
+	/*
 	if (m_Name != "Root" && m_Min.x == m_Max.x && m_Min.y == m_Max.y && m_Min.z == m_Max.z) // TODO: Revise this if
 	{
 		if (!m_Children.empty())
@@ -101,7 +101,7 @@ void GameObject::Update()
 		}
 		m_aabb = AABB(m_Min, m_Max);
 	}
-
+	*/
 	// Hierarchical frustum culling
 	bool parentInFrustum = true;
 	if (m_Parent != NULL) 
@@ -125,10 +125,6 @@ void GameObject::Update()
 	if (parentInFrustum && IsInFrustum())
 	{
 		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
-	}
-	else
-	{
-		return;
 	}
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)

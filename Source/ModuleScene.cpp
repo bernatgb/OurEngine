@@ -19,6 +19,9 @@
 
 #include <string>
 
+#define MAX_Boundary vec(200, 200, 200)
+#define MIN_Boundary vec(-200, -200, -200)
+
 ModuleScene::ModuleScene()
 {
 }
@@ -42,9 +45,9 @@ bool ModuleScene::Init()
 
     LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
-    qt = new Quadtree(m_Root);
-    qt->AddNode(camera);
-
+    qt = new Quadtree();
+    AABB boundaries = AABB(MIN_Boundary, MAX_Boundary);
+    qt->SetBoundaries(boundaries);
 
     //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
     //activeModel = 0;   
