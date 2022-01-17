@@ -3,6 +3,8 @@
 
 #include "Model.h"
 
+#include "Quadtree.h"
+
 #include "Math/float4x4.h"
 #include "Math/float3x3.h"
 #include "Geometry/Frustum.h"
@@ -30,6 +32,7 @@ public:
 	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
 	void FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*> &hits);
+	void FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*> &hits);
 	void SortHits(std::vector<GameObject*> &hits);
 	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits);
 

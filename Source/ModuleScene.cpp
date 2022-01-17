@@ -19,8 +19,8 @@
 
 #include <string>
 
-#define MAX_Boundary vec(200, 200, 200)
-#define MIN_Boundary vec(-200, -200, -200)
+#define MAX_BOUNDARY vec(200, 200, 200)
+#define MIN_BOUNDARY vec(-200, -200, -200)
 
 ModuleScene::ModuleScene()
 {
@@ -43,11 +43,11 @@ bool ModuleScene::Init()
     GameObject* camera = m_Root->AddChild("Camera");
     camera->AddComponent(new CCamera(true, camera));
 
-    LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
-
     qt = new Quadtree();
-    AABB boundaries = AABB(MIN_Boundary, MAX_Boundary);
+    AABB boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
     qt->SetBoundaries(boundaries);
+
+    LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
     //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
     //activeModel = 0;   
@@ -484,8 +484,11 @@ void ModuleScene::LoadModel(const char* _fileName)
     std::map<std::string, Model*>::iterator it = m_Models.find(modelName.c_str());
     if (it != m_Models.end()) 
     {
-        SelectGameObject(it->second->ExportToGO(m_Root));
+        GameObject* exportedGO = it->second->ExportToGO(m_Root);
+        AddToQuadtreeIfHasMesh(exportedGO);
+        SelectGameObject(exportedGO);
         //App->camera->AdjustToModel(it->second);
+        
         return;
     }
     
@@ -532,4 +535,16 @@ void ModuleScene::SaveScene(rapidjson::Document& d)
         m_Root->m_Children[i]->OnSave(go, allocator);
         d.PushBack(go, allocator);
     }
+}
+
+void ModuleScene::AddToQuadtreeIfHasMesh(GameObject* go)
+{
+    for (int i = 0; i < go->m_Components.size(); ++i)
+    {
+        if (go->m_Components[i]->m_Type == ComponentType::MESH)
+            qt->InsertGO(go);
+    }
+
+    for (int i = 0; i < go->m_Children.size(); ++i)
+        AddToQuadtreeIfHasMesh(go->m_Children[i]);
 }

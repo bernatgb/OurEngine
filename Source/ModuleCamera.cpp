@@ -286,6 +286,26 @@ void ModuleCamera::FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameOb
 		FindIfRayIntersectsAnAABBandAddToHits(ray, go->m_Children[i], hits);
 }
 
+void ModuleCamera::FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*> &hits)
+{
+	if (ray.Intersects(qtn->GetAABB()))
+	{
+		std::list<GameObject*> gameObjects = qtn->GetGameObjectsInThisNode();
+		for (std::list<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end(); ++it)
+		{
+			GameObject* go = *it;
+			if (ray.Intersects(go->m_aabb))
+			{
+				hits.push_back(go); 
+				ImGui::Text("Ray intersects with %s", go->m_Name);
+			}
+		}
+
+		for (int i = 0; i < qtn->GetChildren().size(); ++i)
+			FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtn->GetChildren()[i], hits);
+	}
+}
+
 void ModuleCamera::SortHits(std::vector<GameObject*>& hits)
 {
 	/* With ints
@@ -378,10 +398,15 @@ void ModuleCamera::DrawImGui()
 			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
 
 			LineSegment ray = frustum.UnProjectLineSegment(x, y);
-			const GameObject* root = App->scene->GetRoot();
 			std::vector<GameObject*> hits;
+			/*
+			const GameObject* root = App->scene->GetRoot();
 			for (int i = 0; i < root->m_Children.size(); ++i)
 				FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
+			*/
+			QuadtreeNode* qtRoot = App->scene->GetQuadtree()->GetRoot();
+			FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtRoot, hits);
+
 			if (!hits.empty())
 			{
 				SortHits(hits); // With ray.length?

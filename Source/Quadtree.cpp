@@ -34,7 +34,7 @@ void QuadtreeNode::InsertGO(GameObject* go)
 	}
 }
 
-void QuadtreeNode::EraseGO(GameObject* go) // TODO: Revise
+void QuadtreeNode::EraseGO(GameObject* go)
 {
 	std::list<GameObject*>::iterator it = std::find(gameObjects.begin(), gameObjects.end(), go);
 	if (it != gameObjects.end())
@@ -160,6 +160,17 @@ bool QuadtreeNode::Intersects(Plane planes[6], float3 cornerPoints[8])
 	}
 	return true;
 }
+
+std::vector<QuadtreeNode*> QuadtreeNode::GetChildren()
+{
+	std::vector<QuadtreeNode*> children;
+	QuadtreeNode* qtn;
+	for (int i = 0; i < 4; ++i)
+		if (m_children[i] != nullptr)
+			children.push_back(m_children[i]);
+	
+	return children;
+};
 
 /* QUADTREE */
 

@@ -18,14 +18,17 @@ public:
 
 	void CreateChildren();
 	
-	QuadtreeNode* GetParent() { return m_parent; };
-
 	bool IsFull();
 	bool IsMin();
 	bool IsLeaf();
 
 	void GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goToPaint);
 	bool Intersects(Plane planes[6], float3 cornerPoints[8]);
+
+	AABB GetAABB() { return m_nodeAABB; };
+	QuadtreeNode* GetParent() { return m_parent; };
+	std::vector<QuadtreeNode*> GetChildren();
+	std::list<GameObject*> GetGameObjectsInThisNode() { return gameObjects; };
 
 private:
 	AABB m_nodeAABB;
@@ -46,6 +49,8 @@ public:
 	void SetBoundaries(AABB aabb);
 
 	void GetObejctsToPaint(CCamera* cam);
+
+	QuadtreeNode* GetRoot() { return m_root; };
 
 private:
 	QuadtreeNode* m_root = nullptr;
