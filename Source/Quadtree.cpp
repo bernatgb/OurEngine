@@ -60,7 +60,7 @@ void QuadtreeNode::RedistributeChildren()
 			intersects[i] = m_children[i]->m_nodeAABB.Intersects(go->m_aabb);
 		}
 
-		if (intersects[0] == intersects[1] == intersects[2] == intersects[3] == true)
+		if (intersects[0] && intersects[1] && intersects[2] && intersects[3])
 			++it;
 		else
 		{
@@ -160,17 +160,6 @@ bool QuadtreeNode::Intersects(Plane planes[6], float3 cornerPoints[8])
 	}
 	return true;
 }
-
-std::vector<QuadtreeNode*> QuadtreeNode::GetChildren()
-{
-	std::vector<QuadtreeNode*> children;
-	QuadtreeNode* qtn;
-	for (int i = 0; i < 4; ++i)
-		if (m_children[i] != nullptr)
-			children.push_back(m_children[i]);
-	
-	return children;
-};
 
 /* QUADTREE */
 

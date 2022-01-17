@@ -301,8 +301,11 @@ void ModuleCamera::FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineS
 			}
 		}
 
-		for (int i = 0; i < qtn->GetChildren().size(); ++i)
-			FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtn->GetChildren()[i], hits);
+		if (qtn->GetChildren()[0] != nullptr) 
+		{
+			for (int i = 0; i < 4; ++i)
+				FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtn->GetChildren()[i], hits);
+		}
 	}
 }
 
@@ -337,9 +340,9 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 	{
 		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
 		{
-			if (hits[i]->m_Components[i]->m_Type == ComponentType::MESH)
+			if (hits[i]->m_Components[j]->m_Type == ComponentType::MESH)
 			{
-				CMesh* cMesh = (CMesh*)hits[i]->m_Components[i];
+				CMesh* cMesh = (CMesh*)hits[i]->m_Components[j];
 				//math::Triangle tri = (Triangle)cMesh->m_Triangles[];
 				//bool hit = ray_local_space.Intersects(tri, &distance, &hit_point);
 			}

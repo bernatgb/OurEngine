@@ -27,7 +27,7 @@ public:
 
 	AABB GetAABB() { return m_nodeAABB; };
 	QuadtreeNode* GetParent() { return m_parent; };
-	std::vector<QuadtreeNode*> GetChildren();
+	QuadtreeNode** GetChildren() { return m_children; };
 	std::list<GameObject*> GetGameObjectsInThisNode() { return gameObjects; };
 
 private:

@@ -387,7 +387,11 @@ void ModuleScene::DrawImGuiResources()
     for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
     {
         if (ImGui::Button(it->first.c_str())) 
-            SelectGameObject(it->second->ExportToGO(m_Root));
+        {
+            GameObject* exportedGO = it->second->ExportToGO(m_Root);
+            AddToQuadtreeIfHasMesh(exportedGO);
+            SelectGameObject(exportedGO);
+        }
     }
 }
 
@@ -495,7 +499,9 @@ void ModuleScene::LoadModel(const char* _fileName)
     Model* model = importer::LoadModel(_fileName);
     m_Models[model->m_Name] = model;
 
-    SelectGameObject(m_Models[model->m_Name]->ExportToGO(m_Root));
+    GameObject* exportedGO = m_Models[model->m_Name]->ExportToGO(m_Root);
+    AddToQuadtreeIfHasMesh(exportedGO);
+    SelectGameObject(exportedGO);
     //App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
 
