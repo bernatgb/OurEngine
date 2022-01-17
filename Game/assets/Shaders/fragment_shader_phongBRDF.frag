@@ -46,7 +46,7 @@ void main()
     vec3 viewDir = normalize(cameraPosition - position);
     vec3 n = normalize(normal);
 
-    vec3 luminance = ambientColor.rgb;
+    vec3 luminance = ambientColor.rgb * diffuseColor;
   
     float illuminance = dot(lightDir, n);
     if(illuminance > 0.0) 
@@ -57,6 +57,6 @@ void main()
     }
 
     outColor.rgb = luminance;
-    //outColor.rgb = pow(outColor.rgb, vec3(1/2.2));
+    outColor.rgb = pow(outColor.rgb, vec3(1/2.2));
     outColor.a = 1.0;
 }
