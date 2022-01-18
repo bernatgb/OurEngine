@@ -255,7 +255,8 @@ update_status ModuleRender::Update()
 
 	loc = glGetUniformLocation(program, "cam_pos");
 	if (loc < 0) MY_LOG("Uniform location not found: cam_pos");
-	glUniform3fv(loc, 1, &App->camera->eye[0]);
+	float3 cam_pos = float3(App->camera->GetFrustum()->Pos()[0], App->camera->GetFrustum()->Pos()[1], App->camera->GetFrustum()->Pos()[2]);
+	glUniform3fv(loc, 1, &cam_pos[0]);
 
 	float3 color_a = float3(0.25f, 0.25f, 0.25f);
 	loc = glGetUniformLocation(program, "color_a");
@@ -281,14 +282,15 @@ update_status ModuleRender::Update()
 	float n = 0.0f;
 	loc = glGetUniformLocation(program, "n");
 	if (loc < 0) MY_LOG("Uniform location not found: n");
-	glUniform1f(loc, n);
-	*/
-	float3 lightDirection = float3(0.0, -1.0, 1.0);
+	glUniform1f(loc, n);*/
+	
+	float3 lightDirection = float3(1.0, -1.0, 1.0);
+	lightDirection.Normalize();
 	loc = glGetUniformLocation(program, "lightDirection");
 	if (loc < 0) MY_LOG("Uniform location not found: lightDirection");
 	glUniform3fv(loc, 1, &lightDirection[0]);
 
-	float3 ambientColor = float3(0.01, 0.01, 0.01);
+	float3 ambientColor = float3(0.1, 0.1, 0.1);
 	loc = glGetUniformLocation(program, "ambientColor");
 	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
 	glUniform3fv(loc, 1, &ambientColor[0]);
@@ -298,7 +300,7 @@ update_status ModuleRender::Update()
 	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
 	glUniform3fv(loc, 1, &specularColor[0]);
 
-	float shininess = 300.0;
+	float shininess = 1.0;
 	loc = glGetUniformLocation(program, "shininess");
 	if (loc < 0) MY_LOG("Uniform location not found: shininess");
 	glUniform1f(loc, shininess);
