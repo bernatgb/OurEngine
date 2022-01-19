@@ -4,6 +4,10 @@
 
 #include "SceneImporter.h"
 
+#include "Application.h"
+#include "ModuleScene.h"
+#include "Quadtree.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -40,6 +44,10 @@ Component* CTransform::GetAClone(GameObject* _owner)
 
 void CTransform::NotifyMovement()
 {
+	Quadtree* qt = App->scene->GetQuadtree();
+	GameObject* go = m_Owner;
+	qt->EraseGO(go);
+
 	//Change AccumulativeModelMatrix
 	if (m_Owner->m_Parent != nullptr)
 		m_AccumulativeModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_ModelMatrix;
@@ -50,7 +58,11 @@ void CTransform::NotifyMovement()
 
 	//Notify other components
 	for (unsigned int i = 0; i < m_Owner->m_Components.size(); ++i)
+	{
 		m_Owner->m_Components[i]->NotifyMovement();
+		if (go->m_Components[i]->m_Type == ComponentType::MESH)
+			qt->InsertGO(go);
+	}
 
 	//Notify owner children
 	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)

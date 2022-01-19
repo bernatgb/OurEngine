@@ -41,7 +41,7 @@ public:
 	void LoadScene(const rapidjson::Document& d);
 	void SaveScene(rapidjson::Document& d);
 
-	void AddToQuadtreeIfHasMesh(GameObject* go);
+	void AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go);
 
 	Model* FindModel(std::string _modelName) {
 		std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);

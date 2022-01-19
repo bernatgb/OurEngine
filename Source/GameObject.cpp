@@ -1,6 +1,7 @@
 #include "GameObject.h"
 
 #include "Application.h"
+#include "ModuleScene.h"
 #include "ModuleRender.h"
 #include "ModuleCamera.h"
 #include "ModuleDebugDraw.h"
@@ -241,6 +242,9 @@ GameObject* GameObject::Clone(GameObject* _parent)
 	newGO->m_Min = m_Min;
 	newGO->m_Max = m_Max;
 
+	Quadtree* qt = App->scene->GetQuadtree();
+	App->scene->AddToQuadtreeIfHasMesh(qt, newGO);
+
 	return newGO;
 }
 
@@ -310,15 +314,23 @@ void GameObject::DrawImGui()
 
 	m_Transform->DrawImGui();
 
-	if (ImGui::Checkbox("Show AABB", &m_showAABB)) // DEBUG NEEDS FIXING
+	/*
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
-		//Draw GameObject BB
-		float3* aabbPoints = new float3[8];
-		m_aabb.GetCornerPoints(aabbPoints);
-		App->debugDraw->DrawBB(aabbPoints);
-		delete[] aabbPoints;
+		if (m_Components[i]->m_Type == ComponentType::MESH)
+		{
+			if (ImGui::Checkbox("Show AABB", &m_showAABB)) // DEBUG NEEDS FIXING
+			{
+				//Draw GameObject BB
+				float3* aabbPoints = new float3[8];
+				m_aabb.GetCornerPoints(aabbPoints);
+				App->debugDraw->DrawBB(aabbPoints);
+				delete[] aabbPoints;
+			}
+			break;
+		}
 	}
-
+	*/
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 
 		m_Components[i]->DrawImGui();

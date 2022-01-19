@@ -389,7 +389,7 @@ void ModuleScene::DrawImGuiResources()
         if (ImGui::Button(it->first.c_str())) 
         {
             GameObject* exportedGO = it->second->ExportToGO(m_Root);
-            AddToQuadtreeIfHasMesh(exportedGO);
+            AddToQuadtreeIfHasMesh(qt, exportedGO);
             SelectGameObject(exportedGO);
         }
     }
@@ -489,7 +489,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     if (it != m_Models.end()) 
     {
         GameObject* exportedGO = it->second->ExportToGO(m_Root);
-        AddToQuadtreeIfHasMesh(exportedGO);
+        AddToQuadtreeIfHasMesh(qt, exportedGO);
         SelectGameObject(exportedGO);
         //App->camera->AdjustToModel(it->second);
         
@@ -500,7 +500,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     m_Models[model->m_Name] = model;
 
     GameObject* exportedGO = m_Models[model->m_Name]->ExportToGO(m_Root);
-    AddToQuadtreeIfHasMesh(exportedGO);
+    AddToQuadtreeIfHasMesh(qt, exportedGO);
     SelectGameObject(exportedGO);
     //App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
@@ -543,7 +543,7 @@ void ModuleScene::SaveScene(rapidjson::Document& d)
     }
 }
 
-void ModuleScene::AddToQuadtreeIfHasMesh(GameObject* go)
+void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
 {
     for (int i = 0; i < go->m_Components.size(); ++i)
     {
@@ -552,5 +552,5 @@ void ModuleScene::AddToQuadtreeIfHasMesh(GameObject* go)
     }
 
     for (int i = 0; i < go->m_Children.size(); ++i)
-        AddToQuadtreeIfHasMesh(go->m_Children[i]);
+        AddToQuadtreeIfHasMesh(qt, go->m_Children[i]);
 }
