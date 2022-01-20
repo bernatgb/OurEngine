@@ -108,6 +108,8 @@ void CCamera::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Camera"))
 	{
+		Component::DrawImGui();
+
 		if (ImGui::Checkbox("Main camera (in progress)", &m_MainCamera))
 		{
 			// TODO: IMPLEMENT

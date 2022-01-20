@@ -354,6 +354,11 @@ void GameObject::DrawImGui()
 			CCamera* newCCamera = new CCamera(true, this);
 			AddComponent(newCCamera);
 		}
+		if (ImGui::Selectable("Light"))
+		{
+			CLight* newCLight = new CLight(true, this);
+			AddComponent(newCLight);
+		}
 		ImGui::EndPopup();
 	}
 }
@@ -366,12 +371,16 @@ T* GameObject::GetComponent()
 	{
 	case CTransform:
 		type = ComponentType::TRANSFORM;
+		return m_Transform;
 		break;
 	case CMesh:
 		type = ComponentType::MESH;
 		break;
 	case CCamera:
 		type = ComponentType::CAMERA;
+		break;
+	case CLight:
+		type = ComponentType::LIGHT;
 		break;
 	default:
 		return nullptr;

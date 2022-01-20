@@ -89,8 +89,7 @@ void CMesh::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Mesh"))
 	{
-		// Show enabled variable
-		ImGui::Checkbox("Enabled", &m_Enabled);
+		Component::DrawImGui();
 
 		// Selected mesh
 		if (ImGui::Button("Select Mesh..."))

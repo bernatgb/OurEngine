@@ -5,6 +5,10 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 class GameObject;
 
 enum class ComponentType {
@@ -48,6 +52,12 @@ public:
 	};
 	virtual void DrawImGui() 
 	{
+		// Show enabled variable
+		ImGui::Checkbox("Enabled", &m_Enabled); // TODO: use flags
+
+		// Delete button
+		if (ImGui::Button("Delete"))
+			m_DeleteFlag = true;
 	};
 	
 	virtual void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const 
@@ -67,4 +77,7 @@ public:
 	ComponentType m_Type;
 	bool m_Enabled;
 	GameObject* m_Owner;
+
+	bool m_EnableFlag; // TODO: use flags
+	bool m_DeleteFlag;
 };

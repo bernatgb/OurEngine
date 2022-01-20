@@ -13,17 +13,18 @@ class CLight : public Component
 {
 public:
 	CLight(bool _enabled, GameObject* _owner);
+	CLight(bool _enabled, GameObject* _owner, CLight* cLight);
 	~CLight() override;
 
 	/*void Enable() override;
 	void Update() override;
-	void Disable() override;
+	void Disable() override;*/
 
 	Component* GetAClone(GameObject* _owner) override;
-	void NotifyMovement() override;*/
+	//void NotifyMovement() override;
 	void DrawImGui() override;
 
-	//void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
+	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	//void OnLoad(const rapidjson::Value& node) override;
 
 private:

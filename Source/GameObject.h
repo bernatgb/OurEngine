@@ -4,6 +4,7 @@
 #include "CTransform.h"
 #include "CMesh.h"
 #include "CCamera.h"
+#include "CLight.h"
 
 #include <vector>
 
@@ -83,6 +84,8 @@ public:
 			return ComponentType::MESH;
 		case CCamera:
 			return ComponentType::CAMERA;
+		case CLight:
+			return ComponentType::LIGHT;
 		}
 		return ComponentType::UNDEFINED;
 	}
@@ -96,6 +99,8 @@ public:
 			return CMesh;
 		case ComponentType::CAMERA:
 			return CCamera;
+		case ComponentType::LIGHT:
+			return CLight;
 		}
 		return Component;
 	}
