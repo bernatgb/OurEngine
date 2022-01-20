@@ -36,6 +36,6 @@ public:
 
 	float3* m_BB;
 
-	std::vector<std::vector<float3>> m_Triangles;
+	std::vector<Triangle> m_Triangles;
 };
 

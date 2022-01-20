@@ -97,6 +97,7 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
+	/*
 	//CREATING TRIANGLES VECTOR
 	int j = 0;
 	for (int i = 0; i < mesh->mNumVertices; ++i)
@@ -105,7 +106,20 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 		vertices[i % 3] = float3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 		if (i % 3 == 0)
 		{
-			ourMesh->m_Triangles.push_back(vertices);
+			//ourMesh->m_Triangles.push_back(vertices);
+			++j;
+		}
+	}
+	*/
+
+	int j = 0;
+	for (int i = 0; i < mesh->mNumVertices; ++i)
+	{
+		std::vector<float3> vertices(3);
+		vertices[i % 3] = float3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+		if (i % 3 == 0)
+		{
+			ourMesh->m_Triangles.push_back(Triangle(vertices[0], vertices[1], vertices[2]));
 			++j;
 		}
 	}
