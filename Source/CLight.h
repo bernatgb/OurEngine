@@ -4,9 +4,9 @@
 #include "MathGeoLib.h"
 
 enum class LightType {
-	DIRECTIONAL,
-	POINT,
-	SPOT
+	DIRECTIONAL = 0,
+	POINT = 1,
+	SPOT = 2
 };
 
 class CLight : public Component
@@ -25,7 +25,7 @@ public:
 	void DrawImGui() override;
 
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
-	//void OnLoad(const rapidjson::Value& node) override;
+	void OnLoad(const rapidjson::Value& node) override;
 
 private:
 	LightType m_Type;
