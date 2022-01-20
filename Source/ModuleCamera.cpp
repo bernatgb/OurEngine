@@ -338,13 +338,20 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 {
 	for (int i = 0; i < hits.size(); ++i)
 	{
+		// Transform once the ray into Game Object space to test against all triangles
+		float4x4 modelMatrix = hits[i]->m_Transform->m_AccumulativeModelMatrix;
+		//LineSegment rayLocalSpace = LineSegment(  modelMatrix.Inverse() * ray.Dir() );
+
 		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
 		{
 			if (hits[i]->m_Components[j]->m_Type == ComponentType::MESH)
 			{
 				CMesh* cMesh = (CMesh*)hits[i]->m_Components[j];
-				//math::Triangle tri = (Triangle)cMesh->m_Triangles[];
-				//bool hit = ray_local_space.Intersects(tri, &distance, &hit_point);
+				std::vector<Triangle> triangles = cMesh->m_Triangles;
+				for (int k = 0; k < triangles.size(); ++k)
+				{
+					//bool hit = rayLocalSpace.Intersects(triangles[k], &distance, &hit_point);
+				}
 			}
 		}
 	}
@@ -376,28 +383,33 @@ void ModuleCamera::DrawImGui()
 			ImVec2 v2 = ImGui::GetMousePos();
 			ImGui::Text("mouse x = %i, mouse y = %i", (int)v2.x, (int)v2.y);
 			
-			// 8 & 37 are magic numbers to correct the position
-			mouse_x -= App->renderer->GetSceneWindowStartPos().x + 8;
-			mouse_y -= App->renderer->GetSceneWindowStartPos().y + 37;
+			const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
+			//const ImVec2 vContentRegionMax = ImGui::GetWindowContentRegionMax();
 
-			ImGui::Text("scene starts at:");
-			ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
+			mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
+			mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
+
+			//ImGui::Text("scene starts at:");
+			//ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
 
 			float width = App->renderer->GetSceneWindowSize().x; 
 			float height = App->renderer->GetSceneWindowSize().y; 
 
-			ImGui::Text("width = %i, height = %i", (int)width, (int)height);
+			//ImGui::Text("width = %i, height = %i", (int)width, (int)height);
 
 			float x = (2.0f * mouse_x) / width - 1.0f;
 			float y = 1.0f - (2.0f * mouse_y) / height;
 			float z = 1.0f;
 			vec ray_nds = vec(x, y, z);
 			ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
+
 			float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
+			
 			float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
 			ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
+			
 			float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
-			ray_world = ray_world.Normalized();
+			ray_world = (ray_world - frustum.Pos()).Normalized();
 			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
 
 			LineSegment ray = frustum.UnProjectLineSegment(x, y);
