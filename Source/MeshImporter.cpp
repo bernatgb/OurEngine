@@ -97,8 +97,8 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
-	/*
 	//CREATING TRIANGLES VECTOR
+	/*
 	int j = 0;
 	for (int i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -267,6 +267,19 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+
+	//CREATING TRIANGLES VECTOR
+	int j = 0;
+	for (int i = 0; i < ourMesh->m_NumVertices; ++i)
+	{
+		std::vector<float3> vertices(3);
+		vertices[i % 3] = float3(ourMesh->m_Vertices[i].x, ourMesh->m_Vertices[i].y, ourMesh->m_Vertices[i].z);
+		if (i % 3 == 0)
+		{
+			ourMesh->m_Triangles.push_back(Triangle(vertices[0], vertices[1], vertices[2]));
+			++j;
+		}
+	}
 
 	MY_LOG("MeshImporter_Load: Loading complete");
 }

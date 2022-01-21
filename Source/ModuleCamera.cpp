@@ -340,7 +340,9 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 	{
 		// Transform once the ray into Game Object space to test against all triangles
 		float4x4 modelMatrix = hits[i]->m_Transform->m_AccumulativeModelMatrix;
-		//LineSegment rayLocalSpace = LineSegment(  modelMatrix.Inverse() * ray.Dir() );
+		vec rayOrigin = modelMatrix.Inverse() * ray.a;
+		vec rayDir = (modelMatrix.Inverse() * ray.Dir()).Normalized();
+		LineSegment rayLocalSpace = LineSegment(Ray(rayOrigin, rayDir), 500.0f);
 
 		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
 		{
@@ -348,11 +350,18 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 			{
 				CMesh* cMesh = (CMesh*)hits[i]->m_Components[j];
 				std::vector<Triangle> triangles = cMesh->m_Triangles;
+				
 				for (int k = 0; k < triangles.size(); ++k)
 				{
-					//bool hit = rayLocalSpace.Intersects(triangles[k], &distance, &hit_point);
+					Triangle triangle = triangles[k];
+					vec triangleNormal = Cross(triangle.c - triangle.a, triangle.b - triangle.a);
+					float distanceOriginPlane = Dot(triangleNormal, triangle.a); // distance from (0,0,0) to plane;
+					float dist = -(Dot(triangleNormal, rayOrigin) + distanceOriginPlane) / Dot(triangleNormal, rayDir);
+					vec hitPoint = vec(rayOrigin + (rayDir * dist));
+					bool hit = rayLocalSpace.Intersects(triangles[k], &dist, &hitPoint);
 				}
 			}
+			break; // Only a CMesh for GO?
 		}
 	}
 }
