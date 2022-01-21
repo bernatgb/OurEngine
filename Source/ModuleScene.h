@@ -43,6 +43,8 @@ public:
 
 	void AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go);
 
+	void RecursiveSearch(GameObject* _go);
+
 	Model* FindModel(std::string _modelName) {
 		std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);
 		if (it != m_Models.end())
@@ -68,8 +70,10 @@ public:
 	std::map<unsigned int, Mesh*> m_Meshes;
 	std::map<unsigned int, Texture*> m_Textures;
 
+	std::list<CLight*> m_Lights;
+
 	// Gets
-	const GameObject* GetRoot() const
+	GameObject* GetRoot() const
 	{
 		return m_Root;
 	};

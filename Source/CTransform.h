@@ -20,9 +20,9 @@ public:
 	void Copy(const CTransform* _transform);
 
 	float3 GetPos() const;
-	float3 GetForward() const;
-	float3 GetUp() const;
-	float3 GetRight() const;
+	float3 GetForward(bool normalize = false) const;
+	float3 GetUp(bool normalize = false) const;
+	float3 GetRight(bool normalize = false) const;
 
 	float4x4 m_AccumulativeModelMatrix;
 

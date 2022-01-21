@@ -554,3 +554,37 @@ void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
     for (int i = 0; i < go->m_Children.size(); ++i)
         AddToQuadtreeIfHasMesh(qt, go->m_Children[i]);
 }
+
+void ModuleScene::RecursiveSearch(GameObject* _go)
+{
+    //TODO: CHECK OBJECT FLAGS
+
+    //TODO: CHECK COMPONENTS FLAGS
+
+    for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
+    {
+        if (_go->m_Components[i]->m_Type == ComponentType::LIGHT)
+            m_Lights.push_back((CLight*)_go->m_Components[i]);
+    }
+
+    for (unsigned int i = 0; i < _go->m_Children.size(); ++i) 
+    {
+        RecursiveSearch(_go->m_Children[i]);
+    }
+}
+
+/*
+Light GetLightStruct(CLight* _light) {
+    Light light;
+    light.lightType = (int)_light->m_Type;
+    light.lightColor = _light->m_Color;
+    light.intensity = _light->m_Intensity;
+    light.radius = _light->m_Radius;
+    light.innerAngle = _light->m_InnerAngle * DEGTORAD;
+    light.outerAngle = _light->m_OuterAngle * DEGTORAD;
+
+    light.direction = _light->m_Owner->m_Transform->GetForward(true);
+    light.position = _light->m_Owner->m_Transform->GetPos();
+
+    return light;
+};*/

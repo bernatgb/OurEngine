@@ -10,6 +10,7 @@ struct SDL_Texture;
 struct SDL_Renderer;
 struct SDL_Rect;
 
+class Texture;
 class CubeMap;
 
 class ModuleRender : public Module
@@ -25,6 +26,8 @@ public:
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
 	
+	void ActivateTexture(Texture* _texture);
+
 	CubeMap* GetCubeMap();
 
 	void* context;

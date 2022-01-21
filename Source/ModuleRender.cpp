@@ -12,6 +12,8 @@
 #include "GL/glew.h"
 #include <MathGeoLib.h>
 
+#include "Texture.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -125,7 +127,8 @@ bool ModuleRender::Init()
 	MY_LOG("Shaders: Creating program");
 	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
 	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag");
-	program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phongBRDF.vert", ".\\assets\\Shaders\\fragment_shader_phongBRDF.frag");
+	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phongBRDF.vert", ".\\assets\\Shaders\\fragment_shader_phongBRDF.frag");
+	program = App->program->CreateProgram(".\\assets\\Shaders\\phongBRDFengine_SimpleVS.glsl", ".\\assets\\Shaders\\phongBRDFengine_SimplePS.glsl");
 
 	MY_LOG("Framebuffer: Creating framebuffer");
 	//FBO
@@ -284,7 +287,7 @@ update_status ModuleRender::Update()
 	if (loc < 0) MY_LOG("Uniform location not found: n");
 	glUniform1f(loc, n);*/
 	
-	float3 lightDirection = float3(1.0, -1.0, 1.0);
+	/*float3 lightDirection = float3(1.0, -1.0, 1.0);
 	lightDirection.Normalize();
 	loc = glGetUniformLocation(program, "lightDirection");
 	if (loc < 0) MY_LOG("Uniform location not found: lightDirection");
@@ -308,7 +311,24 @@ update_status ModuleRender::Update()
 	float3 lightColor = float3(1.0, 1.0, 1.0);
 	loc = glGetUniformLocation(program, "lightColor");
 	if (loc < 0) MY_LOG("Uniform location not found: lightColor");
-	glUniform3fv(loc, 1, &lightColor[0]);
+	glUniform3fv(loc, 1, &lightColor[0]);*/
+
+	loc = glGetUniformLocation(program, "camPos");
+	if (loc < 0) MY_LOG("Uniform location not found: camPos");
+	float3 camPos = float3(App->camera->GetFrustum()->Pos()[0], App->camera->GetFrustum()->Pos()[1], App->camera->GetFrustum()->Pos()[2]);
+	glUniform3fv(loc, 1, &camPos[0]);
+
+	float3 color_a = float3(0.25f, 0.25f, 0.25f);
+	loc = glGetUniformLocation(program, "ambientColor");
+	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
+	glUniform3fv(loc, 1, &color_a[0]);
+
+	// TODO: MOVE TO THE PREUPDATE
+	App->scene->m_Lights.clear();
+	App->scene->RecursiveSearch(App->scene->GetRoot());
+
+	// TODO: ACTIVATE ALL LIGHTS AND THINGS
+
 
 
 	App->scene->Draw(program);
@@ -388,6 +408,65 @@ bool ModuleRender::CleanUp()
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void ModuleRender::ActivateTexture(Texture* _texture)
+{
+	/*glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _texture->m_Texture);
+	glUniform1i(glGetUniformLocation(program, "texture"), 0);
+
+	return;*/
+
+	////////////////////////////////////////////////////////////////////////
+
+	unsigned int loc;
+
+	loc = glGetUniformLocation(program, "hasDiffuseTex");
+	if (loc < 0) MY_LOG("Uniform location not found: hasDiffuseTex");
+	glUniform1i(loc, _texture->m_TextureData != nullptr);
+
+	loc = glGetUniformLocation(program, "hasSpecularTex");
+	if (loc < 0) MY_LOG("Uniform location not found: hasSpecularTex");
+	glUniform1i(loc, _texture->m_SpecularTextureData != nullptr);
+
+	loc = glGetUniformLocation(program, "shininessAlpha");
+	if (loc < 0) MY_LOG("Uniform location not found: shininessAlpha");
+	glUniform1i(loc, _texture->m_ShininessAlpha);
+
+	loc = glGetUniformLocation(program, "shininess");
+	if (loc < 0) MY_LOG("Uniform location not found: shininess");
+	glUniform1f(loc, _texture->m_Shininess);
+
+	loc = glGetUniformLocation(program, "diffuseColor");
+	if (loc < 0) MY_LOG("Uniform location not found: diffuseColor");
+	glUniform3fv(loc, 1, &_texture->m_DiffuseColor[0]);
+
+	loc = glGetUniformLocation(program, "specularColor");
+	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
+	glUniform3fv(loc, 1, &_texture->m_SpecularColor[0]);
+
+	if (_texture->m_TextureData != nullptr)
+	{
+		loc = glGetUniformLocation(program, "diffuseTex");
+		if (loc < 0) MY_LOG("Uniform location not found: diffuseTex");
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _texture->m_Texture);
+		glUniform1i(loc, 0);
+		//glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	
+	if (_texture->m_SpecularTextureData != nullptr)
+	{
+		loc = glGetUniformLocation(program, "specularTex");
+		if (loc < 0) MY_LOG("Uniform location not found: specularTex");
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, _texture->m_SpecularTexture);
+		glUniform1i(loc, 0);
+		//glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 CubeMap* ModuleRender::GetCubeMap()

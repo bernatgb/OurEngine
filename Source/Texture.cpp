@@ -118,45 +118,40 @@ Texture::~Texture()
 	}
 }
 
-void Texture::ActivateTexture(const unsigned int& program) 
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, m_Texture);
-	glUniform1i(glGetUniformLocation(program, "texture"), 0);
-}
-
 void Texture::DrawImGui()
 {
+	ImGui::ColorEdit3("Diffuse color", &m_DiffuseColor[0]);
+	ImGui::ColorEdit3("Specular color", &m_SpecularColor[0]);
+
+	ImGui::Checkbox("Use specular Alpha as shininess", &m_ShininessAlpha);
+	ImGui::DragFloat("Shininess", &m_Shininess);
+
+	ImGui::Separator();
+
+	ImGui::Text("DiffuseTexture");
 	ImGui::Text("Name: %s", m_Name.c_str());
 	ImGui::Text("Witdh: %i", m_TextureData->width);
 	ImGui::Text("Height: %i", m_TextureData->height);
 	ImGui::Text("Depth: %i", m_TextureData->depth);
-
-	switch (m_TextureData->format)
-	{
-	case GL_COLOR_INDEX:
-		ImGui::Text("Format: COLOUR_INDEX");
-		break;
-	case GL_RGB:
-		ImGui::Text("Format: RGB");
-		break;
-	case GL_RGBA:
-		ImGui::Text("Format: RGBA");
-		break;
-	case GL_BGR:
-		ImGui::Text("Format: BGR");
-		break;
-	case GL_BGRA:
-		ImGui::Text("Format: BGRA");
-		break;
-	case GL_LUMINANCE:
-		ImGui::Text("Format: LUMINANCE");
-		break;
-	}
+	ImGui::Text("Format: %s", FormatToString(m_TextureData->format));
 
 	ImGui::Image((void*)m_Texture, ImVec2(100, 100));
 
 	ImGui::Separator();
+
+	if (m_SpecularTextureData != nullptr)
+	{
+		ImGui::Text("SpecularTexture");
+		//ImGui::Text("Name: %s", m_Name.c_str());
+		ImGui::Text("Witdh: %i", m_SpecularTextureData->width);
+		ImGui::Text("Height: %i", m_SpecularTextureData->height);
+		ImGui::Text("Depth: %i", m_SpecularTextureData->depth);
+		ImGui::Text("Format: %s", FormatToString(m_SpecularTextureData->format));
+
+		ImGui::Image((void*)m_Texture, ImVec2(100, 100));
+
+		ImGui::Separator();
+	}
 
 	bool change = false;
 
@@ -251,6 +246,20 @@ void Texture::DrawImGui()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
 	}
+}
+
+const char* Texture::FormatToString(unsigned int _format) const
+{
+	switch (_format)
+	{
+	case GL_COLOR_INDEX: return "COLOUR_INDEX";
+	case GL_RGB: return "Format: RGB";
+	case GL_RGBA: return "Format: RGBA";
+	case GL_BGR: return "Format: BGR";
+	case GL_BGRA: return "Format: BGRA";
+	case GL_LUMINANCE: return "Format: LUMINANCE";
+	}
+	return "";
 }
 
 const char* Texture::ConfigToString(unsigned int _config) const

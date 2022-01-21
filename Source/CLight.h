@@ -9,6 +9,22 @@ enum class LightType {
 	SPOT = 2
 };
 
+struct Light 
+{
+public:
+	int lightType;
+	float3 lightColor;
+	int padding[1];
+	float intensity;
+	float radius;
+	float innerAngle;
+	float outerAngle;
+
+	float3 direction;
+	int padding2[1];
+	float3 position;
+};
+
 class CLight : public Component
 {
 public:
@@ -26,6 +42,21 @@ public:
 
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;
+
+	Light GetLightStruct(float3 _direction, float3 _position) {
+		Light light;
+		light.lightType = (int)m_Type;
+		light.lightColor = m_Color;
+		light.intensity = m_Intensity;
+		light.radius = m_Radius;
+		light.innerAngle = m_InnerAngle * DEGTORAD;
+		light.outerAngle = m_OuterAngle * DEGTORAD;
+
+		light.direction = _direction; // m_Owner->m_Transform->GetForward(true);
+		light.position = _position; // m_Owner->m_Transform->GetPos();
+
+		return light;
+	};
 
 private:
 	LightType m_Type;

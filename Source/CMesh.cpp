@@ -52,7 +52,7 @@ void CMesh::Update()
 		return;
 	
 	// Draw mesh
-	m_Texture->ActivateTexture(App->renderer->program);
+	App->renderer->ActivateTexture(m_Texture);
 	m_Mesh->Draw();
 
 	// Draw bounding box if needed

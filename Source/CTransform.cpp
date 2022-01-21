@@ -167,23 +167,38 @@ float3 CTransform::GetPos() const
 	return m_Position;
 }
 
-float3 CTransform::GetForward() const
+float3 CTransform::GetForward(bool normalize) const
 {
+	float3 forward;
 	if (m_Owner->m_Parent != nullptr)
-		return (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldZ().ToDir4()).Float3Part();
-	return m_Rotation.WorldZ();
+		forward = (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldZ().ToDir4()).Float3Part();
+	else
+		forward = m_Rotation.WorldZ();
+
+	if (normalize) return forward.Normalized();
+	return forward;
 }
 
-float3 CTransform::GetUp() const
+float3 CTransform::GetUp(bool normalize) const
 {
+	float3 up;
 	if (m_Owner->m_Parent != nullptr)
-		return (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldY().ToDir4()).Float3Part();
-	return m_Rotation.WorldY();
+		up = (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldY().ToDir4()).Float3Part();
+	else
+		up = m_Rotation.WorldY();
+
+	if (normalize) return up.Normalized();
+	return up;
 }
 
-float3 CTransform::GetRight() const
+float3 CTransform::GetRight(bool normalize) const
 {
+	float3 right;
 	if (m_Owner->m_Parent != nullptr)
-		return (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldX().ToDir4()).Float3Part();
-	return m_Rotation.WorldX();
+		right = (m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_Rotation.WorldX().ToDir4()).Float3Part();
+	else
+		right = m_Rotation.WorldX();
+
+	if (normalize) return right.Normalized();
+	return right;
 }
