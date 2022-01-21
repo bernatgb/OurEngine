@@ -1,0 +1,239 @@
+[
+    {
+        "GUID": 1769,
+        "Name": "Camera",
+        "Active": true,
+        "Parent": 0,
+        "Components": [
+            {
+                "Type": 1,
+                "Id": 30122,
+                "Enabled": true,
+                "Position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "Type": 3,
+                "Id": 11914,
+                "Enabled": true,
+                "MainCamera": false,
+                "CullingCamera": false,
+                "Fov": 45.0,
+                "ZNear": 0.10000000149011612,
+                "ZFar": 200.0
+            }
+        ],
+        "Children": [],
+        "Min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Max": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    },
+    {
+        "GUID": 24558,
+        "Name": "BakerHouse.fbx",
+        "Active": true,
+        "Parent": 0,
+        "Components": [
+            {
+                "Type": 1,
+                "Id": 13672,
+                "Enabled": true,
+                "Position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        ],
+        "Children": [
+            {
+                "GUID": 16124,
+                "Name": "Chimney",
+                "Active": true,
+                "Parent": 24558,
+                "Components": [
+                    {
+                        "Type": 1,
+                        "Id": 28524,
+                        "Enabled": true,
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "Type": 2,
+                        "Id": 29957,
+                        "Enabled": true,
+                        "MeshId": 8633,
+                        "ShowBB": false,
+                        "MaterialId": 9222
+                    }
+                ],
+                "Children": [],
+                "Min": [
+                    1.5711853504180909,
+                    0.012897491455078125,
+                    -0.03543161228299141
+                ],
+                "Max": [
+                    2.2668659687042238,
+                    2.394075632095337,
+                    0.964568555355072
+                ]
+            },
+            {
+                "GUID": 25644,
+                "Name": "Baker_house",
+                "Active": true,
+                "Parent": 24558,
+                "Components": [
+                    {
+                        "Type": 1,
+                        "Id": 2252,
+                        "Enabled": true,
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "Type": 2,
+                        "Id": 11999,
+                        "Enabled": true,
+                        "MeshId": 218,
+                        "ShowBB": false,
+                        "MaterialId": 9222
+                    }
+                ],
+                "Children": [],
+                "Min": [
+                    -1.5340535640716553,
+                    0.012897372245788575,
+                    -2.060347080230713
+                ],
+                "Max": [
+                    1.6797043085098267,
+                    3.555873394012451,
+                    1.906912922859192
+                ]
+            }
+        ],
+        "Min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Max": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    },
+    {
+        "GUID": 578,
+        "Name": "Empty GameObject",
+        "Active": true,
+        "Parent": 0,
+        "Components": [
+            {
+                "Type": 1,
+                "Id": 29429,
+                "Enabled": true,
+                "Position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "Type": 4,
+                "Id": 27953,
+                "Enabled": true,
+                "LightType": 0,
+                "Color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "Intensity": 300,
+                "Radius": 0,
+                "InnerAngle": 0,
+                "OuterAngle": 0
+            }
+        ],
+        "Children": [],
+        "Min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Max": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+]

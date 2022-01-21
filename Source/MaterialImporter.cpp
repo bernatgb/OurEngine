@@ -25,6 +25,11 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 	ourMaterial->m_MagFilter = GL_LINEAR;
 	ourMaterial->m_Wrap = GL_CLAMP;
 
+	ourMaterial->m_DiffuseColor = float3(0.0f, 0.0f, 0.0f);
+	ourMaterial->m_SpecularColor = float3(0.0f, 0.0f, 0.0f);
+	ourMaterial->m_ShininessAlpha = false;
+	ourMaterial->m_Shininess = 0.0f;
+
 	glGenTextures(1, &ourMaterial->m_Texture);
 	glBindTexture(GL_TEXTURE_2D, ourMaterial->m_Texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ourMaterial->m_MinFilter);
@@ -110,7 +115,7 @@ void importer::material::Import(const aiMaterial* material, Texture* ourMaterial
 
 int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 {
-	unsigned int header[10] = {
+	unsigned int header[11] = {
 		ourMaterial->m_GUID,
 		ourMaterial->m_MinFilter,
 		ourMaterial->m_MagFilter,
@@ -120,10 +125,17 @@ int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 		ourMaterial->m_TextureData->depth,
 		ourMaterial->m_TextureData->format,
 		ourMaterial->m_TextureData->bpp,
+		(ourMaterial->m_ShininessAlpha ? 1 : 0),
 		(ourMaterial->m_SpecularTextureData != nullptr ? 1 : 0)
 	};
 
-	unsigned int size = ourMaterial->m_Name.length() + 1 + sizeof(header) + ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
+	float values[7] = {
+		ourMaterial->m_DiffuseColor.x, ourMaterial->m_DiffuseColor.y, ourMaterial->m_DiffuseColor.z,
+		ourMaterial->m_SpecularColor.x, ourMaterial->m_SpecularColor.y, ourMaterial->m_SpecularColor.z,
+		ourMaterial->m_Shininess
+	};
+
+	unsigned int size = ourMaterial->m_Name.length() + 1 + sizeof(header) + sizeof(values) + ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
 	
 	if (ourMaterial->m_SpecularTextureData != nullptr) 
 		size += sizeof(int) * 5 + ourMaterial->m_SpecularTextureData->bpp * ourMaterial->m_SpecularTextureData->width * ourMaterial->m_SpecularTextureData->height;
@@ -142,6 +154,11 @@ int importer::material::Save(const Texture* ourMaterial, char*& fileBuffer)
 	// Store header
 	bytes = sizeof(header);
 	memcpy(cursor, header, sizeof(header));
+	cursor += bytes;
+
+	// Store values
+	bytes = sizeof(values);
+	memcpy(cursor, values, sizeof(values));
 	cursor += bytes;
 
 	// Store vertices
@@ -182,7 +199,7 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 		ourMaterial->m_Name += cursor[i + 1];
 	cursor += (bytes + 1);
 
-	unsigned int header[10];
+	unsigned int header[11];
 	bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
@@ -192,8 +209,18 @@ void importer::material::Load(const char* fileBuffer, Texture* ourMaterial)
 	ourMaterial->m_MagFilter = header[2];
 	ourMaterial->m_Wrap = header[3];
 	ourMaterial->m_TextureData = new TextureData(false, 0, header[4], header[5], header[6], header[7], header[8], nullptr);
+	ourMaterial->m_Shininess = header[9];
 
-	bool specularTexture = header[9];
+	bool specularTexture = header[10];
+
+	float values[7];
+	bytes = sizeof(values);
+	memcpy(values, cursor, bytes);
+	cursor += bytes; 
+	
+	ourMaterial->m_DiffuseColor = float3(values[0], values[1], values[2]);
+	ourMaterial->m_SpecularColor = float3(values[3], values[4], values[5]);
+	ourMaterial->m_Shininess = values[6];
 
 	bytes = ourMaterial->m_TextureData->bpp * ourMaterial->m_TextureData->width * ourMaterial->m_TextureData->height;
 	ourMaterial->m_TextureData->data = new byte[bytes];

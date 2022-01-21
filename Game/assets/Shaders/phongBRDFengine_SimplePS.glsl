@@ -4,16 +4,18 @@ struct Light
 {
  int lightType;
  vec3 lightColor;
- float intensity;
- float radius;
- float innerAngle;
- float outerAngle;
+ vec4 values;
+ //float intensity;
+ //float radius;
+ //float innerAngle;
+ //float outerAngle;
  
  vec3 direction;
  vec3 position;
 };
 
 #define PI 3.1415926538
+#define MAX_NUM_TOTAL_LIGHTS 20
 
 in vec2 uv0;
 in vec3 normal;
@@ -33,6 +35,12 @@ uniform bool hasSpecularTex;
 uniform bool shininessAlpha;
 //
 
+layout (std140) uniform Lights
+{
+ int numLights; 
+ Light[MAX_NUM_TOTAL_LIGHTS] lights; 
+};
+
 uniform vec3 ambientColor;
 
 uniform vec3 camPos;
@@ -41,9 +49,11 @@ out vec4 color;
 
 vec3 GetPhongBRDFDirectional(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 part1)
 {
+	float intensity = light.values.x;
+
 	vec3 L = light.direction;
 	vec3 R = reflect(L, N);
-	vec3 Li = light.lightColor * light.intensity;
+	vec3 Li = light.lightColor * intensity;
 	float lambert = max(dot(N, -L), 0.0);
 	vec3 Rf = Cs + (1.0 - Cs) * pow(1.0 - lambert, 5.0);
 	
@@ -52,11 +62,14 @@ vec3 GetPhongBRDFDirectional(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3
 
 vec3 GetPhongBRDFPoint(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 pos, vec3 part1) 
 {
+	float intensity = light.values.x;
+	float radius = light.values.y;
+
 	float dist = distance(light.position, pos);
-	float Fatt = pow(max(1 - pow(dist / light.radius, 4.0), 0.0), 2.0)/(dist * dist + 1);
+	float Fatt = pow(max(1 - pow(dist / radius, 4.0), 0.0), 2.0)/(dist * dist + 1);
 	vec3 L = normalize(pos - light.position);
 	vec3 R = reflect(L, N);
-	vec3 Li = light.lightColor * light.intensity * Fatt;
+	vec3 Li = light.lightColor * intensity * Fatt;
 	float lambert = max(-dot(N, L), 0.0);
 	vec3 Rf = Cs + (1.0 - Cs) * pow(1.0 - lambert, 5.0);
 	
@@ -65,18 +78,23 @@ vec3 GetPhongBRDFPoint(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 pos, 
 
 vec3 GetPhongBRDFSpot(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 pos, vec3 part1) 
 {
+	float intensity = light.values.x;
+	float radius = light.values.y;
+	float innerAngle = light.values.z;
+	float outerAngle = light.values.w;
+
 	vec3 L = normalize(pos - light.position);
 	float C = dot(L, light.direction);
 	float Catt = 0;
-	if (C >= cos(light.innerAngle))
+	if (C >= cos(innerAngle))
 		Catt = 1;
-	else if (C < cos(light.innerAngle) && C >= cos(light.outerAngle))
-		Catt = (C - cos(light.outerAngle))/(cos(light.innerAngle) - cos(light.outerAngle));
+	else if (C < cos(innerAngle) && C >= cos(outerAngle))
+		Catt = (C - cos(outerAngle))/(cos(innerAngle) - cos(outerAngle));
 		
 	float dist = dot(L, light.direction);
-	float Fatt = pow(max(1 - pow(dist / light.radius, 4.0), 0.0), 2.0)/(dist * dist + 1);
+	float Fatt = pow(max(1 - pow(dist / radius, 4.0), 0.0), 2.0)/(dist * dist + 1);
 	vec3 R = reflect(L, N);
-	vec3 Li = light.lightColor * light.intensity * Fatt * Catt;
+	vec3 Li = light.lightColor * intensity * Fatt * Catt;
 	float lambert = max(-dot(N, L), 0.0);
 	vec3 Rf = Cs + (1.0 - Cs) * pow(1.0 - lambert, 5.0);
 	
@@ -101,16 +119,16 @@ void main()
     
  	vec3 part1 = (Cd * (1.0 - Cs));
  	
- 	Light light;
- 	light.lightType = 3;
- 	
  	vec3 finalColor = vec3(0.0, 0.0, 0.0);
-    if (light.lightType == 0)
-        finalColor += GetPhongBRDFDirectional(light, Cs, N, V, n, part1);
-    else if (light.lightType == 1)
-    	finalColor += GetPhongBRDFPoint(light, Cs, N, V, n, position, part1);
-	else if (light.lightType == 2)
-    	finalColor += GetPhongBRDFSpot(light, Cs, N, V, n, position, part1);
+    for (int i = 0; i < MAX_NUM_TOTAL_LIGHTS; ++i) 
+    {
+		if (lights[i].lightType == 0)
+			finalColor += GetPhongBRDFDirectional(lights[i], Cs, N, V, n, part1);
+		else if (lights[i].lightType == 1)
+    		finalColor += GetPhongBRDFPoint(lights[i], Cs, N, V, n, position, part1);
+		else if (lights[i].lightType == 2)
+    		finalColor += GetPhongBRDFSpot(lights[i], Cs, N, V, n, position, part1);
+    }
     
     finalColor += Ca * Cd;
     finalColor = finalColor / (finalColor + vec3(1.0)); // reinhard tone mapping

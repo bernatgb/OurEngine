@@ -13,16 +13,18 @@ struct Light
 {
 public:
 	int lightType;
+	int padding1[3];
 	float3 lightColor;
-	int padding[1];
+	int padding2[1];
 	float intensity;
 	float radius;
 	float innerAngle;
 	float outerAngle;
 
 	float3 direction;
-	int padding2[1];
+	int padding3[1];
 	float3 position;
+	int padding4[1];
 };
 
 class CLight : public Component

@@ -564,7 +564,7 @@ void ModuleScene::RecursiveSearch(GameObject* _go)
     for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
     {
         if (_go->m_Components[i]->m_Type == ComponentType::LIGHT)
-            m_Lights.push_back((CLight*)_go->m_Components[i]);
+            m_Lights.push_back(((CLight*)_go->m_Components[i])->GetLightStruct(_go->m_Transform->GetForward(true), _go->m_Transform->GetPos()));
     }
 
     for (unsigned int i = 0; i < _go->m_Children.size(); ++i) 

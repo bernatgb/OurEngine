@@ -159,6 +159,13 @@ bool ModuleRender::Init()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//Light buffer
+	glGenBuffers(1, &m_lightsUBO); // this generates UBO, OK
+	glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO); // this binds it, OK
+	glBufferData(GL_UNIFORM_BUFFER, 16 + 20 * 20, &m_LightsContainer, GL_DYNAMIC_DRAW); // this allocates space for the UBO. 
+	glBindBufferRange(GL_UNIFORM_BUFFER, glGetUniformBlockIndex(program, "Lights"), m_lightsUBO, 0, 16 + 20 * 20); // this binds UBO to Buffer Index
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	//Create cube map
 	std::vector<std::string> faces
 	{
@@ -327,8 +334,17 @@ update_status ModuleRender::Update()
 	App->scene->m_Lights.clear();
 	App->scene->RecursiveSearch(App->scene->GetRoot());
 
-	// TODO: ACTIVATE ALL LIGHTS AND THINGS
+	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();
+	int i = 0;
+	for (auto it = App->scene->m_Lights.cbegin(); it != App->scene->m_Lights.cend(); ++it) {
+		m_LightsContainer.lights[i] = *it;
+		++i;
+	}
 
+	// TODO: ACTIVATE ALL LIGHTS AND THINGS
+	glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 + 20 * 20, &m_LightsContainer);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
 	App->scene->Draw(program);

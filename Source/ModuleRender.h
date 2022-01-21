@@ -6,12 +6,21 @@
 #include "Math/float3x3.h"
 #include "Geometry/Frustum.h"
 
+#include "CLight.h"
+
 struct SDL_Texture;
 struct SDL_Renderer;
 struct SDL_Rect;
 
 class Texture;
 class CubeMap;
+
+struct LightContainer {
+public:
+	int numberOfLights;
+	int padding[3];
+	Light lights[20];
+};
 
 class ModuleRender : public Module
 {
@@ -52,6 +61,9 @@ private:
 	unsigned int fbo;
 	unsigned int fbo_texture;
 	unsigned int rbo;
+	unsigned int m_lightsUBO;
+
+	LightContainer m_LightsContainer;
 
 	CubeMap* cubeMap;
 

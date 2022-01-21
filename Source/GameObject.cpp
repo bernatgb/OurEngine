@@ -209,6 +209,13 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 			AddComponent(newCCamera);
 			break;
 		}
+		case ComponentType::LIGHT:
+		{
+			CLight* newLight = new CLight(true, this);
+			newLight->OnLoad(*itr);
+			AddComponent(newLight);
+			break;
+		}
 		}
 	}
 	// Load the transform component at the end

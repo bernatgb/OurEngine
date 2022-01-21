@@ -70,7 +70,7 @@ public:
 	std::map<unsigned int, Mesh*> m_Meshes;
 	std::map<unsigned int, Texture*> m_Textures;
 
-	std::list<CLight*> m_Lights;
+	std::list<Light> m_Lights;
 
 	// Gets
 	GameObject* GetRoot() const
