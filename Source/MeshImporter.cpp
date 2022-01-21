@@ -125,7 +125,7 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 		ourMesh->m_GUID,
 		ourMesh->m_NumVertices,
 		ourMesh->m_NumIndices,
-		ourMesh->m_MaterialIndex //??
+		ourMesh->m_MaterialIndex
 	};
 
 	float extremes[6] = {
@@ -134,7 +134,7 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	};
 
 	unsigned int size = sizeof(header) + sizeof(extremes) + sizeof(unsigned int) * ourMesh->m_NumIndices + ourMesh->m_NumVertices * sizeof(float) * 8;
-	// size += ourMesh->m_Triangles.size() * sizeof(ourMesh->m_Triangles)
+	// size += ourMesh->m_Triangles.size() * sizeof(Triangle)
 
 	// Allocate
 	fileBuffer = new char[size];
@@ -261,7 +261,8 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
 	//RESTORING TRIANGLES VECTOR
-	//bytes = sizeof(Triangle) * ourMesh->m_Triangles.size();
+	//bytes = sizeof(Triangle) * ourMesh->m_NumIndices / 3;
+	//ourMesh->m_Triangles = std::vector<Triangle>(ourMesh->m_NumIndices / 3);
 	//memcpy(ourMesh->m_Triangles, cursor, bytes);
 	//cursor += bytes;
 
