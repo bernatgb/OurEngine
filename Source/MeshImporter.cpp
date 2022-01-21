@@ -98,16 +98,14 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
 	//CREATING TRIANGLES VECTOR
-	int j = 0;
-	for (int i = 0; i < mesh->mNumVertices; ++i)
+	ourMesh->m_Triangles = std::vector<Triangle>(ourMesh->m_NumIndices / 3);
+	for (int i = 0; i < mesh->mNumFaces; ++i)
 	{
-		std::vector<float3> vertices(3);
-		vertices[i % 3] = float3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-		if (i % 3 == 0)
-		{
-			ourMesh->m_Triangles.push_back(Triangle(vertices[0], vertices[1], vertices[2]));
-			++j;
-		}
+		ourMesh->m_Triangles[i] = Triangle(
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[0]].x, mesh->mVertices[mesh->mFaces[i].mIndices[0]].y, mesh->mVertices[mesh->mFaces[i].mIndices[0]].z),
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[1]].x, mesh->mVertices[mesh->mFaces[i].mIndices[1]].y, mesh->mVertices[mesh->mFaces[i].mIndices[1]].z),
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[2]].x, mesh->mVertices[mesh->mFaces[i].mIndices[2]].y, mesh->mVertices[mesh->mFaces[i].mIndices[2]].z)
+		);
 	}
 
 	MY_LOG("Assimp mesh: Create correctly");
