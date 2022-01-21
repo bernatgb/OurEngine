@@ -98,20 +98,6 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
 	//CREATING TRIANGLES VECTOR
-	/*
-	int j = 0;
-	for (int i = 0; i < mesh->mNumVertices; ++i)
-	{
-		std::vector<float3> vertices(3);
-		vertices[i % 3] = float3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-		if (i % 3 == 0)
-		{
-			//ourMesh->m_Triangles.push_back(vertices);
-			++j;
-		}
-	}
-	*/
-
 	int j = 0;
 	for (int i = 0; i < mesh->mNumVertices; ++i)
 	{
@@ -148,6 +134,7 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	};
 
 	unsigned int size = sizeof(header) + sizeof(extremes) + sizeof(unsigned int) * ourMesh->m_NumIndices + ourMesh->m_NumVertices * sizeof(float) * 8;
+	// size += ourMesh->m_Triangles.size() * sizeof(ourMesh->m_Triangles)
 
 	// Allocate
 	fileBuffer = new char[size];
@@ -179,6 +166,11 @@ int importer::mesh::Save(const Mesh* ourMesh, char*& fileBuffer)
 	memcpy(cursor, ourMesh->MapIndicesBuffer(), bytes);
 	ourMesh->UnMapIndicesBuffer();
 	cursor += bytes;
+
+	// Store triangles
+	//bytes = sizeof(Triangle) * ourMesh->m_Triangles.size();
+	//memcpy(cursor, ourMesh->m_Triangles, bytes);
+	//cursor += bytes;
 
 	return size;
 }
@@ -268,18 +260,10 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 
-	//CREATING TRIANGLES VECTOR
-	int j = 0;
-	for (int i = 0; i < ourMesh->m_NumVertices; ++i)
-	{
-		std::vector<float3> vertices(3);
-		vertices[i % 3] = float3(ourMesh->m_Vertices[i].x, ourMesh->m_Vertices[i].y, ourMesh->m_Vertices[i].z);
-		if (i % 3 == 0)
-		{
-			ourMesh->m_Triangles.push_back(Triangle(vertices[0], vertices[1], vertices[2]));
-			++j;
-		}
-	}
+	//RESTORING TRIANGLES VECTOR
+	//bytes = sizeof(Triangle) * ourMesh->m_Triangles.size();
+	//memcpy(ourMesh->m_Triangles, cursor, bytes);
+	//cursor += bytes;
 
 	MY_LOG("MeshImporter_Load: Loading complete");
 }
