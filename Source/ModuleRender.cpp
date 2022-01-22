@@ -456,11 +456,15 @@ void ModuleRender::ActivateTexture(Texture* _texture)
 
 	loc = glGetUniformLocation(program, "diffuseColor");
 	if (loc < 0) MY_LOG("Uniform location not found: diffuseColor");
-	glUniform3fv(loc, 1, &_texture->m_DiffuseColor[0]);
+	float3 diffuseColor = _texture->m_DiffuseColor;
+	diffuseColor /= 256;
+	glUniform3fv(loc, 1, &diffuseColor[0]);
 
 	loc = glGetUniformLocation(program, "specularColor");
 	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
-	glUniform3fv(loc, 1, &_texture->m_SpecularColor[0]);
+	float3 specularColor = _texture->m_SpecularColor;
+	specularColor /= 256;
+	glUniform3fv(loc, 1, &specularColor[0]);
 
 	if (_texture->m_TextureData != nullptr)
 	{

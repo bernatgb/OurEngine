@@ -48,7 +48,7 @@ public:
 	Light GetLightStruct(float3 _direction, float3 _position) {
 		Light light;
 		light.lightType = (int)m_Type;
-		light.lightColor = m_Color;
+		light.lightColor = m_Color / 256;
 		light.intensity = m_Intensity;
 		light.radius = m_Radius;
 		light.innerAngle = m_InnerAngle * DEGTORAD;
@@ -61,14 +61,14 @@ public:
 	};
 
 private:
-	LightType m_Type;
-	float3 m_Color;
-	float m_Intensity;
+	LightType m_Type = LightType::DIRECTIONAL;
+	float3 m_Color = float3(256);
+	float m_Intensity = 1.0f;
 
 	// Point light variables
-	float m_Radius;
+	float m_Radius = 5.0f;
 
 	// Spot light
-	float m_InnerAngle;
-	float m_OuterAngle;
+	float m_InnerAngle = 30.0f;
+	float m_OuterAngle = 60.0f;
 };

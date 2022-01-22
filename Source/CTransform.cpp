@@ -12,6 +12,8 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 
+// TODO: show all decimals in imguis
+
 CTransform::CTransform(bool _enabled, GameObject* _owner) : Component(ComponentType::TRANSFORM, _enabled, _owner)
 {
 	m_AccumulativeModelMatrix = float4x4::identity;
@@ -25,6 +27,13 @@ CTransform::CTransform(bool _enabled, GameObject* _owner) : Component(ComponentT
 
 CTransform::~CTransform()
 {
+}
+
+void Float3ToRange0_360(float3& _values) 
+{
+	_values.x = fmod((_values.x < 0.0f) ? _values.x + 360 : _values.x, 360);
+	_values.y = fmod((_values.y < 0.0f) ? _values.y + 360 : _values.y, 360);
+	_values.z = fmod((_values.z < 0.0f) ? _values.z + 360 : _values.z, 360);
 }
 
 Component* CTransform::GetAClone(GameObject* _owner)
@@ -77,8 +86,10 @@ void CTransform::DrawImGui()
 		{
 			RecalculateModelMatrix();
 		}
-		if (ImGui::DragFloat3("Rotation", &m_RotationEuler[0], 10.0f, 0.0f, 360.0f))
+		if (ImGui::DragFloat3("Rotation", &m_RotationEuler[0], 5.0f))
 		{
+			Float3ToRange0_360(m_RotationEuler);
+
 			//maybe use the delta rotation deltaRotation (so the quat isnt recalculated)
 			m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x * DEGTORAD, m_RotationEuler.y * DEGTORAD, m_RotationEuler.z * DEGTORAD);
 			RecalculateModelMatrix();
@@ -114,31 +125,21 @@ void CTransform::OnLoad(const rapidjson::Value& node)
 
 void CTransform::GizmoTransformChange(float4x4 _newAccumulativeModelMatrix)
 {
-	// TODO: calculate the new modelMatrix and call NotifyMovement();
-	//m_ModelMatrix = _newAccumulativeModelMatrix * m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted();
-
-	//m_ModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * _newAccumulativeModelMatrix.Inverted();
+	// Recalculate the new modelMatrix
 	m_ModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix.Inverted() * _newAccumulativeModelMatrix;
 
-	//todo: get position rotation and scale
+	// Set all the values
 	m_Position = m_ModelMatrix.Col3(3);
 	m_RotationEuler = m_ModelMatrix.ToEulerXYZ();
 	m_Rotation = Quat::FromEulerXYZ(m_RotationEuler.x, m_RotationEuler.y, m_RotationEuler.z);
 	m_RotationEuler.x = RadToDeg(m_RotationEuler.x);
 	m_RotationEuler.y = RadToDeg(m_RotationEuler.y);
 	m_RotationEuler.z = RadToDeg(m_RotationEuler.z);
+	Float3ToRange0_360(m_RotationEuler);
 	m_Scale = m_ModelMatrix.GetScale();
 
+	// Notify movement
 	NotifyMovement();
-
-	/*m_AccumulativeModelMatrix = _newAccumulativeModelMatrix;
-
-	for (unsigned int i = 0; i < m_Owner->m_Components.size(); ++i)
-		m_Owner->m_Components[i]->NotifyMovement();
-
-	//Notify owner children
-	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)
-		m_Owner->m_Children[i]->m_Transform->NotifyMovement();*/
 }
 
 void CTransform::Copy(const CTransform* _transform)

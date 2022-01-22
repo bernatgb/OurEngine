@@ -28,8 +28,7 @@ public:
 class Model
 {
 public:
-	Model() {};
-	Model(const char* _fileName);
+	Model();
 	~Model();
 
 	GameObject* ExportToGO(GameObject* _parent);
@@ -66,10 +65,6 @@ public:
 	float3 m_Max;
 
 private:
-	void LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes);
-	void LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials, const char* _fullPath);
-
 	GameObject* RecursiveExportToGORoot(ModelNode* ourNode, GameObject* parent);
-	void RecursiveContructionRoot(aiNode* node, ModelNode* ourNode);
 };
 

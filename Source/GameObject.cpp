@@ -65,6 +65,7 @@ void GameObject::Update()
 	// Better in another place? Start / addComponent / notify movement
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
+		// TODO: can be more than one mesh
 		if (m_Components[i]->m_Type == ComponentType::MESH)
 		{
 			CMesh* cMesh = (CMesh*)m_Components[i];

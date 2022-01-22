@@ -16,60 +16,8 @@
 
 #include "ModelImporter.h"
 
-Model::Model(const char* _fileName)
+Model::Model()
 {
-	MY_LOG("Assimp (%s): Loading the model", _fileName);
-
-	m_Name = _fileName;
-	const size_t last_slash_idx = m_Name.rfind('\\');
-	if (std::string::npos != last_slash_idx)
-		m_Name = m_Name.substr(last_slash_idx+1, m_Name.length());
-
-	const aiScene* scene = aiImportFile(_fileName, aiProcessPreset_TargetRealtime_MaxQuality || aiProcess_Triangulate);
-	if (scene)
-	{
-		LoadMeshes(scene->mMeshes, scene->mNumMeshes);
-		//LoadMeshes(scene->mMeshes, 1);
-		LoadTextures(scene->mMaterials, scene->mNumMaterials, _fileName);
-
-		m_Min = m_Meshes[0]->m_Min;
-		m_Max = m_Meshes[0]->m_Min;
-
-		for (unsigned int i = 0; i < m_Meshes.size(); ++i)
-		{
-			m_NumVertices += m_Meshes[i]->m_NumVertices;
-			m_NumTriangles += m_Meshes[i]->m_NumIndices / 3;
-
-			if (m_Meshes[i]->m_Min.x > m_Max.x) m_Max.x = m_Meshes[i]->m_Min.x;
-			if (m_Meshes[i]->m_Min.x < m_Min.x) m_Min.x = m_Meshes[i]->m_Min.x;
-
-			if (m_Meshes[i]->m_Min.y > m_Max.y) m_Max.y = m_Meshes[i]->m_Min.y;
-			if (m_Meshes[i]->m_Min.y < m_Min.y) m_Min.y = m_Meshes[i]->m_Min.y;
-
-			if (m_Meshes[i]->m_Min.z > m_Max.z) m_Max.z = m_Meshes[i]->m_Min.z;
-			if (m_Meshes[i]->m_Min.z < m_Min.z) m_Min.z = m_Meshes[i]->m_Min.z;
-		}
-
-		m_RootStructure = new ModelNode();
-		RecursiveContructionRoot(scene->mRootNode, m_RootStructure);
-		m_RootStructure->m_Name = m_Name;
-
-		/*Model* m = new Model();
-		importer::model::Import(scene, m, _fileName);
-		char* file = nullptr;
-		importer::model::Save(m, file);
-
-		Model* m2 = new Model();
-		importer::model::Load(file, m2);
-
-		delete m;
-		delete m2;
-		delete file;*/
-	}
-	else
-	{
-		MY_LOG("Error loading %s: %s", m_Name, aiGetErrorString());
-	}
 }
 
 void RecursiveDeleteRoot(ModelNode* ourNode)
@@ -144,32 +92,6 @@ void Model::DrawImGui()
 	}
 }
 
-void Model::LoadMeshes(aiMesh** _meshes, const unsigned int& _numMeshes)
-{
-	MY_LOG("Assimp: Loading the meshes");
-	m_Meshes = std::vector<Mesh*>(_numMeshes);
-
-	for (unsigned int i = 0; i < _numMeshes; ++i)
-	{
-		MY_LOG("Assimp: Loading the mesh %i", i);
-		m_Meshes[i] = new Mesh(_meshes[i]);
-	}
-}
-
-void Model::LoadTextures(aiMaterial** _materials, const unsigned int& _numMaterials, const char* _fullPath)
-{
-	MY_LOG("Assimp: Loading the textures");
-	aiString file;
-	m_Textures = std::vector<Texture*>(_numMaterials);
-	for (unsigned i = 0; i < _numMaterials; ++i)
-	{
-		if (_materials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
-		{
-			m_Textures[i] = new Texture(file.data, _fullPath);
-		}
-	}
-}
-
 GameObject* Model::RecursiveExportToGORoot(ModelNode* ourNode, GameObject* parent)
 {
 	GameObject* go = parent->AddChild(ourNode->m_Name.c_str());
@@ -183,18 +105,4 @@ GameObject* Model::RecursiveExportToGORoot(ModelNode* ourNode, GameObject* paren
 		RecursiveExportToGORoot(ourNode->m_Children[i], go);
 
 	return go;
-}
-
-void Model::RecursiveContructionRoot(aiNode* node, ModelNode* ourNode)
-{
-	ourNode->m_Name = node->mName.C_Str();
-
-	for (unsigned int i = 0; i < node->mNumMeshes; ++i)
-		ourNode->m_Meshes.push_back(m_Meshes[node->mMeshes[i]]);
-
-	for (unsigned int i = 0; i < node->mNumChildren; ++i)
-	{
-		ourNode->m_Children.push_back(new ModelNode());
-		RecursiveContructionRoot(node->mChildren[i], ourNode->m_Children[i]);
-	}
 }

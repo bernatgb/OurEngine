@@ -11,99 +11,8 @@
 
 #include "MaterialImporter.h"
 
-//TODO: STRING TO CHAR*
-
-Texture::Texture(const char* _fileName, const char* _fullPath)
+Texture::Texture()
 {
-	MY_LOG("Assimp texture (%s): Loading the texture file and setting its configuration", _fileName);
-	
-	m_Name = _fileName;
-
-	m_MinFilter = GL_LINEAR;
-	m_MagFilter = GL_LINEAR;
-	m_Wrap = GL_CLAMP;
-
-	glGenTextures(1, &m_Texture);
-	glBindTexture(GL_TEXTURE_2D, m_Texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_MinFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, m_MagFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_Wrap);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_Wrap);
-
-	/*MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
-	if (!App->texture->LoadTextureData(_fileName, width, height, depth, format))
-	{
-		std::string directoryPath = _fullPath;
-		const size_t last_slash_idx = directoryPath.rfind('\\');
-		if (std::string::npos != last_slash_idx)
-			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + _fileName;
-		
-		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
-		if (!App->texture->LoadTextureData(directoryPath.c_str(), width, height, depth, format))
-		{
-			directoryPath = TEXTURES_FOLDER;
-			directoryPath += _fileName;
-
-			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
-			if (!App->texture->LoadTextureData(directoryPath.c_str(), width, height, depth, format))
-			{
-				MY_LOG("Assimp texture: Texture couldn't be loaded");
-				return;
-			}
-		}
-	}*/
-	
-	m_TextureData = nullptr;
-
-	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", _fileName);
-	m_TextureData = App->texture->LoadAndReturnTextureData(_fileName);
-	if (m_TextureData == nullptr)
-	{
-		std::string directoryPath = _fullPath;
-		const size_t last_slash_idx = directoryPath.rfind('\\');
-		if (std::string::npos != last_slash_idx)
-			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + _fileName;
-
-		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
-		m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
-		if (m_TextureData == nullptr)
-		{
-			directoryPath = TEXTURES_FOLDER;
-			directoryPath += _fileName;
-
-			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
-			m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
-			if (m_TextureData == nullptr)
-			{
-				MY_LOG("Assimp texture: Texture couldn't be loaded");
-				return;
-			}
-		}
-	}
-	glTexImage2D(GL_TEXTURE_2D, 0, m_TextureData->format, m_TextureData->width, m_TextureData->height, 0, m_TextureData->format, GL_UNSIGNED_BYTE, m_TextureData->data);
-
-	MY_LOG("Assimp texture: Texture loaded correctly");
-
-	/////////////////////////////////////////////////////////////////////////////////
-	/*char* file = nullptr;
-	int fileSize = importer::material::Save(this, file);
-
-	App->texture->DeleteTextureData(m_TextureData);
-	glDeleteTextures(1, &m_Texture);
-
-	//importer::SaveFile("Assets\\Library\\mesh.asset", file, fileSize);
-
-	//char* storedFile = nullptr;
-
-	//importer::LoadFile("Assets\\Library\\mesh.asset", storedFile);
-
-	importer::material::Load(file, this);
-
-	delete[] file;
-	//delete[] storedFile;*/
-	/////////////////////////////////////////////////////////////////////////////////
-
-	glGenerateTextureMipmap(m_Texture);
 }
 
 Texture::~Texture()
@@ -124,7 +33,7 @@ void Texture::DrawImGui()
 	ImGui::ColorEdit3("Specular color", &m_SpecularColor[0]);
 
 	ImGui::Checkbox("Use specular Alpha as shininess", &m_ShininessAlpha);
-	ImGui::DragFloat("Shininess", &m_Shininess);
+	ImGui::DragFloat("Shininess", &m_Shininess, 0.01f, 0.0f);
 
 	ImGui::Separator();
 

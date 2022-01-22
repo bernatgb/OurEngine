@@ -4,7 +4,6 @@
 #include "ModuleRender.h"
 #include "ModuleInput.h"
 #include "ModuleProgram.h"
-#include "ModuleRenderExercise.h"
 #include "ModuleImGui.h"
 #include "ModuleDebugDraw.h"
 #include "ModuleTexture.h"
@@ -27,7 +26,6 @@ Application::Application()
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(renderer = new ModuleRender());
 	modules.push_back(scene = new ModuleScene());
-	//modules.push_back(rendererExercise = new ModuleRenderExercise());
 	modules.push_back(debugDraw = new ModuleDebugDraw());
 	modules.push_back(imGui = new ModuleImGui());
 }

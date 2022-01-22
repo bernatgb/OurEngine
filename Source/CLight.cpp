@@ -9,6 +9,11 @@
 CLight::CLight(bool _enabled, GameObject* _owner) : Component(ComponentType::LIGHT, _enabled, _owner)
 {
 	m_Type = LightType::DIRECTIONAL;
+	m_Color = float3(256);
+	m_Intensity = 1.0f;
+	m_Radius = 5.0f;
+	m_InnerAngle = 30.0f;
+	m_OuterAngle = 60.0f;
 }
 
 CLight::CLight(bool _enabled, GameObject* _owner, CLight* cLight) : Component(ComponentType::LIGHT, _enabled, _owner)

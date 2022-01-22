@@ -9,8 +9,7 @@
 class Mesh
 {
 public:
-	Mesh() {};
-	Mesh(aiMesh* _mesh);
+	Mesh();
 	~Mesh();
 
 	void Draw() const;

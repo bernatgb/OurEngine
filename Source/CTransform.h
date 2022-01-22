@@ -24,13 +24,15 @@ public:
 	float3 GetUp(bool normalize = false) const;
 	float3 GetRight(bool normalize = false) const;
 
-	float4x4 m_AccumulativeModelMatrix;
+	float4x4 m_AccumulativeModelMatrix = float4x4::identity;
 
 private:
 	void RecalculateModelMatrix();
 
-	float4x4 m_ModelMatrix;
-	float3 m_Position, m_RotationEuler, m_Scale;
-	Quat m_Rotation;
+	float4x4 m_ModelMatrix = float4x4::identity;
+	float3 m_Position = float3::zero;
+	float3 m_RotationEuler = float3::zero;
+	float3 m_Scale = float3::one;
+	Quat m_Rotation = Quat::identity;
 };
 

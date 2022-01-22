@@ -30,6 +30,8 @@ public:
 	void NotifyMovement();
 	void NotifySonMovement();
 
+	//void OnDestroy();
+
 	template<typename T> T* GetComponent();
 	//template<typename T> void AddComponent(T* _newComponent);
 	void AddComponent(Component* _newComponent);
