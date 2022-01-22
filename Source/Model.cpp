@@ -30,12 +30,6 @@ void RecursiveDeleteRoot(ModelNode* ourNode)
 
 Model::~Model()
 {
-	//for (int i = 0; i < m_Meshes.size(); ++i)
-	//	delete m_Meshes[i];
-
-	//for (int i = 0; i < m_Textures.size(); ++i)
-	//	delete m_Textures[i];
-
 	if (m_RootStructure != nullptr)
 		RecursiveDeleteRoot(m_RootStructure);
 }
@@ -43,27 +37,6 @@ Model::~Model()
 GameObject* Model::ExportToGO(GameObject* _parent)
 {
 	return RecursiveExportToGORoot(m_RootStructure, _parent);
-
-	/*GameObject* go = _parent->AddChild(m_Name);
-
-	if (m_Meshes.size() == 1) 
-	{
-		go->AddComponent(new CMesh(true, go, m_Meshes[0]));
-		go->SetMaterial(m_Textures[m_Meshes[0]->m_MaterialIndex]);
-	}
-	else 
-	{
-		for (unsigned int i = 0; i < m_Meshes.size(); ++i) 
-		{
-			std::string name = m_Name;
-			name += '_' + std::to_string(i);
-			GameObject* goChild = go->AddChild(name.c_str());
-			goChild->AddComponent(new CMesh(true, goChild, m_Meshes[i]));
-			goChild->SetMaterial(m_Textures[m_Meshes[i]->m_MaterialIndex]);
-		}
-	}
-
-	return go;*/
 }
 
 void Model::DrawImGui()

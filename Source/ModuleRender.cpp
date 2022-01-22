@@ -210,9 +210,11 @@ update_status ModuleRender::Update()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	const ImVec2 newViewportPanelSize = ImGui::GetContentRegionAvail();
+	viewportSizeChanged = false;
 	if (viewportPanelSize.x != newViewportPanelSize.x || viewportPanelSize.y != newViewportPanelSize.y) {
 		viewportPanelSize.x = newViewportPanelSize.x;
 		viewportPanelSize.y = newViewportPanelSize.y;
+		viewportSizeChanged = true;
 
 		//Resize textures
 		glBindTexture(GL_TEXTURE_2D, fbo_texture);

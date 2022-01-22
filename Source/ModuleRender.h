@@ -42,6 +42,7 @@ public:
 	void* context;
 	unsigned int program;
 
+
 	//Gets
 	float2 GetSceneWindowSize() const
 	{
@@ -54,6 +55,10 @@ public:
 	float2 GetSceneWindowStartPos() const
 	{
 		return sceneWindowPos;
+	};
+	bool HasViewportSizeChanged() const
+	{
+		return viewportSizeChanged;
 	};
 
 private:
@@ -68,6 +73,6 @@ private:
 	CubeMap* cubeMap;
 
 	float2 viewportPanelSize;
-
 	float2 sceneWindowPos;
+	bool viewportSizeChanged;
 };

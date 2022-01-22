@@ -78,8 +78,8 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		App->scene->m_Textures[ourModel->m_Textures[i]->m_GUID] = ourModel->m_Textures[i];
 	}
 
-	ourModel->m_Min = ourModel->m_Meshes[0]->m_Min;
-	ourModel->m_Max = ourModel->m_Meshes[0]->m_Min;
+	ourModel->m_Min = (ourModel->m_Meshes.size() >= 1) ? ourModel->m_Meshes[0]->m_Min : float3::zero;
+	ourModel->m_Max = (ourModel->m_Meshes.size() >= 1) ? ourModel->m_Meshes[0]->m_Min : float3::zero;
 
 	for (unsigned int i = 0; i < ourModel->m_Meshes.size(); ++i)
 	{
