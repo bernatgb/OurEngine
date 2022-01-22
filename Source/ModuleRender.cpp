@@ -332,7 +332,7 @@ update_status ModuleRender::Update()
 
 	// TODO: MOVE TO THE PREUPDATE
 	App->scene->m_Lights.clear();
-	App->scene->RecursiveSearch(App->scene->GetRoot());
+	App->scene->RecursiveSearch(App->scene->GetRoot(), true);
 
 	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();
 	int i = 0;

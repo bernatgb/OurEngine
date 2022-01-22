@@ -28,6 +28,9 @@ public:
 		m_Type = _type;
 		m_Enabled = _enabled;
 		m_Owner = _owner;
+
+		m_EnableFlag = _enabled; 
+		m_DeleteFlag = false;
 	};
 	virtual ~Component() 
 	{
@@ -53,7 +56,7 @@ public:
 	virtual void DrawImGui() 
 	{
 		// Show enabled variable
-		ImGui::Checkbox("Enabled", &m_Enabled); // TODO: use flags
+		ImGui::Checkbox("Enabled", &m_EnableFlag);
 
 		// Delete button
 		if (ImGui::Button("Delete"))

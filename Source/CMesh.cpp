@@ -51,6 +51,10 @@ void CMesh::Update()
 	if (m_Mesh == nullptr || m_Texture == nullptr)
 		return;
 	
+	// Return if owner not in frustrum
+	if (!m_Owner->m_InFrustum)
+		return;
+
 	// Draw mesh
 	App->renderer->ActivateTexture(m_Texture);
 	m_Mesh->Draw();

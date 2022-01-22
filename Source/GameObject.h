@@ -42,7 +42,6 @@ public:
 	unsigned int m_GUID;
 	char* m_Name;
 	bool m_Active;
-	bool m_Selected;
 	bool m_InFrustum;
 	CTransform* m_Transform;
 	std::vector<Component*> m_Components;
@@ -74,6 +73,8 @@ public:
 	float3 m_Min;
 	float3 m_Max;
 
+	bool m_ActiveFlag;
+	bool m_Selected;
 
 	template<typename T> ComponentType TypeToComponentType(T type) {
 		switch (T)

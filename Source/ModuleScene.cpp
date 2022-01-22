@@ -555,22 +555,67 @@ void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
         AddToQuadtreeIfHasMesh(qt, go->m_Children[i]);
 }
 
-void ModuleScene::RecursiveSearch(GameObject* _go)
+void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame) //TODO: check start/enable/disable behaviours
 {
-    //TODO: CHECK OBJECT FLAGS
+    _go->m_InFrustum = false;
 
-    //TODO: CHECK COMPONENTS FLAGS
-
-    for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
+    // First frame
+    if (firstFrame)
     {
-        if (_go->m_Components[i]->m_Type == ComponentType::LIGHT)
-            m_Lights.push_back(((CLight*)_go->m_Components[i])->GetLightStruct(_go->m_Transform->GetForward(true), _go->m_Transform->GetPos()));
+        _go->m_ActiveFlag = _go->m_Active;
+        if (ancestors && _go->m_Active) 
+            _go->Start();
+
+        for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
+        {
+            _go->m_Components[i]->m_EnableFlag = _go->m_Components[i]->m_Enabled;
+            if (ancestors && _go->m_Active && _go->m_Components[i]->m_Enabled)
+                _go->m_Components[i]->Enable();
+        }
+    }
+    else {
+        if (_go->m_ActiveFlag != _go->m_Active)
+        {
+            _go->m_Active = _go->m_ActiveFlag;
+            if (ancestors && _go->m_Active)
+                _go->Start();
+        }
+
+        unsigned int i = 0;
+        while (i < _go->m_Components.size())
+        {
+            if (_go->m_Components[i]->m_DeleteFlag) {
+                _go->m_Components[i]->Disable();
+                delete _go->m_Components[i];
+
+                for (unsigned int j = i; j < _go->m_Components.size() - 1; ++j)
+                    _go->m_Components[j] = _go->m_Components[j + 1];
+                _go->m_Components.resize(_go->m_Components.size() - 1);
+            }
+            else
+            {
+                if (_go->m_Components[i]->m_EnableFlag != _go->m_Components[i]->m_Enabled)
+                {
+                    _go->m_Components[i]->m_Enabled = _go->m_Components[i]->m_EnableFlag;
+                    if (_go->m_Components[i]->m_Enabled) _go->m_Components[i]->Enable();
+                    else _go->m_Components[i]->Disable();
+                }
+                ++i;
+            }
+        }
+    }
+    
+    if (ancestors && _go->m_Active)
+    {
+        for (unsigned int i = 0;  i < _go->m_Components.size(); ++i) 
+        {
+            if (_go->m_Active && _go->m_Components[i]->m_Enabled && _go->m_Components[i]->m_Type == ComponentType::LIGHT)
+                m_Lights.push_back(((CLight*)_go->m_Components[i])->GetLightStruct(_go->m_Transform->GetForward(true), _go->m_Transform->GetPos()));
+        }
     }
 
-    for (unsigned int i = 0; i < _go->m_Children.size(); ++i) 
-    {
-        RecursiveSearch(_go->m_Children[i]);
-    }
+    for (unsigned int i = 0; i < _go->m_Children.size(); ++i)
+        RecursiveSearch(_go->m_Children[i], ancestors && _go->m_Active, firstFrame);
 }
 
 /*

@@ -21,8 +21,9 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 	strcpy(m_Name, _name);
 
 	m_Active = true;
+	m_ActiveFlag = true;
 	m_Selected = false;
-	m_InFrustum = true;
+	m_InFrustum = false;
 	m_Parent = _parent;
 
 	m_Transform = new CTransform(true, this);
@@ -123,7 +124,7 @@ void GameObject::Update()
 	m_InFrustum = allChildrenInFrustum;
 	*/
 
-	if (parentInFrustum && IsInFrustum())
+	if (true) //parentInFrustum && IsInFrustum())
 	{
 		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
 	}
@@ -313,7 +314,9 @@ void GameObject::DeleteChild(GameObject* _go)
 void GameObject::DrawImGui()
 {
 	ImGui::InputText("Name", m_Name, 100);
-	ImGui::Checkbox("Active", &m_Active);
+	ImGui::Checkbox("Active", &m_ActiveFlag);
+	if (m_InFrustum) ImGui::Text("Visible");
+	else ImGui::Text("Not visible");
 	//header
 
 	ImGui::Text("Min: %f %f %f", m_Min.x, m_Min.y, m_Min.z);

@@ -43,7 +43,7 @@ public:
 
 	void AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go);
 
-	void RecursiveSearch(GameObject* _go);
+	void RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame = false);
 
 	Model* FindModel(std::string _modelName) {
 		std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);
