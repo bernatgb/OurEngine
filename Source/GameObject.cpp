@@ -125,7 +125,9 @@ void GameObject::Update()
 	m_InFrustum = allChildrenInFrustum;
 	*/
 
-	if (true) //parentInFrustum && IsInFrustum())
+	//if (parentInFrustum && IsInFrustum())
+	//if (IsInFrustumViaQuadtree(App->scene->GetQuadtree()->GetRoot()))
+	if(m_InFrustum)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
 	}
@@ -269,7 +271,7 @@ bool GameObject::IsInFrustum()
 		{
 			//ImGui::Text("%s", m_Name);
 			CMesh* cMesh = (CMesh*)m_Components[i];
-			inFrustum = App->camera->BoxInFrustum(*App->camera->GetGameCameraFrustum(), cMesh->m_BB);
+			inFrustum = App->camera->BoxInFrustum(*App->camera->GetCullingCamera(), cMesh->m_BB);
 			//ImGui::SameLine();
 			//std::string sb = "no";
 			//if (inFrustum)
@@ -280,6 +282,37 @@ bool GameObject::IsInFrustum()
 	}
 
 	return inFrustum;
+}
+
+bool GameObject::IsInFrustumViaQuadtree(QuadtreeNode* qtn)
+{
+	vec* aabbCornerPoints = new vec[8];
+	qtn->GetAABB().GetCornerPoints(aabbCornerPoints);
+
+	if (App->camera->BoxInFrustum(*App->camera->GetCullingCamera(), aabbCornerPoints))
+	{
+		std::list<GameObject*> gameObjectsInThisNode = qtn->GetGameObjectsInThisNode();
+		std::list<GameObject*>::iterator it = std::find(gameObjectsInThisNode.begin(), gameObjectsInThisNode.end(), this);
+		if (it != gameObjectsInThisNode.end())
+		{
+			return true;
+		}
+		else
+		{
+			QuadtreeNode** nodesChildren = qtn->GetChildren();
+			if (!qtn->IsLeaf())
+			{
+				for (int i = 0; i < 4; ++i)
+				{
+					if (IsInFrustumViaQuadtree(nodesChildren[i]))
+						return true;
+				}
+			}
+		}
+	}
+	delete aabbCornerPoints;
+
+	return false;
 }
 
 GameObject* GameObject::AddChild(const char* _name)

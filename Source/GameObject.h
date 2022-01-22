@@ -12,6 +12,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
+class QuadtreeNode;
+
 class GameObject
 {
 public:
@@ -26,6 +28,7 @@ public:
 	GameObject* Clone(GameObject* _parent);
 
 	bool IsInFrustum();
+	bool IsInFrustumViaQuadtree(QuadtreeNode* qtn);
 
 	void NotifyMovement();
 	void NotifySonMovement();

@@ -28,13 +28,14 @@ public:
 	void SetCullingCamera(CCamera* _camera);
 	
 	Frustum* GetFrustum();
-	Frustum* GetGameCameraFrustum();
+	//Frustum* GetGameCameraFrustum();
+	Frustum* GetCullingCamera();
 	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
-	void FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*> &hits);
-	void FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*> &hits);
-	void SortHits(std::vector<GameObject*> &hits);
-	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits);
+	void FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*>& hits);
+	void FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*>& hits);
+	void SortHits(std::vector<GameObject*>& hits);
+	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits, std::vector< std::pair<float, GameObject*> >& hitPointsDistances);
 
 	float4x4 view, proj;
 	//float3 eye;

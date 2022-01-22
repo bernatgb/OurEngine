@@ -127,15 +127,18 @@ void QuadtreeNode::GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goT
 	if (Intersects(planes, cornerPoints))
 	{
 
-		for (std::list<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end();)
+		for (std::list<GameObject*>::iterator it = gameObjects.begin(); it != gameObjects.end(); ++it)
 		{
 			GameObject* go = *it;
 
 			float3 goCornerPoints[8];
 			go->m_aabb.GetCornerPoints(goCornerPoints);
 
-			if (Intersects(planes, goCornerPoints))
-				gameObjects.push_back(go);
+			if (!go->m_InFrustum && Intersects(planes, goCornerPoints))
+			{
+				goToPaint.push_back(go);
+				go->m_InFrustum = true;
+			}
 		}
 
 		for (int i = 0; i < 4; ++i)
@@ -205,10 +208,10 @@ void Quadtree::SetBoundaries(AABB aabb)
 	m_root = new QuadtreeNode(aabb, nullptr);
 }
 
-void Quadtree::GetObejctsToPaint(CCamera* camera)
+void Quadtree::GetObejctsToPaint(Frustum* frustum)
 {
 	Plane planes[6];
-	camera->frustum.GetPlanes(planes);
+	frustum->GetPlanes(planes);
 
 	std::list<GameObject*> goToPaint;
 

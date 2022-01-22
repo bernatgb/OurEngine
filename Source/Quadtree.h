@@ -26,13 +26,13 @@ public:
 	bool Intersects(Plane planes[6], float3 cornerPoints[8]);
 
 	AABB GetAABB() { return m_nodeAABB; };
-	QuadtreeNode* GetParent() { return m_parent; };
-	QuadtreeNode** GetChildren() { return m_children; };
-	std::list<GameObject*> GetGameObjectsInThisNode() { return gameObjects; };
+	QuadtreeNode* GetParent() { return m_parent; }; // const x2
+	QuadtreeNode** GetChildren() { return m_children; }; // const x2
+	std::list<GameObject*> GetGameObjectsInThisNode() { return gameObjects; }; // const
 
 private:
 	AABB m_nodeAABB;
-	QuadtreeNode* m_parent;
+	QuadtreeNode* m_parent = nullptr;
 	QuadtreeNode* m_children[4]; // 0 = NW, 1 = NE, 2 = SW, 3 = SE.
 	std::list<GameObject*> gameObjects;
 };
@@ -48,7 +48,7 @@ public:
 
 	void SetBoundaries(AABB aabb);
 
-	void GetObejctsToPaint(CCamera* cam);
+	void GetObejctsToPaint(Frustum* frustum); // const
 
 	QuadtreeNode* GetRoot() { return m_root; };
 

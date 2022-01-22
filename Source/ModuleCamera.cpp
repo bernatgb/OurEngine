@@ -224,16 +224,24 @@ void ModuleCamera::SetCullingCamera(CCamera* _camera)
 	ViewProjectionMatrix();
 }
 
+Frustum* ModuleCamera::GetCullingCamera()
+{
+	if (m_CullingCamera == nullptr)
+		return &frustum;
+	else
+		return &gameCameraFrustum;
+}
+
 Frustum* ModuleCamera::GetFrustum()
 {
 	return &frustum;
 }
-
+/*
 Frustum* ModuleCamera::GetGameCameraFrustum()
 {
 	return &gameCameraFrustum;
 }
-
+*/
 // false if fully outside, true if inside or intersects
 bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 {
@@ -324,7 +332,7 @@ void ModuleCamera::SortHits(std::vector<GameObject*>& hits)
 	*/
 
 	/* With GameObjects */
-	std::vector <std::pair<float, GameObject*> > hitsDistances(hits.size());
+	std::vector< std::pair<float, GameObject*> > hitsDistances(hits.size());
 	for (int i = 0; i < hitsDistances.size(); ++i)
 		hitsDistances[i] = std::pair<float, GameObject*>(hits[i]->m_aabb.Distance(frustum.Pos()), hits[i]);
 
@@ -334,14 +342,15 @@ void ModuleCamera::SortHits(std::vector<GameObject*>& hits)
 		hits[i] = hitsDistances[i].second;
 }
 
-void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits)
+void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits, std::vector< std::pair<float, GameObject*> >& hitPoints)
 {
 	for (int i = 0; i < hits.size(); ++i)
 	{
 		// Transform once the ray into Game Object space to test against all triangles
 		float4x4 modelMatrix = hits[i]->m_Transform->m_AccumulativeModelMatrix;
-		vec rayOrigin = modelMatrix.Inverse() * ray.a;
-		vec rayDir = (modelMatrix.Inverse() * ray.Dir()).Normalized();
+		modelMatrix.Inverse();
+		vec rayOrigin = (modelMatrix * float4(ray.a, 1.0f)).xyz();
+		vec rayDir = ((modelMatrix * float4(ray.Dir().xyz(), 0.0f)).Normalized()).xyz();
 		LineSegment rayLocalSpace = LineSegment(Ray(rayOrigin, rayDir), 500.0f);
 
 		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
@@ -354,14 +363,12 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 				for (int k = 0; k < triangles.size(); ++k)
 				{
 					Triangle triangle = triangles[k];
-					vec triangleNormal = Cross(triangle.c - triangle.a, triangle.b - triangle.a);
-					float distanceOriginPlane = Dot(triangleNormal, triangle.a); // distance from (0,0,0) to plane;
-					float dist = -(Dot(triangleNormal, rayOrigin) + distanceOriginPlane) / Dot(triangleNormal, rayDir);
-					vec hitPoint = vec(rayOrigin + (rayDir * dist));
-					bool hit = rayLocalSpace.Intersects(triangles[k], &dist, &hitPoint);
+					float dist = 500.0f;
+					vec hitPoint;
+					if (rayLocalSpace.Intersects(triangles[k], &dist, &hitPoint))
+						hitPoints.push_back(std::pair<float, GameObject*>(Distance(hitPoint, rayOrigin), hits[i]));
 				}
 			}
-			break; // Only a CMesh for GO?
 		}
 	}
 }
@@ -434,7 +441,11 @@ void ModuleCamera::DrawImGui()
 			if (!hits.empty())
 			{
 				SortHits(hits); // With ray.length?
-				FindIfRayIntersectsATriangle(ray, hits);
+				std::vector< std::pair<float, GameObject*> > hitPointsDistances;
+				FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
+				std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
+				if (!hitPointsDistances.empty()) 
+					ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
 			}
 		}
 		
