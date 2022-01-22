@@ -118,10 +118,10 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
         node_clicked = go;
         m_GODrag = go;
     }
-    if (ImGui::IsMouseDoubleClicked(0))
+    /*if (ImGui::IsMouseDoubleClicked(0))
     {
         App->camera->AdjustToGO(go);
-    }
+    }*/
 
     CheckHoverHierarchy(go);
     /*if (ImGui::BeginDragDropSource())
@@ -206,28 +206,6 @@ void ModuleScene::DrawImGuiHierarchy()
 
 void ModuleScene::DrawImGuiResources()
 {
-    //// TEST
-    if (ImGui::Button("Open File Dialog"))
-        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".cpp,.h,.hpp", ".");
-
-    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
-    {
-        // action if OK
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            // action
-            MY_LOG("File selected");
-            MY_LOG(filePathName.c_str());
-            MY_LOG(filePath.c_str());
-        }
-
-        // close
-        ImGuiFileDialog::Instance()->Close();
-    }
-    ////
-
     // Load scene
     if (ImGui::Button("Load Scene"))
         ImGuiFileDialog::Instance()->OpenDialog("LoadScene", "Load Scene", ".scene", ".");

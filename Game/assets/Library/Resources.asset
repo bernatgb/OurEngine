@@ -7,9 +7,17 @@
         {
             "Id": 8633,
             "Path": ".\\Assets\\Library\\Meshes\\8633.asset"
+        },
+        {
+            "Id": 18397,
+            "Path": ".\\Assets\\Library\\Meshes\\18397.asset"
         }
     ],
     "Materials": [
+        {
+            "Id": 4234,
+            "Path": ".\\Assets\\Library\\Materials\\4234.asset"
+        },
         {
             "Id": 9222,
             "Path": ".\\Assets\\Library\\Materials\\9222.asset"
@@ -19,6 +27,10 @@
         {
             "Id": "BakerHouse.fbx",
             "Path": ".\\Assets\\Library\\Models\\BakerHouse.fbx.asset"
+        },
+        {
+            "Id": "mushroom_friend.fbx",
+            "Path": ".\\Assets\\Library\\Models\\mushroom_friend.fbx.asset"
         }
     ]
 }

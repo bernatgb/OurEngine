@@ -160,6 +160,7 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 			CMesh* newCMesh = new CMesh(true, this);
 			newCMesh->OnLoad(*itr);
 			AddComponent(newCMesh);
+
 			break;
 		}
 		case ComponentType::CAMERA:
@@ -190,6 +191,8 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 	// Load Min & Max
 	m_Min = importer::ValueToFloat3(node["Min"]);
 	m_Max = importer::ValueToFloat3(node["Max"]);
+
+	RecalculateBB();
 }
 
 GameObject* GameObject::Clone(GameObject* _parent)
@@ -416,7 +419,6 @@ void GameObject::DrawImGui()
 		{
 			CMesh* newCMesh = new CMesh(true, this);
 			AddComponent(newCMesh);
-			RecalculateBB();
 		}
 		if (ImGui::Selectable("Camera"))
 		{
@@ -467,6 +469,8 @@ T* GameObject::GetComponent()
 void GameObject::AddComponent(Component* _newComponent)
 {
 	m_Components.push_back(_newComponent);
+	if (_newComponent->m_Type == ComponentType::MESH)
+		RecalculateBB();
 }
 
 /*template<typename T>
