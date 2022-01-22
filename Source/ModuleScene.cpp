@@ -290,7 +290,7 @@ void ModuleScene::DrawImGuiResources()
 
 void ModuleScene::Draw(unsigned int program)
 {
-    // Gizmos
+    // Gizmos TODO gizmos/controller
     if (m_GOSelected != nullptr)
     {
         if (App->input->GetKey(SDL_SCANCODE_T) == KeyState::KEY_DOWN)
@@ -370,6 +370,8 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
     {
         m_Root->AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
     }
+
+    AddToQuadtreeIfHasMesh(qt, m_Root);
 }
 
 void ModuleScene::SaveTempScene()
@@ -395,8 +397,11 @@ void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
 {
     for (int i = 0; i < go->m_Components.size(); ++i)
     {
-        if (go->m_Components[i]->m_Type == ComponentType::MESH)
+        if (go->m_Components[i]->m_Type == ComponentType::MESH) 
+        {
             qt->InsertGO(go);
+            break;
+        }
     }
 
     for (int i = 0; i < go->m_Children.size(); ++i)

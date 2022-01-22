@@ -47,8 +47,7 @@ GameObject::~GameObject()
 
 void GameObject::Start()
 {
-	if (m_Parent != nullptr) 
-		m_Transform->NotifyMovement();
+	NotifyMovement(false);
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
 	{
@@ -62,49 +61,6 @@ void GameObject::Update()
 	if (!m_Active)
 		return;
 
-	// Better in another place? Start / addComponent / notify movement
-	for (unsigned int i = 0; i < m_Components.size(); ++i)
-	{
-		// TODO: can be more than one mesh
-		if (m_Components[i]->m_Type == ComponentType::MESH)
-		{
-			CMesh* cMesh = (CMesh*)m_Components[i];
-
-			m_Min = cMesh->m_MinPoint;
-			m_Max = cMesh->m_MaxPoint;
-
-			m_aabb = AABB(cMesh->m_MinPoint, cMesh->m_MaxPoint);
-			/*ImGui::Text("%s aabb = (%f, %f, %f), (%f, %f, %f)", m_Name, cMesh->m_MinPoint.x, cMesh->m_MinPoint.y, cMesh->m_MinPoint.z,
-				cMesh->m_MaxPoint.x, cMesh->m_MaxPoint.y, cMesh->m_MaxPoint.z);*/
-		}
-	}
-	/*
-	if (m_Name != "Root" && m_Min.x == m_Max.x && m_Min.y == m_Max.y && m_Min.z == m_Max.z) // TODO: Revise this if
-	{
-		if (!m_Children.empty())
-		{
-			m_Min = m_Children[0]->m_Min;
-			m_Max = m_Children[0]->m_Max;
-
-			for (int i = 1; i < m_Children.size(); ++i)
-			{
-				if (m_Min.x > m_Children[i]->m_Min.x)
-					m_Min.x = m_Children[i]->m_Min.x;
-				if (m_Min.y > m_Children[i]->m_Min.y)
-					m_Min.y = m_Children[i]->m_Min.y;
-				if (m_Min.z > m_Children[i]->m_Min.z)
-					m_Min.z = m_Children[i]->m_Min.z;
-				if (m_Max.x < m_Children[i]->m_Max.x)
-					m_Max.x = m_Children[i]->m_Max.x;
-				if (m_Max.y < m_Children[i]->m_Max.y)
-					m_Max.y = m_Children[i]->m_Max.y;
-				if (m_Max.z < m_Children[i]->m_Max.z)
-					m_Max.z = m_Children[i]->m_Max.z;
-			}
-		}
-		m_aabb = AABB(m_Min, m_Max);
-	}
-	*/
 	// Hierarchical frustum culling
 	bool parentInFrustum = true;
 	if (m_Parent != NULL) 
@@ -334,6 +290,8 @@ void GameObject::NotifyMovement(bool notifiedByTransform)
 	// If it has a mesh update the quadtree
 	if (hasMesh)
 	{
+		RecalculateBB();
+
 		Quadtree* qt = App->scene->GetQuadtree();
 		qt->EraseGO(this);
 		qt->InsertGO(this);
@@ -342,6 +300,37 @@ void GameObject::NotifyMovement(bool notifiedByTransform)
 	// Notify owner children
 	for (unsigned int i = 0; i < m_Children.size(); ++i)
 		m_Children[i]->NotifyMovement(false);
+}
+
+void GameObject::RecalculateBB()
+{
+	m_Min = float3::zero;
+	m_Max = float3::zero;
+
+	bool firstMesh = true;
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
+	{
+		if (m_Components[i]->m_Type == ComponentType::MESH)
+		{
+			CMesh* cMesh = (CMesh*)m_Components[i];
+			if (firstMesh)
+			{
+				m_Min = cMesh->m_MinPoint;
+				m_Max = cMesh->m_MaxPoint;
+				firstMesh = false;
+			}
+			else
+			{
+				if (m_Min.x > cMesh->m_MinPoint.x) m_Min.x = cMesh->m_MinPoint.x;
+				if (m_Min.y > cMesh->m_MinPoint.y) m_Min.y = cMesh->m_MinPoint.y;
+				if (m_Min.z > cMesh->m_MinPoint.z) m_Min.z = cMesh->m_MinPoint.z;
+				if (m_Max.x < cMesh->m_MaxPoint.x) m_Max.x = cMesh->m_MaxPoint.x;
+				if (m_Max.y < cMesh->m_MaxPoint.y) m_Max.y = cMesh->m_MaxPoint.y;
+				if (m_Max.z < cMesh->m_MaxPoint.z) m_Max.z = cMesh->m_MaxPoint.z;
+			}
+		}
+	}
+	m_aabb = AABB(m_Min, m_Max);
 }
 
 void GameObject::SetParent(GameObject* _go)
@@ -427,6 +416,7 @@ void GameObject::DrawImGui()
 		{
 			CMesh* newCMesh = new CMesh(true, this);
 			AddComponent(newCMesh);
+			RecalculateBB();
 		}
 		if (ImGui::Selectable("Camera"))
 		{

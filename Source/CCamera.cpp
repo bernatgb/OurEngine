@@ -37,6 +37,14 @@ void CCamera::Enable()
 
 void CCamera::Update()
 {
+	if (App->renderer->HasViewportSizeChanged()) 
+	{
+		float aspect = App->renderer->GetSceneWindowAspect();
+		float fov = DEGTORAD * initialVerticalFov;
+		if (aspect < 1)
+			fov = math::Atan(math::Tan(fov) / aspect);
+		frustum.SetVerticalFovAndAspectRatio(fov, aspect);
+	}
 }
 
 void CCamera::Disable()
