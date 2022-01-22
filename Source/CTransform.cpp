@@ -4,10 +4,6 @@
 
 #include "SceneImporter.h"
 
-#include "Application.h"
-#include "ModuleScene.h"
-#include "Quadtree.h"
-
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -53,29 +49,11 @@ Component* CTransform::GetAClone(GameObject* _owner)
 
 void CTransform::NotifyMovement()
 {
-	Quadtree* qt = App->scene->GetQuadtree();
-	GameObject* go = m_Owner;
-	qt->EraseGO(go);
-
-	//Change AccumulativeModelMatrix
+	// Change AccumulativeModelMatrix
 	if (m_Owner->m_Parent != nullptr)
 		m_AccumulativeModelMatrix = m_Owner->m_Parent->m_Transform->m_AccumulativeModelMatrix * m_ModelMatrix;
 	else
 		m_AccumulativeModelMatrix = m_ModelMatrix;
-
-	//TODO: NOTIFY GO OWNER
-
-	//Notify other components
-	for (unsigned int i = 0; i < m_Owner->m_Components.size(); ++i)
-	{
-		m_Owner->m_Components[i]->NotifyMovement();
-		if (go->m_Components[i]->m_Type == ComponentType::MESH)
-			qt->InsertGO(go);
-	}
-
-	//Notify owner children
-	for (unsigned int i = 0; i < m_Owner->m_Children.size(); ++i)
-		m_Owner->m_Children[i]->m_Transform->NotifyMovement();
 }
 
 void CTransform::DrawImGui()
@@ -140,6 +118,9 @@ void CTransform::GizmoTransformChange(float4x4 _newAccumulativeModelMatrix)
 
 	// Notify movement
 	NotifyMovement();
+
+	// Notify movement to parent
+	m_Owner->NotifyMovement(true);
 }
 
 void CTransform::Copy(const CTransform* _transform)
@@ -157,9 +138,11 @@ void CTransform::RecalculateModelMatrix()
 {
 	m_ModelMatrix = float4x4::FromTRS(m_Position, m_Rotation, m_Scale);
 
+	// Notify movement
 	NotifyMovement();
+	// Notify movement to parent
+	m_Owner->NotifyMovement(true); // TODO: MOVE
 }
-
 
 float3 CTransform::GetPos() const
 {

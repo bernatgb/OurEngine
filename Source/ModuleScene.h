@@ -29,6 +29,7 @@ public:
 
 	void SelectGameObject(GameObject* go);
 	void RecursiveHierarchy(GameObject* go, GameObject*& node_clicked);
+	void CheckHoverHierarchy(GameObject* go);
 	void DrawImGuiHierarchy();
 	void DrawImGuiModel();
 	void DrawImGuiResources();
@@ -87,6 +88,8 @@ public:
 private:
 	GameObject* m_Root = nullptr;
 	GameObject* m_GOSelected = nullptr;
+	GameObject* m_GODrag = nullptr;
+	GameObject* m_GODragParent = nullptr;
 
 	Quadtree* qt = nullptr;
 

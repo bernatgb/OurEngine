@@ -49,9 +49,6 @@ bool ModuleScene::Init()
 
     LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
-    //models.push_back(new Model(".\\assets\\Models\\BakerHouse.fbx"));
-    //activeModel = 0;   
-
     currentGizmoOperation = ImGuizmo::TRANSLATE;
 
 	return true;
@@ -73,9 +70,6 @@ bool ModuleScene::CleanUp()
 
     for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
         delete it->second;
-
-    //for (unsigned int i = 0; i < models.size(); ++i)
-    //    delete models[i];
 
 	return true;
 }
@@ -113,15 +107,29 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
     if (go->m_Children.size() <= 0)
         node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
+    ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    if (!go->m_Active)
+        color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+    ImGui::PushStyleColor(ImGuiCol_Text, color);
+
     bool node_open = ImGui::TreeNodeEx(go, node_flags, go->m_Name);
-    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    if (ImGui::IsItemClicked()) // && !ImGui::IsItemToggledOpen())
+    {
         node_clicked = go;
-    if (ImGui::BeginDragDropSource())
+        m_GODrag = go;
+    }
+    if (ImGui::IsMouseDoubleClicked(0))
+    {
+        App->camera->AdjustToGO(go);
+    }
+
+    CheckHoverHierarchy(go);
+    /*if (ImGui::BeginDragDropSource())
     {
         ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
         ImGui::Text("This is a drag and drop source");
         ImGui::EndDragDropSource();
-    }
+    }*/
 
     if (node_open && go->m_Children.size() > 0)
     {
@@ -130,6 +138,25 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
             RecursiveHierarchy(go->m_Children[i], node_clicked);
         }
         ImGui::TreePop();
+    }
+    ImGui::PopStyleColor();
+}
+
+void ModuleScene::CheckHoverHierarchy(GameObject* go)
+{
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+    {
+        if (m_GODrag && m_GODrag != go)
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text("Move %s to %s", m_GODrag->m_Name, go->m_Name);
+            ImGui::EndTooltip();
+        }
+
+        if (m_GODrag && ImGui::IsMouseReleased(0) && m_GODrag != go)
+        {
+            m_GODragParent = go;
+        }
     }
 }
 
@@ -149,6 +176,14 @@ void ModuleScene::DrawImGuiHierarchy()
         for (unsigned int i = 0; i < m_Root->m_Children.size(); ++i)
             RecursiveHierarchy(m_Root->m_Children[i], node_clicked);
 
+        if (m_GODragParent) 
+        {
+            // TODO: check if its legal
+            m_GODrag->SetParent(m_GODragParent);
+            m_GODrag = nullptr;
+            m_GODragParent = nullptr;
+        }
+
         if (node_clicked != nullptr)
         {
             SelectGameObject(node_clicked);
@@ -163,152 +198,10 @@ void ModuleScene::DrawImGuiHierarchy()
         }
         ImGui::TreePop();
     }
+    if (m_GODrag && ImGui::IsMouseReleased(0))
+        m_GODrag = nullptr;
 
-    //// NOTEBOOK PROPOUSE
-    ImGui::Separator();
-
-    ImGui::Text("Things to ask to the teacher");
-    ImGui::BulletText("Mesh BB - destroy it");
-    ImGui::BulletText("Shader in materials - yep");
-    ImGui::BulletText("ImGui inputs: only in scene? - hover / improve input");
-    ImGui::BulletText("Time and skybox images in ImGui");
-    ImGui::BulletText("Where to do the FindMeshes & co");
-
-    ImGui::Separator();
-
-    ImGui::Text("TODO");
-    ImGui::BulletText("Corrections to f (not calculating the distance properly) & orbit (errors in pols)");
-    ImGui::BulletText("Fix camera movement speed -> effected by fps");
-    ImGui::BulletText("Fix mouse clicking");
-    ImGui::BulletText("Have two cameras");
-    ImGui::BulletText("Use correctly start and enable of components");
-    ImGui::BulletText("Currently not using pitch & yawn");
-
-    ImGui::Separator();
-
-    ImGui::Text("Corrections");
-    ImGui::BulletText("overrides for the virtuals");
-    ImGui::BulletText("const for const things");
-    ImGui::BulletText("Make things private (sadly)");
-    ImGui::BulletText("Try not to nest ifs");
-    ImGui::BulletText("const & parameters");
-    ImGui::BulletText("function names start with verbs");
-    ImGui::BulletText("initialize in .h");
-
-    /*
-    MIQUEL:
-    -SCENE SERIALIZATION
-    -FILE SYSTEM
-
-
-    -ASSIMP TRANSFORMS
-    -ASPECTS (WINDOW/IMGUI)
-    -GAME VIEW
-    -FIX ENABLED / START
-    -SERIALIZATION OF GAMEOBJECTS USING GUID
-    -FIX GO MIN & MAX
-    -WORKING HIERARCHY
-    -IMPORVE INPUT MODULE TO WORK AS THE 2D EXERCISE
-
-
-    BERNAT:
-    -MOUSE/GIZMOS
-    -PBR
-    */
-    ////
-
-    /*if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
-    {
-        static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;
-        static bool test_drag_and_drop = false;
-
-        ImGui::Checkbox("Test tree node as drag source", &test_drag_and_drop);
-
-        // 'selection_mask' is dumb representation of what may be user-side selection state.
-        //  You may retain selection state inside or outside your objects in whatever format you see fit.
-        // 'node_clicked' is temporary storage of what node we have clicked to process selection at the end
-        /// of the loop. May be a pointer to your own node type, etc.
-        static int selection_mask = (1 << 2);
-        int node_clicked = -1;
-        for (int i = 0; i < 6; i++)
-        {
-            // Disable the default "open on single-click behavior" + set Selected flag according to our selection.
-            // To alter selection we use IsItemClicked() && !IsItemToggledOpen(), so clicking on an arrow doesn't alter selection.
-            ImGuiTreeNodeFlags node_flags = base_flags;
-            const bool is_selected = (selection_mask & (1 << i)) != 0;
-            if (is_selected)
-                node_flags |= ImGuiTreeNodeFlags_Selected;
-            if (i < 3)
-            {
-                // Items 0..2 are Tree Node
-                bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
-                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                    node_clicked = i;
-                if (test_drag_and_drop && ImGui::BeginDragDropSource())
-                {
-                    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
-                    ImGui::Text("This is a drag and drop source");
-                    ImGui::EndDragDropSource();
-                }
-                if (node_open)
-                {
-                    ImGui::BulletText("Blah blah Blah Blah");
-                    ImGui::TreePop();
-                }
-            }
-            else
-            {
-                // Items 3..5 are Tree Leaves
-                // The only reason we use TreeNode at all is to allow selection of the leaf. Otherwise we can
-                // use BulletText() or advance the cursor by GetTreeNodeToLabelSpacing() and call Text().
-                node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
-                ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Leaf %d", i);
-                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                    node_clicked = i;
-                if (test_drag_and_drop && ImGui::BeginDragDropSource())
-                {
-                    ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
-                    ImGui::Text("This is a drag and drop source");
-                    ImGui::EndDragDropSource();
-                }
-            }
-        }
-        if (node_clicked != -1)
-        {
-            // Update selection state
-            // (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
-            if (ImGui::GetIO().KeyCtrl)
-                selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
-            else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
-                selection_mask = (1 << node_clicked);           // Click to single-select
-        }
-        ImGui::TreePop();
-    }
-
-
-
-    if (ImGui::TreeNode("Drag to reorder items (simple)"))
-    {
-        // Simple reordering
-        static const char* item_names[] = { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
-        for (int n = 0; n < IM_ARRAYSIZE(item_names); n++)
-        {
-            const char* item = item_names[n];
-            ImGui::Selectable(item);
-
-            if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
-            {
-                int n_next = n + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-                if (n_next >= 0 && n_next < IM_ARRAYSIZE(item_names))
-                {
-                    item_names[n] = item_names[n_next];
-                    item_names[n_next] = item;
-                    ImGui::ResetMouseDragDelta();
-                }
-            }
-        }
-        ImGui::TreePop();
-    }*/
+    
 }
 
 void ModuleScene::DrawImGuiResources()
@@ -425,7 +318,8 @@ void ModuleScene::Draw(unsigned int program)
 
     if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN && m_GOSelected != nullptr)
     {
-        m_GOSelected->m_Parent->DeleteChild(m_GOSelected);
+        m_GOSelected->m_Parent->RemoveChild(m_GOSelected);
+        delete m_GOSelected;
         m_GOSelected = nullptr;
     }
 
@@ -437,49 +331,6 @@ void ModuleScene::Draw(unsigned int program)
 
 void ModuleScene::LoadModel(const char* _fileName)
 {
-    /*
-    std::string modelName = _fileName;
-    const size_t last_slash_idx = modelName.rfind('\\');
-    if (std::string::npos != last_slash_idx)
-        modelName = modelName.substr(last_slash_idx, modelName.length());
-
-    std::map<std::string, Model*>::iterator it = m_Models.find(modelName);
-    if (it == m_Models.end()) 
-    {
-        //import new model
-        //and save it
-    }
-
-    SelectGameObject(m_Models[modelName]->ExportToGO(m_Root));
-    App->camera->AdjustToModel(m_Models[modelName]);*/
-
-    /*activeModel = -1;
-    for (unsigned int i = 0; i < models.size(); ++i)
-    {
-        unsigned int j = 0;
-        while (models[i]->m_Name[j] == _fileName[j]) {
-            if (models[i]->m_Name[j] == '\0' && _fileName[j] == '\0') 
-            {
-                activeModel = i;
-                break;
-            }
-            ++j;
-        }
-
-        if (activeModel != -1)
-            break;
-    }
-
-    if (activeModel == -1) 
-    {
-        models.push_back(new Model(_fileName));
-        activeModel = models.size()-1;
-    }
-
-    SelectGameObject(models[activeModel]->ExportToGO(m_Root));
-
-    App->camera->AdjustToModel(models[activeModel]);*/
-
     std::string modelName = _fileName;
     const size_t last_slash_idx = modelName.rfind('\\');
     if (std::string::npos != last_slash_idx)
@@ -490,9 +341,7 @@ void ModuleScene::LoadModel(const char* _fileName)
     {
         GameObject* exportedGO = it->second->ExportToGO(m_Root);
         AddToQuadtreeIfHasMesh(qt, exportedGO);
-        SelectGameObject(exportedGO);
-        //App->camera->AdjustToModel(it->second);
-        
+        SelectGameObject(exportedGO);        
         return;
     }
     
@@ -502,7 +351,6 @@ void ModuleScene::LoadModel(const char* _fileName)
     GameObject* exportedGO = m_Models[model->m_Name]->ExportToGO(m_Root);
     AddToQuadtreeIfHasMesh(qt, exportedGO);
     SelectGameObject(exportedGO);
-    //App->camera->AdjustToModel(m_Models[model->m_Name]);
 }
 
 void ModuleScene::LoadTempScene()
@@ -618,18 +466,97 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
         RecursiveSearch(_go->m_Children[i], ancestors && _go->m_Active, firstFrame);
 }
 
-/*
-Light GetLightStruct(CLight* _light) {
-    Light light;
-    light.lightType = (int)_light->m_Type;
-    light.lightColor = _light->m_Color;
-    light.intensity = _light->m_Intensity;
-    light.radius = _light->m_Radius;
-    light.innerAngle = _light->m_InnerAngle * DEGTORAD;
-    light.outerAngle = _light->m_OuterAngle * DEGTORAD;
 
-    light.direction = _light->m_Owner->m_Transform->GetForward(true);
-    light.position = _light->m_Owner->m_Transform->GetPos();
+/* IMGUI CODE FOR DRAG AND DROP / REORDER
 
-    return light;
-};*/
+if (ImGui::TreeNode("ImGui demo: Advanced, with Selectable nodes"))
+{
+    static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;
+    static bool test_drag_and_drop = false;
+
+    ImGui::Checkbox("Test tree node as drag source", &test_drag_and_drop);
+
+    // 'selection_mask' is dumb representation of what may be user-side selection state.
+    //  You may retain selection state inside or outside your objects in whatever format you see fit.
+    // 'node_clicked' is temporary storage of what node we have clicked to process selection at the end
+    /// of the loop. May be a pointer to your own node type, etc.
+    static int selection_mask = (1 << 2);
+    int node_clicked = -1;
+    for (int i = 0; i < 6; i++)
+    {
+        // Disable the default "open on single-click behavior" + set Selected flag according to our selection.
+        // To alter selection we use IsItemClicked() && !IsItemToggledOpen(), so clicking on an arrow doesn't alter selection.
+        ImGuiTreeNodeFlags node_flags = base_flags;
+        const bool is_selected = (selection_mask & (1 << i)) != 0;
+        if (is_selected)
+            node_flags |= ImGuiTreeNodeFlags_Selected;
+        if (i < 3)
+        {
+            // Items 0..2 are Tree Node
+            bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                node_clicked = i;
+            if (test_drag_and_drop && ImGui::BeginDragDropSource())
+            {
+                ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+                ImGui::Text("This is a drag and drop source");
+                ImGui::EndDragDropSource();
+            }
+            if (node_open)
+            {
+                ImGui::BulletText("Blah blah Blah Blah");
+                ImGui::TreePop();
+            }
+        }
+        else
+        {
+            // Items 3..5 are Tree Leaves
+            // The only reason we use TreeNode at all is to allow selection of the leaf. Otherwise we can
+            // use BulletText() or advance the cursor by GetTreeNodeToLabelSpacing() and call Text().
+            node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
+            ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Leaf %d", i);
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                node_clicked = i;
+            if (test_drag_and_drop && ImGui::BeginDragDropSource())
+            {
+                ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+                ImGui::Text("This is a drag and drop source");
+                ImGui::EndDragDropSource();
+            }
+        }
+    }
+    if (node_clicked != -1)
+    {
+        // Update selection state
+        // (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
+        if (ImGui::GetIO().KeyCtrl)
+            selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
+        else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
+            selection_mask = (1 << node_clicked);           // Click to single-select
+    }
+    ImGui::TreePop();
+}
+
+
+if (ImGui::TreeNode("Drag to reorder items (simple)"))
+{
+    // Simple reordering
+    static const char* item_names[] = { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
+    for (int n = 0; n < IM_ARRAYSIZE(item_names); n++)
+    {
+        const char* item = item_names[n];
+        ImGui::Selectable(item);
+
+        if (ImGui::IsItemActive() && !ImGui::IsItemHovered())
+        {
+            int n_next = n + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+            if (n_next >= 0 && n_next < IM_ARRAYSIZE(item_names))
+            {
+                item_names[n] = item_names[n_next];
+                item_names[n_next] = item;
+                ImGui::ResetMouseDragDelta();
+            }
+        }
+    }
+    ImGui::TreePop();
+}*/

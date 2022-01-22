@@ -315,6 +315,42 @@ bool GameObject::IsInFrustumViaQuadtree(QuadtreeNode* qtn)
 	return false;
 }
 
+void GameObject::NotifyMovement(bool notifiedByTransform)
+{
+	// Notify transform if the notification doesnt come from him
+	if (!notifiedByTransform)
+		m_Transform->NotifyMovement();
+
+	bool hasMesh = false;
+
+	// Notify other components
+	for (unsigned int i = 0; i < m_Components.size(); ++i)
+	{
+		m_Components[i]->NotifyMovement();
+		if (m_Components[i]->m_Type == ComponentType::MESH)
+			hasMesh = true;
+	}
+
+	// If it has a mesh update the quadtree
+	if (hasMesh)
+	{
+		Quadtree* qt = App->scene->GetQuadtree();
+		qt->EraseGO(this);
+		qt->InsertGO(this);
+	}
+
+	// Notify owner children
+	for (unsigned int i = 0; i < m_Children.size(); ++i)
+		m_Children[i]->NotifyMovement(false);
+}
+
+void GameObject::SetParent(GameObject* _go)
+{
+	if (m_Parent != nullptr)
+		m_Parent->RemoveChild(this);
+	_go->AddChild(this);
+}
+
 GameObject* GameObject::AddChild(const char* _name)
 {
 	GameObject* child = new GameObject(_name, this);
@@ -323,26 +359,25 @@ GameObject* GameObject::AddChild(const char* _name)
 	return child;
 }
 
-void GameObject::DeleteChild(GameObject* _go)
+void GameObject::AddChild(GameObject* _go)
+{
+	m_Children.push_back(_go);
+	NotifyMovement(false);
+}
+
+void GameObject::RemoveChild(GameObject* _go)
 {
 	bool found = false;
 	for (unsigned int i = 0; i < m_Children.size(); ++i) 
 	{
 		if (found)
-		{
 			m_Children[i-1] = m_Children[i];
-		}
 		else if (m_Children[i] == _go)
-		{
-			delete m_Children[i];
 			found = true;
-		}
 	}
 
 	if (found) 
-	{
 		m_Children.pop_back();
-	}
 }
 
 void GameObject::DrawImGui()

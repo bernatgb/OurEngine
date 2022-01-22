@@ -30,7 +30,7 @@ public:
 	bool IsInFrustum();
 	bool IsInFrustumViaQuadtree(QuadtreeNode* qtn);
 
-	void NotifyMovement();
+	void NotifyMovement(bool notifiedByTransform);
 	void NotifySonMovement();
 
 	//void OnDestroy();
@@ -39,8 +39,10 @@ public:
 	//template<typename T> void AddComponent(T* _newComponent);
 	void AddComponent(Component* _newComponent);
 
+	void SetParent(GameObject* _go);
 	GameObject* AddChild(const char* _name);
-	void DeleteChild(GameObject* _go);
+	void AddChild(GameObject* _go);
+	void RemoveChild(GameObject* _go);
 
 	void DrawImGui();
 
