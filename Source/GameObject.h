@@ -34,6 +34,7 @@ public:
 	void NotifySonMovement();
 
 	//void OnDestroy();
+	void RecalculateBB();
 
 	template<typename T> T* GetComponent();
 	//template<typename T> void AddComponent(T* _newComponent);
