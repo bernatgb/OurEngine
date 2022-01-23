@@ -163,8 +163,8 @@ bool ModuleRender::Init()
 	//Light buffer
 	glGenBuffers(1, &m_lightsUBO); // this generates UBO, OK
 	glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO); // this binds it, OK
-	glBufferData(GL_UNIFORM_BUFFER, 16 + 20 * 20, &m_LightsContainer, GL_DYNAMIC_DRAW); // this allocates space for the UBO. 
-	glBindBufferRange(GL_UNIFORM_BUFFER, glGetUniformBlockIndex(program, "Lights"), m_lightsUBO, 0, 16 + 20 * 20); // this binds UBO to Buffer Index
+	glBufferData(GL_UNIFORM_BUFFER, 16 + 80 * 20, &m_LightsContainer, GL_DYNAMIC_DRAW); // this allocates space for the UBO. 
+	glBindBufferRange(GL_UNIFORM_BUFFER, glGetUniformBlockIndex(program, "Lights"), m_lightsUBO, 0, 16 + 80 * 20); // this binds UBO to Buffer Index
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	//Create cube map
@@ -347,7 +347,7 @@ update_status ModuleRender::Update()
 
 	// TODO: ACTIVATE ALL LIGHTS AND THINGS
 	glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 + 20 * 20, &m_LightsContainer);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 + 80 * 20, &m_LightsContainer);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 
