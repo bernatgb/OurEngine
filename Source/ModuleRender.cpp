@@ -436,6 +436,9 @@ void ModuleRender::DrawImGui()
 	{
 		ImGui::ColorEdit3("Ambient color", &m_AmbientColor[0]);
 
+		ImGui::Checkbox("Draw axis", &m_DrawAxis);
+		ImGui::Checkbox("Draw grid", &m_DrawGrid);
+
 		ImGui::DragInt("Active cubemap", &m_ActiveCubeMap);
 
 		cubeMap->DrawImGui();

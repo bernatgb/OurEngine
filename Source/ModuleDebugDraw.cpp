@@ -3,6 +3,9 @@
 #define DEBUG_DRAW_IMPLEMENTATION
 #include "DebugDraw.h"     // Debug Draw API. Notice that we need the DEBUG_DRAW_IMPLEMENTATION macro here!
 
+#include "Application.h"
+#include "ModuleRender.h"
+
 #include "GL/glew.h"
 
 class DDRenderInterfaceCoreGL final
@@ -609,8 +612,10 @@ update_status ModuleDebugDraw::Update()
 {
     OPTICK_CATEGORY("ModuleDebugDraw::Update", Optick::Category::Debug);
 
-    dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
-    dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Gray);
+    if (App->renderer->DrawAxis())
+        dd::axisTriad(float4x4::identity, 0.1f, 1.0f);
+    if (App->renderer->DrawGrid())
+        dd::xzSquareGrid(-10, 10, 0.0f, 1.0f, dd::colors::Gray);
 
 	return UPDATE_CONTINUE;
 }
