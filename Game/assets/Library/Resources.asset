@@ -1,32 +1,224 @@
 {
     "Meshes": [
         {
+            "Id": 474,
+            "Path": ".\\Assets\\Library\\Meshes\\474.asset"
+        },
+        {
             "Id": 3510,
             "Path": ".\\Assets\\Library\\Meshes\\3510.asset"
+        },
+        {
+            "Id": 4866,
+            "Path": ".\\Assets\\Library\\Meshes\\4866.asset"
+        },
+        {
+            "Id": 6279,
+            "Path": ".\\Assets\\Library\\Meshes\\6279.asset"
+        },
+        {
+            "Id": 6824,
+            "Path": ".\\Assets\\Library\\Meshes\\6824.asset"
+        },
+        {
+            "Id": 6855,
+            "Path": ".\\Assets\\Library\\Meshes\\6855.asset"
+        },
+        {
+            "Id": 13709,
+            "Path": ".\\Assets\\Library\\Meshes\\13709.asset"
+        },
+        {
+            "Id": 16519,
+            "Path": ".\\Assets\\Library\\Meshes\\16519.asset"
         },
         {
             "Id": 17199,
             "Path": ".\\Assets\\Library\\Meshes\\17199.asset"
         },
         {
+            "Id": 18236,
+            "Path": ".\\Assets\\Library\\Meshes\\18236.asset"
+        },
+        {
+            "Id": 18753,
+            "Path": ".\\Assets\\Library\\Meshes\\18753.asset"
+        },
+        {
+            "Id": 21934,
+            "Path": ".\\Assets\\Library\\Meshes\\21934.asset"
+        },
+        {
+            "Id": 26822,
+            "Path": ".\\Assets\\Library\\Meshes\\26822.asset"
+        },
+        {
             "Id": 29194,
             "Path": ".\\Assets\\Library\\Meshes\\29194.asset"
+        },
+        {
+            "Id": 30258,
+            "Path": ".\\Assets\\Library\\Meshes\\30258.asset"
+        },
+        {
+            "Id": 30594,
+            "Path": ".\\Assets\\Library\\Meshes\\30594.asset"
+        },
+        {
+            "Id": 31462,
+            "Path": ".\\Assets\\Library\\Meshes\\31462.asset"
         }
     ],
     "Textures": [
+        {
+            "Id": 457,
+            "Path": ".\\Assets\\Library\\Textures\\457.asset"
+        },
+        {
+            "Id": 473,
+            "Path": ".\\Assets\\Library\\Textures\\473.asset"
+        },
+        {
+            "Id": 3131,
+            "Path": ".\\Assets\\Library\\Textures\\3131.asset"
+        },
+        {
+            "Id": 3508,
+            "Path": ".\\Assets\\Library\\Textures\\3508.asset"
+        },
+        {
+            "Id": 3921,
+            "Path": ".\\Assets\\Library\\Textures\\3921.asset"
+        },
+        {
+            "Id": 4232,
+            "Path": ".\\Assets\\Library\\Textures\\4232.asset"
+        },
+        {
+            "Id": 5452,
+            "Path": ".\\Assets\\Library\\Textures\\5452.asset"
+        },
+        {
+            "Id": 6512,
+            "Path": ".\\Assets\\Library\\Textures\\6512.asset"
+        },
+        {
+            "Id": 7295,
+            "Path": ".\\Assets\\Library\\Textures\\7295.asset"
+        },
+        {
+            "Id": 7453,
+            "Path": ".\\Assets\\Library\\Textures\\7453.asset"
+        },
+        {
+            "Id": 10096,
+            "Path": ".\\Assets\\Library\\Textures\\10096.asset"
+        },
+        {
+            "Id": 11699,
+            "Path": ".\\Assets\\Library\\Textures\\11699.asset"
+        },
+        {
+            "Id": 12808,
+            "Path": ".\\Assets\\Library\\Textures\\12808.asset"
+        },
+        {
+            "Id": 13334,
+            "Path": ".\\Assets\\Library\\Textures\\13334.asset"
+        },
         {
             "Id": 17180,
             "Path": ".\\Assets\\Library\\Textures\\17180.asset"
         },
         {
+            "Id": 19775,
+            "Path": ".\\Assets\\Library\\Textures\\19775.asset"
+        },
+        {
+            "Id": 21171,
+            "Path": ".\\Assets\\Library\\Textures\\21171.asset"
+        },
+        {
+            "Id": 25597,
+            "Path": ".\\Assets\\Library\\Textures\\25597.asset"
+        },
+        {
+            "Id": 25929,
+            "Path": ".\\Assets\\Library\\Textures\\25929.asset"
+        },
+        {
+            "Id": 26190,
+            "Path": ".\\Assets\\Library\\Textures\\26190.asset"
+        },
+        {
             "Id": 27035,
             "Path": ".\\Assets\\Library\\Textures\\27035.asset"
+        },
+        {
+            "Id": 29823,
+            "Path": ".\\Assets\\Library\\Textures\\29823.asset"
+        },
+        {
+            "Id": 31320,
+            "Path": ".\\Assets\\Library\\Textures\\31320.asset"
+        },
+        {
+            "Id": 31831,
+            "Path": ".\\Assets\\Library\\Textures\\31831.asset"
         }
     ],
     "Materials": [
         {
+            "Id": 264,
+            "Path": ".\\Assets\\Library\\Materials\\264.asset"
+        },
+        {
+            "Id": 4990,
+            "Path": ".\\Assets\\Library\\Materials\\4990.asset"
+        },
+        {
+            "Id": 5677,
+            "Path": ".\\Assets\\Library\\Materials\\5677.asset"
+        },
+        {
+            "Id": 6303,
+            "Path": ".\\Assets\\Library\\Materials\\6303.asset"
+        },
+        {
+            "Id": 7954,
+            "Path": ".\\Assets\\Library\\Materials\\7954.asset"
+        },
+        {
+            "Id": 11380,
+            "Path": ".\\Assets\\Library\\Materials\\11380.asset"
+        },
+        {
             "Id": 15645,
             "Path": ".\\Assets\\Library\\Materials\\15645.asset"
+        },
+        {
+            "Id": 17934,
+            "Path": ".\\Assets\\Library\\Materials\\17934.asset"
+        },
+        {
+            "Id": 18931,
+            "Path": ".\\Assets\\Library\\Materials\\18931.asset"
+        },
+        {
+            "Id": 25155,
+            "Path": ".\\Assets\\Library\\Materials\\25155.asset"
+        },
+        {
+            "Id": 25310,
+            "Path": ".\\Assets\\Library\\Materials\\25310.asset"
+        },
+        {
+            "Id": 28442,
+            "Path": ".\\Assets\\Library\\Materials\\28442.asset"
+        },
+        {
+            "Id": 29097,
+            "Path": ".\\Assets\\Library\\Materials\\29097.asset"
         },
         {
             "Id": 29897,
@@ -41,6 +233,42 @@
         {
             "Id": "Clock.fbx",
             "Path": ".\\Assets\\Library\\Models\\Clock.fbx.asset"
+        },
+        {
+            "Id": "Drawers.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Drawers.fbx.asset"
+        },
+        {
+            "Id": "Firetruck.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Firetruck.fbx.asset"
+        },
+        {
+            "Id": "Floor.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Floor.fbx.asset"
+        },
+        {
+            "Id": "Hearse.FBX",
+            "Path": ".\\Assets\\Library\\Models\\Hearse.FBX.asset"
+        },
+        {
+            "Id": "Player.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Player.fbx.asset"
+        },
+        {
+            "Id": "Robot.FBX",
+            "Path": ".\\Assets\\Library\\Models\\Robot.FBX.asset"
+        },
+        {
+            "Id": "SpinningTop.fbx",
+            "Path": ".\\Assets\\Library\\Models\\SpinningTop.fbx.asset"
+        },
+        {
+            "Id": "Wall.FBX",
+            "Path": ".\\Assets\\Library\\Models\\Wall.FBX.asset"
+        },
+        {
+            "Id": "Zombunny.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Zombunny.fbx.asset"
         }
     ]
 }

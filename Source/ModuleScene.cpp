@@ -48,12 +48,12 @@ bool ModuleScene::Init()
     qt->SetBoundaries(boundaries);
 
     //LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
-
+    
     m_GOSelected = nullptr;
     rapidjson::Document d;
     importer::LoadFile(".\\Assets\\Scene.scene", d);
     LoadScene(d);
-
+    
     currentGizmoOperation = ImGuizmo::TRANSLATE;
 
 	return true;
@@ -325,9 +325,9 @@ void ModuleScene::LoadResource(const char* _fileName)
     const size_t last_slash_idx = extension.rfind('.');
     extension = extension.substr(last_slash_idx + 1, extension.length());
 
-    if (extension == "fbx")
+    if (extension == "fbx" || extension == "FBX")
         LoadModel(_fileName);
-    else if (extension == "png" || extension == "jpg" || extension == "tif")
+    else if (extension == "png" || extension == "jpg" || extension == "tif" || extension == "PNG" || extension == "JPG" || extension == "TIF")
     {
         Texture* newTexture = new Texture();
         importer::texture::Import(_fileName, newTexture, nullptr);
