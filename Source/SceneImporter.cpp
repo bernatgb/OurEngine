@@ -115,7 +115,7 @@ bool importer::LoadFile(const char* path, rapidjson::Document& jsonDocument)
 	return false;
 }
 
-void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _materials, const std::map<std::string, Model*>& _models)
+void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _texture, const std::map<unsigned int, Material*>& _materials, const std::map<std::string, Model*>& _models)
 {
 	rapidjson::Document d;
 	rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
@@ -141,6 +141,27 @@ void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const
 		meshes.PushBack(newMesh, allocator);
 	}
 	d.AddMember("Meshes", meshes, allocator);
+
+	// Store Textures
+	rapidjson::Value textures(rapidjson::kArrayType);
+	for (auto it = _texture.begin(); it != _texture.end(); ++it)
+	{
+		// Path
+		std::string path = LIBRARY_TEXTURES + std::to_string(it->first) + ".asset";
+
+		// Store texture
+		char* file = nullptr;
+		int fileSize = importer::texture::Save(it->second, file);
+		importer::SaveFile(path.c_str(), file, fileSize);
+		delete[] file;
+
+		// Store material resource info
+		rapidjson::Value newTexture(rapidjson::kObjectType);
+		newTexture.AddMember("Id", it->first, allocator);
+		newTexture.AddMember("Path", rapidjson::Value(path.c_str(), allocator), allocator);
+		textures.PushBack(newTexture, allocator);
+	}
+	d.AddMember("Textures", textures, allocator);
 
 	// Store Materials
 	rapidjson::Value materials(rapidjson::kArrayType);
@@ -188,7 +209,7 @@ void importer::SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const
 	importer::SaveFile(RESOURCES_FILE, d);
 }
 
-void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _materials, std::map<std::string, Model*>& _models)
+void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _textures, std::map<unsigned int, Material*>& _materials, std::map<std::string, Model*>& _models)
 {
 	// Load resources file
 	char* fileBuffer = nullptr;
@@ -217,6 +238,24 @@ void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<un
 		delete[] file;
 	}
 
+	// Load Textures
+	for (rapidjson::Value::ConstValueIterator itr = d["Textures"].Begin(); itr != d["Textures"].End(); ++itr)
+	{
+		// Get material resource info
+		unsigned int id = (*itr)["Id"].GetInt();
+		std::string path = (*itr)["Path"].GetString();
+
+		// Load and store material
+		char* file = nullptr;
+		importer::LoadFile(path.c_str(), file);
+
+		Texture* texture = new Texture();
+		importer::texture::Load(file, texture);
+		_textures[id] = texture;
+
+		delete[] file;
+	}
+
 	// Load Materials
 	for (rapidjson::Value::ConstValueIterator itr = d["Materials"].Begin(); itr != d["Materials"].End(); ++itr)
 	{
@@ -228,7 +267,7 @@ void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<un
 		char* file = nullptr;
 		importer::LoadFile(path.c_str(), file);
 
-		Texture* material = new Texture();
+		Material* material = new Material();
 		importer::material::Load(file, material);
 		_materials[id] = material;
 

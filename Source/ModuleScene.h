@@ -14,6 +14,7 @@
 
 class Model;
 class Mesh;
+class Material;
 class Texture;
 
 class ModuleScene : public Module
@@ -60,6 +61,13 @@ public:
 		return nullptr;
 	};
 
+	Material* FindMaterial(unsigned int _materialId) {
+		std::map<unsigned int, Material*>::iterator it = m_Materials.find(_materialId);
+		if (it != m_Materials.end())
+			return it->second;
+		return nullptr;
+	};
+
 	Texture* FindTexture(unsigned int _textureId) {
 		std::map<unsigned int, Texture*>::iterator it = m_Textures.find(_textureId);
 		if (it != m_Textures.end())
@@ -69,6 +77,7 @@ public:
 
 	std::map<std::string, Model*> m_Models;
 	std::map<unsigned int, Mesh*> m_Meshes;
+	std::map<unsigned int, Material*> m_Materials;
 	std::map<unsigned int, Texture*> m_Textures;
 
 	std::list<Light> m_Lights;

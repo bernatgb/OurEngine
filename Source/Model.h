@@ -2,7 +2,7 @@
 #include "Globals.h"
 
 #include "Mesh.h"
-#include "Texture.h"
+#include "Material.h"
 
 #include "MathGeoLib.h"
 #include <string>
@@ -56,7 +56,7 @@ public:
 	ModelNode* m_RootStructure = nullptr;
 
 	std::vector<Mesh*> m_Meshes;
-	std::vector<Texture*> m_Textures;
+	std::vector<Material*> m_Materials;
 
 	unsigned int m_NumVertices = 0;
 	unsigned int m_NumTriangles = 0;

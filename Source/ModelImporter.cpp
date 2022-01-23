@@ -65,17 +65,17 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 
 	MY_LOG("Assimp: Loading the textures");
 	aiString file;
-	ourModel->m_Textures = std::vector<Texture*>(model->mNumMaterials);
+	ourModel->m_Materials = std::vector<Material*>(model->mNumMaterials);
 	for (unsigned i = 0; i < model->mNumMaterials; ++i)
 	{
 		MY_LOG("Assimp: Loading the material %i", i);
-		ourModel->m_Textures[i] = new Texture();
-		importer::material::Import(model->mMaterials[i], ourModel->m_Textures[i], fullPath.c_str());
+		ourModel->m_Materials[i] = new Material();
+		importer::material::Import(model->mMaterials[i], ourModel->m_Materials[i], fullPath.c_str());
 		/*if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
 		{
 			ourModel->m_Textures[i] = new Texture(file.data, fullPath.c_str());
 		}*/
-		App->scene->m_Textures[ourModel->m_Textures[i]->m_GUID] = ourModel->m_Textures[i];
+		App->scene->m_Materials[ourModel->m_Materials[i]->m_GUID] = ourModel->m_Materials[i];
 	}
 
 	ourModel->m_Min = (ourModel->m_Meshes.size() >= 1) ? ourModel->m_Meshes[0]->m_Min : float3::zero;
@@ -148,9 +148,9 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 	d.AddMember("Meshes", meshes, allocator);
 
 	rapidjson::Value textures(rapidjson::kArrayType);
-	for (unsigned int i = 0; i < ourModel->m_Textures.size(); ++i)
-		textures.PushBack(ourModel->m_Textures[i]->m_GUID, allocator);
-	d.AddMember("Textures", textures, allocator);
+	for (unsigned int i = 0; i < ourModel->m_Materials.size(); ++i)
+		textures.PushBack(ourModel->m_Materials[i]->m_GUID, allocator);
+	d.AddMember("Materials", textures, allocator);
 
 	d.AddMember("Min", Float3ToValue(ourModel->m_Min, allocator), allocator);
 	d.AddMember("Max", Float3ToValue(ourModel->m_Max, allocator), allocator);
@@ -239,15 +239,15 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 		ourModel->m_Meshes.push_back(mesh);
 	}
 
-	for (rapidjson::Value::ConstValueIterator itr = d["Textures"].Begin(); itr != d["Textures"].End(); ++itr)
+	for (rapidjson::Value::ConstValueIterator itr = d["Materials"].Begin(); itr != d["Materials"].End(); ++itr)
 	{
-		Texture* texture = App->scene->FindTexture(itr->GetInt());
-		if (texture == nullptr)
+		Material* material = App->scene->FindMaterial(itr->GetInt());
+		if (material == nullptr)
 		{
 			MY_LOG("Error when loading Model");
 			//return;
 		}
-		ourModel->m_Textures.push_back(texture);
+		ourModel->m_Materials.push_back(material);
 	}
 
 	ourModel->m_Min = ValueToFloat3(d["Min"]);

@@ -12,7 +12,7 @@ struct SDL_Texture;
 struct SDL_Renderer;
 struct SDL_Rect;
 
-class Texture;
+class Material;
 class CubeMap;
 
 struct LightContainer {
@@ -35,7 +35,7 @@ public:
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
 	
-	void ActivateTexture(Texture* _texture);
+	void ActivateMaterial(Material* _material);
 
 	CubeMap* GetCubeMap();
 

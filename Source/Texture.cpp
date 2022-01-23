@@ -19,23 +19,12 @@ Texture::~Texture()
 {
 	App->texture->DeleteTextureData(m_TextureData);
 	glDeleteTextures(1, &m_Texture);
-
-	if (m_SpecularTextureData != nullptr)
-	{
-		App->texture->DeleteTextureData(m_SpecularTextureData);
-		glDeleteTextures(1, &m_SpecularTexture);
-	}
 }
 
 void Texture::DrawImGui()
 {
-	ImGui::ColorEdit3("Diffuse color", &m_DiffuseColor[0]);
-	ImGui::ColorEdit3("Specular color", &m_SpecularColor[0]);
-
-	ImGui::Checkbox("Use specular Alpha as shininess", &m_ShininessAlpha);
-	ImGui::DragFloat("Shininess", &m_Shininess, 0.01f, 0.0f);
-
-	ImGui::Separator();
+	if (m_TextureData == nullptr)
+		return;
 
 	ImGui::Text("DiffuseTexture");
 	ImGui::Text("Name: %s", m_Name.c_str());
@@ -45,22 +34,8 @@ void Texture::DrawImGui()
 	ImGui::Text("Format: %s", FormatToString(m_TextureData->format));
 
 	ImGui::Image((void*)m_Texture, ImVec2(100, 100));
-
+	
 	ImGui::Separator();
-
-	if (m_SpecularTextureData != nullptr)
-	{
-		ImGui::Text("SpecularTexture");
-		//ImGui::Text("Name: %s", m_Name.c_str());
-		ImGui::Text("Witdh: %i", m_SpecularTextureData->width);
-		ImGui::Text("Height: %i", m_SpecularTextureData->height);
-		ImGui::Text("Depth: %i", m_SpecularTextureData->depth);
-		ImGui::Text("Format: %s", FormatToString(m_SpecularTextureData->format));
-
-		ImGui::Image((void*)m_Texture, ImVec2(100, 100));
-
-		ImGui::Separator();
-	}
 
 	bool change = false;
 

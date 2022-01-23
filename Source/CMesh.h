@@ -2,14 +2,13 @@
 #include "Component.h"
 
 #include "Mesh.h"
-#include "Texture.h"
-#include "ModuleProgram.h"
+#include "Material.h"
 
 class CMesh : public Component
 {
 public:
 	CMesh(bool _enabled, GameObject* _owner);
-	CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh, Texture* _texture);
+	CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh, Material* _material);
 	~CMesh() override;
 
 	void Enable() override;
@@ -33,6 +32,5 @@ private:
 	bool m_ShowBoundingBox;
 
 	// Material
-	Texture* m_Texture;
-	Shaders m_Shader; // currently not used
+	Material* m_Material;
 };

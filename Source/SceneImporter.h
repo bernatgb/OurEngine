@@ -19,8 +19,8 @@ namespace importer {
 	bool LoadFile(const char* path, char*& data);
 	bool LoadFile(const char* path, rapidjson::Document& jsonDocument);
 
-	void SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _materials, const std::map<std::string, Model*>& _models);
-	void LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _materials, std::map<std::string, Model*>& _models);
+	void SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _texture, const std::map<unsigned int, Material*>& _materials, const std::map<std::string, Model*>& _models);
+	void LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _textures, std::map<unsigned int, Material*>& _materials, std::map<std::string, Model*>& _models);
 
 	void LoadMeshes(std::map<unsigned int, Mesh*>& _meshes);
 	void LoadTextures(std::map<unsigned int, Texture*>& _textures);

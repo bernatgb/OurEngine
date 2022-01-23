@@ -38,7 +38,7 @@ bool ModuleScene::Init()
     m_Root->m_GUID = 0;
     m_GOSelected = nullptr;
 
-    importer::LoadResources(m_Meshes, m_Textures, m_Models);
+    importer::LoadResources(m_Meshes, m_Textures, m_Materials, m_Models);
 
     GameObject* camera = m_Root->AddChild("Camera");
     camera->AddComponent(new CCamera(true, camera));
@@ -56,7 +56,7 @@ bool ModuleScene::Init()
 
 bool ModuleScene::CleanUp()
 {
-    importer::SaveResources(m_Meshes, m_Textures, m_Models);
+    importer::SaveResources(m_Meshes, m_Textures, m_Materials, m_Models);
 
     delete qt;
 
@@ -66,6 +66,9 @@ bool ModuleScene::CleanUp()
         delete it->second;
 
     for (auto it = m_Textures.begin(); it != m_Textures.end(); ++it)
+        delete it->second;
+
+    for (auto it = m_Materials.begin(); it != m_Materials.end(); ++it)
         delete it->second;
 
     for (auto it = m_Models.begin(); it != m_Models.end(); ++it)

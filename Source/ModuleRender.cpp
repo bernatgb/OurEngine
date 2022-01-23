@@ -12,7 +12,7 @@
 #include "GL/glew.h"
 #include <MathGeoLib.h>
 
-#include "Texture.h"
+#include "Material.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -429,7 +429,7 @@ void ModuleRender::WindowResized(unsigned width, unsigned height)
 	glViewport(0, 0, width, height);
 }
 
-void ModuleRender::ActivateTexture(Texture* _texture)
+void ModuleRender::ActivateMaterial(Material* _material)
 {
 	/*glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _texture->m_Texture);
@@ -443,50 +443,46 @@ void ModuleRender::ActivateTexture(Texture* _texture)
 
 	loc = glGetUniformLocation(program, "hasDiffuseTex");
 	if (loc < 0) MY_LOG("Uniform location not found: hasDiffuseTex");
-	glUniform1i(loc, _texture->m_TextureData != nullptr);
+	glUniform1i(loc, _material->m_DiffuseTexture != nullptr);
 
 	loc = glGetUniformLocation(program, "hasSpecularTex");
 	if (loc < 0) MY_LOG("Uniform location not found: hasSpecularTex");
-	glUniform1i(loc, _texture->m_SpecularTextureData != nullptr);
+	glUniform1i(loc, _material->m_SpecularTexture != nullptr);
 
 	loc = glGetUniformLocation(program, "shininessAlpha");
 	if (loc < 0) MY_LOG("Uniform location not found: shininessAlpha");
-	glUniform1i(loc, _texture->m_ShininessAlpha);
+	glUniform1i(loc, _material->m_ShininessAlpha);
 
 	loc = glGetUniformLocation(program, "shininess");
 	if (loc < 0) MY_LOG("Uniform location not found: shininess");
-	glUniform1f(loc, _texture->m_Shininess);
+	glUniform1f(loc, _material->m_Shininess);
 
 	loc = glGetUniformLocation(program, "diffuseColor");
 	if (loc < 0) MY_LOG("Uniform location not found: diffuseColor");
-	float3 diffuseColor = _texture->m_DiffuseColor;
-	diffuseColor /= 256;
-	glUniform3fv(loc, 1, &diffuseColor[0]);
+	glUniform3fv(loc, 1, &_material->m_DiffuseColor[0]);
 
 	loc = glGetUniformLocation(program, "specularColor");
 	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
-	float3 specularColor = _texture->m_SpecularColor;
-	specularColor /= 256;
-	glUniform3fv(loc, 1, &specularColor[0]);
+	glUniform3fv(loc, 1, &_material->m_SpecularColor[0]);
 
-	if (_texture->m_TextureData != nullptr)
+	if (_material->m_DiffuseTexture != nullptr)
 	{
 		loc = glGetUniformLocation(program, "diffuseTex");
 		if (loc < 0) MY_LOG("Uniform location not found: diffuseTex");
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _texture->m_Texture);
+		glBindTexture(GL_TEXTURE_2D, _material->m_DiffuseTexture->m_Texture);
 		glUniform1i(loc, 0);
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
-	if (_texture->m_SpecularTextureData != nullptr)
+	if (_material->m_SpecularTexture != nullptr)
 	{
 		loc = glGetUniformLocation(program, "specularTex");
 		if (loc < 0) MY_LOG("Uniform location not found: specularTex");
 
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, _texture->m_SpecularTexture);
+		glBindTexture(GL_TEXTURE_2D, _material->m_SpecularTexture->m_Texture);
 		glUniform1i(loc, 0);
 		//glBindTexture(GL_TEXTURE_2D, 0);
 	}

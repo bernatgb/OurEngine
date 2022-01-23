@@ -233,6 +233,7 @@
     <ClCompile Include="ImGuizmo-1.83\ImGradient.cpp" />
     <ClCompile Include="ImGuizmo-1.83\ImGuizmo.cpp" />
     <ClCompile Include="ImGuizmo-1.83\ImSequencer.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialImporter.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK.cpp" />
     <ClCompile Include="MathGeoLib_Source\Algorithm\GJK2D.cpp" />
@@ -445,6 +446,7 @@
     <ClInclude Include="ImGuizmo-1.83\ImGuizmo.h" />
     <ClInclude Include="ImGuizmo-1.83\ImSequencer.h" />
     <ClInclude Include="ImGuizmo-1.83\ImZoomSlider.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialImporter.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK.h" />
     <ClInclude Include="MathGeoLib_Source\Algorithm\GJK2D.h" />

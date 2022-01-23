@@ -56,11 +56,11 @@ void Model::DrawImGui()
 		}
 	}
 
-	if (ImGui::CollapsingHeader("Textures"))
+	if (ImGui::CollapsingHeader("Materials"))
 	{
-		for (unsigned int i = 0; i < m_Textures.size(); ++i)
+		for (unsigned int i = 0; i < m_Materials.size(); ++i)
 		{
-			m_Textures[i]->DrawImGui();
+			m_Materials[i]->DrawImGui();
 		}
 	}
 }
@@ -72,7 +72,7 @@ GameObject* Model::RecursiveExportToGORoot(ModelNode* ourNode, GameObject* paren
 	//TODO: USE ourNode->m_Transform
 
 	for (unsigned int i = 0; i < ourNode->m_Meshes.size(); ++i)
-		go->AddComponent(new CMesh(true, go, ourNode->m_Meshes[i], m_Textures[ourNode->m_Meshes[0]->m_MaterialIndex]));
+		go->AddComponent(new CMesh(true, go, ourNode->m_Meshes[i], m_Materials[ourNode->m_Meshes[i]->m_MaterialIndex]));
 
 	for (unsigned int i = 0; i < ourNode->m_Children.size(); ++i)
 		RecursiveExportToGORoot(ourNode->m_Children[i], go);
