@@ -7,6 +7,7 @@
 #include "ModuleDebugDraw.h"
 #include "ModuleCamera.h"
 #include "ModuleScene.h"
+#include "Config.h"
 #include "CubeMap.h"
 #include "SDL.h"
 #include "GL/glew.h"
@@ -436,8 +437,8 @@ void ModuleRender::DrawImGui()
 	{
 		ImGui::ColorEdit3("Ambient color", &m_AmbientColor[0]);
 
-		ImGui::Checkbox("Draw axis", &m_DrawAxis);
-		ImGui::Checkbox("Draw grid", &m_DrawGrid);
+		ImGui::Checkbox("Draw axis", &Config::m_DrawAxis);
+		ImGui::Checkbox("Draw grid", &Config::m_DrawGrid);
 
 		ImGui::DragInt("Active cubemap", &m_ActiveCubeMap);
 

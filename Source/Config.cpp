@@ -10,6 +10,9 @@ float Config::m_Fov = 45.0f;
 float Config::m_ZNear = 0.1f;
 float Config::m_ZFar = 200.0f;
 
+bool Config::m_DrawAxis = true;
+bool Config::m_DrawGrid = true;
+
 void Config::LoadConfig()
 {
 	rapidjson::Document d;
@@ -21,6 +24,9 @@ void Config::LoadConfig()
 		m_Fov = d["Fov"].GetFloat();
 		m_ZNear = d["ZNear"].GetFloat();
 		m_ZFar = d["ZFar"].GetFloat();
+
+		m_DrawAxis = d["DrawAxis"].GetBool();
+		m_DrawGrid = d["DrawGrid"].GetBool();
 	}
 }
 
@@ -36,6 +42,9 @@ void Config::SaveConfig()
 	d.AddMember("Fov", rapidjson::Value(m_Fov), allocator);
 	d.AddMember("ZNear", rapidjson::Value(m_ZNear), allocator);
 	d.AddMember("ZFar", rapidjson::Value(m_ZFar), allocator);
+
+	d.AddMember("DrawAxis", m_DrawAxis, allocator);
+	d.AddMember("DrawGrid", m_DrawGrid, allocator);
 
 	importer::SaveFile(CONFIG_FILE, d);
 }

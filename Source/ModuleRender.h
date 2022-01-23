@@ -71,9 +71,6 @@ public:
 		return program; 
 	};
 
-	bool DrawAxis() const { return m_DrawAxis; };
-	bool DrawGrid() const { return m_DrawGrid; };
-
 private:
 	void* context = nullptr;
 	unsigned int program;
@@ -89,9 +86,6 @@ private:
 
 	CubeMap* cubeMap = nullptr;
 	int m_ActiveCubeMap = -1;
-
-	bool m_DrawAxis = true;
-	bool m_DrawGrid = true;
 
 	float2 viewportPanelSize;
 	float2 sceneWindowPos;

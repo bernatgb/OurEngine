@@ -14,5 +14,8 @@ public:
 	static float m_Fov;
 	static float m_ZNear;
 	static float m_ZFar;
+
+	static bool m_DrawAxis;
+	static bool m_DrawGrid;
 };
 
