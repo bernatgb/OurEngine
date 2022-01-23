@@ -196,8 +196,28 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 
 void ModuleCamera::AdjustToGO(GameObject* _go)
 {
-	float4 newPos = _go->GetCenter();
-	Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _go->GetDiameter();
+	bool meshFounded = false;
+	for (int i = 0; i < _go->m_Components.size(); ++i)
+	{
+		if (_go->m_Components[i]->m_Type == ComponentType::MESH)
+		{
+			meshFounded = true;
+			CMesh* mesh = (CMesh*)_go->m_Components[i];
+			float4 newPos = float4(mesh->GetMinPoint().x + (mesh->GetMaxPoint().x - mesh->GetMinPoint().x) / 2.0f, mesh->GetMinPoint().y + (mesh->GetMaxPoint().y - mesh->GetMinPoint().y) / 2.0f, mesh->GetMinPoint().z + (mesh->GetMaxPoint().z - mesh->GetMinPoint().z) / 2.0f, 1.0f);
+			Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * Distance3(float4(mesh->GetMaxPoint(), 0.0f), float4(mesh->GetMinPoint(), 0.0f));
+		}
+	}
+
+	if (!meshFounded)
+	{
+		for (int i = 0; i < _go->m_Children.size(); ++i)
+		{
+			AdjustToGO(_go->m_Children[i]);
+		}
+	}
+
+	//float4 newPos = _go->GetCenter();
+	//Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _go->GetDiameter();
 
 	// TODO: USE THE FOLLOWING FORMULA FOR THE DISTANCE
 	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
@@ -389,7 +409,9 @@ void ModuleCamera::DrawImGui()
 	
 		ImGui::Text("Vectors");
 		ImGui::DragFloat3("Cam pos", &Config::m_CamPosition[0], 1.0f, -25.0f, 25.0f, "%.2f");
-		
+		/// <summary>
+		/// 
+		/// </summary>
 		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT)
 		{
 			int mouse_x, mouse_y;
@@ -441,6 +463,7 @@ void ModuleCamera::DrawImGui()
 			if (!hits.empty())
 			{
 				SortHits(hits); // With ray.length?
+				//ImGui::Text("Mouse is pointing nt %s", hits[4]->m_Name);
 				std::vector< std::pair<float, GameObject*> > hitPointsDistances;
 				FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
 				std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
