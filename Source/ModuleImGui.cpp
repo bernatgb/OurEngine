@@ -154,7 +154,7 @@ update_status ModuleImGui::Update()
 			Time::DrawImGui();
 			App->camera->DrawImGui();
 			App->window->DrawImGui();
-			App->renderer->GetCubeMap()->DrawImGui();
+			App->renderer->DrawImGui();
 			SoftwareAndHardware();
 		}
 		ImGui::End();

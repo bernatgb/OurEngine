@@ -94,6 +94,9 @@ void CubeMap::LoadTexture(const std::vector<std::string>& _faces)
 
 void CubeMap::Draw(unsigned int index)
 {
+	if (index < 0 || index >= m_Textures.size())
+		return;
+
 	glDepthMask(GL_FALSE);
 	glUseProgram(m_Program);
 	float4x4 viewMatrixWithoutTrans = float4x4(App->camera->GetView().Float3x3Part());
@@ -115,7 +118,7 @@ void CubeMap::DrawImGui()
 	if (ImGui::CollapsingHeader("Skybox"))
 	{
 
-		ImGui::Image((void*)m_Textures[0], ImVec2(100, 100));
+		/*ImGui::Image((void*)m_Textures[0], ImVec2(100, 100));
 		ImGui::Text("Textures used for the skybox:");
 		for (int i = 0; i < m_TexturesNames.size(); ++i)
 		{
@@ -126,6 +129,6 @@ void CubeMap::DrawImGui()
 			ImGui::Image((void*)textureInfo->texture, ImVec2(50, 50));
 			App->texture->DeleteTextureData(textureInfo);
 			// TODO: change skybox cubemap files using imgui
-		}
+		}*/
 	}
 }

@@ -35,6 +35,8 @@ public:
 	bool CleanUp();
 	void WindowResized(unsigned width, unsigned height);
 	
+	void DrawImGui();
+
 	void ActivateMaterial(Material* _material);
 
 
@@ -80,7 +82,10 @@ private:
 
 	LightContainer m_LightsContainer;
 
+	float3 m_AmbientColor = float3(0.25f, 0.25f, 0.25f);
+
 	CubeMap* cubeMap = nullptr;
+	int m_ActiveCubeMap = -1;
 
 	float2 viewportPanelSize;
 	float2 sceneWindowPos;

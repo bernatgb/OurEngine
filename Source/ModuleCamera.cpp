@@ -384,8 +384,8 @@ void ModuleCamera::DrawImGui()
 			else
 				verticalFov = math::Atan(math::Tan(DEGTORAD * Config::m_Fov) / aspect);
 		}
-		ImGui::DragFloat("Z-near", &Config::m_ZNear, 1.0f, 0.1f, 5.0f, "%.2f");
-		ImGui::DragFloat("Z-far", &Config::m_ZNear, 5.0f, 6.0f, 400.0f, "%.2f");
+		ImGui::DragFloat("Z-near", &Config::m_ZNear, 0.5f, 0.01f, 5.0f, "%.2f");
+		ImGui::DragFloat("Z-far", &Config::m_ZFar, 5.0f, 6.0f, 1000.0f, "%.2f");
 	
 		ImGui::Text("Vectors");
 		ImGui::DragFloat3("Cam pos", &Config::m_CamPosition[0], 1.0f, -25.0f, 25.0f, "%.2f");

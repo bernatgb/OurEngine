@@ -179,6 +179,7 @@ bool ModuleRender::Init()
 
 	cubeMap = new CubeMap();
 	cubeMap->LoadTexture(faces);
+	m_ActiveCubeMap = 0;
 
 	viewportPanelSize = float2(0.0f, 0.0f);
 
@@ -327,10 +328,9 @@ update_status ModuleRender::Update()
 	float3 camPos = float3(App->camera->GetFrustum()->Pos()[0], App->camera->GetFrustum()->Pos()[1], App->camera->GetFrustum()->Pos()[2]);
 	glUniform3fv(loc, 1, &camPos[0]);
 
-	float3 color_a = float3(0.25f, 0.25f, 0.25f);
 	loc = glGetUniformLocation(program, "ambientColor");
 	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
-	glUniform3fv(loc, 1, &color_a[0]);
+	glUniform3fv(loc, 1, &m_AmbientColor[0]);
 
 	// TODO: MOVE TO THE PREUPDATE
 	App->scene->m_Lights.clear();
@@ -354,7 +354,8 @@ update_status ModuleRender::Update()
 	App->debugDraw->Draw(App->camera->GetView(), App->camera->GetProj(), viewportPanelSize.x, viewportPanelSize.y);
 
 	// Draw cubemap
-	cubeMap->Draw(0);
+	if (cubeMap != nullptr)
+		cubeMap->Draw(m_ActiveCubeMap);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -427,6 +428,18 @@ bool ModuleRender::CleanUp()
 void ModuleRender::WindowResized(unsigned width, unsigned height)
 {
 	glViewport(0, 0, width, height);
+}
+
+void ModuleRender::DrawImGui()
+{
+	if (ImGui::CollapsingHeader("Renderer")) 
+	{
+		ImGui::ColorEdit3("Ambient color", &m_AmbientColor[0]);
+
+		ImGui::DragInt("Active cubemap", &m_ActiveCubeMap);
+
+		cubeMap->DrawImGui();
+	}
 }
 
 void ModuleRender::ActivateMaterial(Material* _material)

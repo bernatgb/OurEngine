@@ -116,7 +116,7 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
     ImGui::PushStyleColor(ImGuiCol_Text, color);
 
     bool node_open = ImGui::TreeNodeEx(go, node_flags, go->m_Name);
-    if (ImGui::IsItemClicked()) // && !ImGui::IsItemToggledOpen())
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
     {
         node_clicked = go;
         m_GODrag = go;
