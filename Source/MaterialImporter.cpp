@@ -13,7 +13,7 @@
 
 #include <string>
 
-void importer::texture::Import(const char* filePath, Texture* ourTexture, const char* fullPath)
+bool importer::texture::Import(const char* filePath, Texture* ourTexture, const char* fullPath)
 {
 	ourTexture->m_GUID = rand();
 	ourTexture->m_Name = filePath;
@@ -43,7 +43,7 @@ void importer::texture::Import(const char* filePath, Texture* ourTexture, const 
 	if (fullPath == nullptr && ourTexture->m_TextureData == nullptr) // filePath = fullpath 
 	{
 		MY_LOG("Assimp texture: Texture couldn't be loaded");
-		return;
+		return false;
 	}
 
 	if (ourTexture->m_TextureData == nullptr)
@@ -65,13 +65,14 @@ void importer::texture::Import(const char* filePath, Texture* ourTexture, const 
 			if (ourTexture->m_TextureData == nullptr)
 			{
 				MY_LOG("Assimp texture: Texture couldn't be loaded");
-				return;
+				return false;
 			}
 		}
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, ourTexture->m_TextureData->format, ourTexture->m_TextureData->width, ourTexture->m_TextureData->height, 0, ourTexture->m_TextureData->format, GL_UNSIGNED_BYTE, ourTexture->m_TextureData->data);
 
 	MY_LOG("Assimp texture: Texture loaded correctly");
+	return true;
 }
 
 int importer::texture::Save(const Texture* ourTexture, char*& fileBuffer)
@@ -179,8 +180,14 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS) 
 	{
 		ourMaterial->m_DiffuseTexture = new Texture();
-		importer::texture::Import(file.data, ourMaterial->m_DiffuseTexture, fullPath);
-		App->scene->m_Textures[ourMaterial->m_DiffuseTexture->m_GUID] = ourMaterial->m_DiffuseTexture;
+		bool loaded = importer::texture::Import(file.data, ourMaterial->m_DiffuseTexture, fullPath);
+		if (loaded)
+			App->scene->m_Textures[ourMaterial->m_DiffuseTexture->m_GUID] = ourMaterial->m_DiffuseTexture;
+		else 
+		{
+			delete ourMaterial->m_DiffuseTexture;
+			ourMaterial->m_DiffuseTexture = nullptr;
+		}
 	}
 	else
 		MY_LOG("MaterialImporter: No diffuse texture");
@@ -188,8 +195,14 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	if (material->GetTexture(aiTextureType_SPECULAR, 0, &file) == AI_SUCCESS)
 	{
 		ourMaterial->m_SpecularTexture = new Texture();
-		importer::texture::Import(file.data, ourMaterial->m_SpecularTexture, fullPath);
-		App->scene->m_Textures[ourMaterial->m_SpecularTexture->m_GUID] = ourMaterial->m_SpecularTexture;
+		bool loaded = importer::texture::Import(file.data, ourMaterial->m_SpecularTexture, fullPath);
+		if (loaded)
+			App->scene->m_Textures[ourMaterial->m_SpecularTexture->m_GUID] = ourMaterial->m_SpecularTexture;
+		else
+		{
+			delete ourMaterial->m_SpecularTexture;
+			ourMaterial->m_SpecularTexture = nullptr;
+		}
 	}
 	else
 		MY_LOG("MaterialImporter: No specular texture");
