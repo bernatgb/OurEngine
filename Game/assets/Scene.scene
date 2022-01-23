@@ -1,0 +1,185 @@
+[
+    {
+        "GUID": 4278,
+        "Name": "Camera",
+        "Active": true,
+        "Parent": 0,
+        "Components": [
+            {
+                "Type": 1,
+                "Id": 12600,
+                "Enabled": true,
+                "Position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            {
+                "Type": 3,
+                "Id": 7298,
+                "Enabled": true,
+                "MainCamera": false,
+                "CullingCamera": false,
+                "Fov": 45.0,
+                "ZNear": 0.10000000149011612,
+                "ZFar": 200.0
+            }
+        ],
+        "Children": [],
+        "Min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Max": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    },
+    {
+        "GUID": 12707,
+        "Name": "BakerHouse.fbx",
+        "Active": true,
+        "Parent": 0,
+        "Components": [
+            {
+                "Type": 1,
+                "Id": 29939,
+                "Enabled": true,
+                "Position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "Scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        ],
+        "Children": [
+            {
+                "GUID": 19411,
+                "Name": "Chimney",
+                "Active": true,
+                "Parent": 12707,
+                "Components": [
+                    {
+                        "Type": 1,
+                        "Id": 10741,
+                        "Enabled": true,
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "Type": 2,
+                        "Id": 22458,
+                        "Enabled": true,
+                        "MeshId": 3510,
+                        "ShowBB": false,
+                        "MaterialId": 29897
+                    }
+                ],
+                "Children": [],
+                "Min": [
+                    1.5711853504180909,
+                    0.012897491455078125,
+                    -0.03543161228299141
+                ],
+                "Max": [
+                    2.2668659687042238,
+                    2.394075632095337,
+                    0.964568555355072
+                ]
+            },
+            {
+                "GUID": 25752,
+                "Name": "Baker_house",
+                "Active": true,
+                "Parent": 12707,
+                "Components": [
+                    {
+                        "Type": 1,
+                        "Id": 28522,
+                        "Enabled": true,
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    {
+                        "Type": 2,
+                        "Id": 7907,
+                        "Enabled": true,
+                        "MeshId": 17199,
+                        "ShowBB": false,
+                        "MaterialId": 29897
+                    }
+                ],
+                "Children": [],
+                "Min": [
+                    -1.5340535640716553,
+                    0.012897372245788575,
+                    -2.060347080230713
+                ],
+                "Max": [
+                    1.6797043085098267,
+                    3.555873394012451,
+                    1.906912922859192
+                ]
+            }
+        ],
+        "Min": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "Max": [
+            0.0,
+            0.0,
+            0.0
+        ]
+    }
+]

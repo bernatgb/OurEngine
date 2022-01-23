@@ -36,6 +36,7 @@ public:
 	void DrawImGuiResources();
 
 	void Draw(unsigned int program);
+	void LoadResource(const char* _fileName);
 	void LoadModel(const char* _fileName);
 
 	void LoadTempScene();

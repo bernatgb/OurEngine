@@ -43,7 +43,7 @@ void ModuleCamera::ViewProjectionMatrix()
 
 		// To visualize what gameCamera sees
 		//frustum = gameCameraFrustum;
-	}	 
+	}
 
 	view = float4x4(frustum.ViewMatrix());
 	proj = frustum.ProjectionMatrix();

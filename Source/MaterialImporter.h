@@ -9,7 +9,7 @@ struct aiString;
 
 namespace importer {
 	namespace texture {
-		void Import(const aiString& file, Texture* ourTexture, const char* fullPath);
+		void Import(const char* filePath, Texture* ourTexture, const char* fullPath);
 		int Save(const Texture* ourTexture, char*& fileBuffer);
 		void Load(const char* fileBuffer, Texture* ourTexture);
 	}

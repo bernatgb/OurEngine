@@ -69,7 +69,8 @@ GameObject* Model::RecursiveExportToGORoot(ModelNode* ourNode, GameObject* paren
 {
 	GameObject* go = parent->AddChild(ourNode->m_Name.c_str());
 
-	//TODO: USE ourNode->m_Transform
+	// Apply fbx transform 
+	//go->m_Transform->GizmoTransformChange(ourNode->m_Transform);
 
 	for (unsigned int i = 0; i < ourNode->m_Meshes.size(); ++i)
 		go->AddComponent(new CMesh(true, go, ourNode->m_Meshes[i], m_Materials[ourNode->m_Meshes[i]->m_MaterialIndex]));

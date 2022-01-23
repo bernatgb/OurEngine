@@ -188,12 +188,15 @@ void RecusiveNodeFromJson(const rapidjson::Value& node, ModelNode*& modelNode) {
 
 	//Get transform
 	rapidjson::Value::ConstValueIterator transItr = it->value.Begin();
-	modelNode->m_Transform = float4x4(
-		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
-		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
-		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(),
-		transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat(), transItr++->GetFloat()
-	);
+	modelNode->m_Transform = float4x4::identity;
+	for (unsigned int i = 0; i < 4; ++i)
+	{
+		for (unsigned int j = 0; j < 4; ++j) 
+		{
+			modelNode->m_Transform[i][j] = transItr->GetFloat();
+			++transItr;
+		}
+	}
 	++it;
 
 	//Get meshes

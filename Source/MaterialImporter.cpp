@@ -13,10 +13,16 @@
 
 #include <string>
 
-void importer::texture::Import(const aiString& file, Texture* ourTexture, const char* fullPath)
+void importer::texture::Import(const char* filePath, Texture* ourTexture, const char* fullPath)
 {
 	ourTexture->m_GUID = rand();
-	ourTexture->m_Name = file.data;
+	ourTexture->m_Name = filePath;
+	if (fullPath == nullptr) // filePath = fullpath 
+	{
+		const size_t last_slash_idx = ourTexture->m_Name.rfind('\\');
+		if (std::string::npos != last_slash_idx)
+			ourTexture->m_Name = ourTexture->m_Name.substr(last_slash_idx + 1, ourTexture->m_Name.length());
+	}
 
 	ourTexture->m_MinFilter = GL_LINEAR;
 	ourTexture->m_MagFilter = GL_LINEAR;
@@ -31,21 +37,28 @@ void importer::texture::Import(const aiString& file, Texture* ourTexture, const 
 
 	ourTexture->m_TextureData = nullptr;
 
-	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", file.data);
-	ourTexture->m_TextureData = App->texture->LoadAndReturnTextureData(file.data);
+	MY_LOG("Assimp texture (%s): Loading model from the path described in the FBX", filePath);
+	ourTexture->m_TextureData = App->texture->LoadAndReturnTextureData(filePath);
+
+	if (fullPath == nullptr && ourTexture->m_TextureData == nullptr) // filePath = fullpath 
+	{
+		MY_LOG("Assimp texture: Texture couldn't be loaded");
+		return;
+	}
+
 	if (ourTexture->m_TextureData == nullptr)
 	{
 		std::string directoryPath = fullPath;
 		const size_t last_slash_idx = directoryPath.rfind('\\');
 		if (std::string::npos != last_slash_idx)
-			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + file.data;
+			directoryPath = directoryPath.substr(0, last_slash_idx) + '\\' + filePath;
 
 		MY_LOG("Assimp texture (%s): Loading model from the same folder you of the FBX", directoryPath.c_str());
 		ourTexture->m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
 		if (ourTexture->m_TextureData == nullptr)
 		{
 			directoryPath = TEXTURES_FOLDER;
-			directoryPath += file.data;
+			directoryPath += filePath;
 
 			MY_LOG("Assimp texture (%s): Loading model from the Textures/ folder", directoryPath.c_str());
 			ourTexture->m_TextureData = App->texture->LoadAndReturnTextureData(directoryPath.c_str());
@@ -166,7 +179,7 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	if (material->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS) 
 	{
 		ourMaterial->m_DiffuseTexture = new Texture();
-		importer::texture::Import(file, ourMaterial->m_DiffuseTexture, fullPath);
+		importer::texture::Import(file.data, ourMaterial->m_DiffuseTexture, fullPath);
 		App->scene->m_Textures[ourMaterial->m_DiffuseTexture->m_GUID] = ourMaterial->m_DiffuseTexture;
 	}
 	else
@@ -175,7 +188,7 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	if (material->GetTexture(aiTextureType_SPECULAR, 0, &file) == AI_SUCCESS)
 	{
 		ourMaterial->m_SpecularTexture = new Texture();
-		importer::texture::Import(file, ourMaterial->m_SpecularTexture, fullPath);
+		importer::texture::Import(file.data, ourMaterial->m_SpecularTexture, fullPath);
 		App->scene->m_Textures[ourMaterial->m_SpecularTexture->m_GUID] = ourMaterial->m_SpecularTexture;
 	}
 	else

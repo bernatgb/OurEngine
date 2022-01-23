@@ -114,7 +114,7 @@ update_status ModuleInput::PreUpdate()
                 break;
             case SDL_DROPFILE: {
                 MY_LOG("File dropped %s", sdlEvent.drop.file);
-                App->scene->LoadModel(sdlEvent.drop.file);
+                App->scene->LoadResource(sdlEvent.drop.file);
                 SDL_free(sdlEvent.drop.file);
                 break;
             }

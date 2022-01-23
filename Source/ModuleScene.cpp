@@ -40,14 +40,19 @@ bool ModuleScene::Init()
 
     importer::LoadResources(m_Meshes, m_Textures, m_Materials, m_Models);
 
-    GameObject* camera = m_Root->AddChild("Camera");
-    camera->AddComponent(new CCamera(true, camera));
+    //GameObject* camera = m_Root->AddChild("Camera");
+    //camera->AddComponent(new CCamera(true, camera));
 
     qt = new Quadtree();
     AABB boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
     qt->SetBoundaries(boundaries);
 
-    LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
+    //LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
+
+    m_GOSelected = nullptr;
+    rapidjson::Document d;
+    importer::LoadFile(".\\Assets\\Scene.scene", d);
+    LoadScene(d);
 
     currentGizmoOperation = ImGuizmo::TRANSLATE;
 
@@ -235,6 +240,8 @@ void ModuleScene::DrawImGuiResources()
         ImGuiFileDialog::Instance()->Close();
     }
 
+    ImGui::SameLine();
+
     // Save scene
     if (ImGui::Button("Save Scene"))
         ImGuiFileDialog::Instance()->OpenDialog("SaveScene", "Save Scene", ".scene", ".");
@@ -256,6 +263,8 @@ void ModuleScene::DrawImGuiResources()
         ImGuiFileDialog::Instance()->Close();
     }
 
+    // TODO: CREATE MATERIAL
+
     ImGui::Separator();
 
     for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
@@ -271,7 +280,7 @@ void ModuleScene::DrawImGuiResources()
 
 void ModuleScene::Draw(unsigned int program)
 {
-    // Gizmos TODO gizmos/controller
+    // Gizmos // TODO gizmos controller
     if (m_GOSelected != nullptr)
     {
         if (App->input->GetKey(SDL_SCANCODE_T) == KeyState::KEY_DOWN)
@@ -307,6 +316,22 @@ void ModuleScene::Draw(unsigned int program)
     if (App->input->GetKey(SDL_SCANCODE_LCTRL) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_D) == KEY_DOWN && m_GOSelected != nullptr)
     {
         m_GOSelected->Clone(m_GOSelected->m_Parent);
+    }
+}
+
+void ModuleScene::LoadResource(const char* _fileName)
+{
+    std::string extension = _fileName;
+    const size_t last_slash_idx = extension.rfind('.');
+    extension = extension.substr(last_slash_idx + 1, extension.length());
+
+    if (extension == "fbx")
+        LoadModel(_fileName);
+    else if (extension == "png" || extension == "jpg" || extension == "tif")
+    {
+        Texture* newTexture = new Texture();
+        importer::texture::Import(_fileName, newTexture, nullptr);
+        m_Textures[newTexture->m_GUID] = newTexture;
     }
 }
 
