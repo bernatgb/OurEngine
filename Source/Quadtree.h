@@ -31,6 +31,8 @@ public:
 	QuadtreeNode** GetChildren() { return m_children; }; 
 	std::list<GameObject*> GetGameObjectsInThisNode() const { return gameObjects; };
 
+	void Clear();
+
 private:
 	AABB m_nodeAABB;
 	QuadtreeNode* m_parent = nullptr;
@@ -50,6 +52,8 @@ public:
 	void SetBoundaries(AABB aabb);
 
 	void SetObejctsInFrustum(Frustum* frustum);
+
+	void Clear();
 
 	QuadtreeNode* GetRoot() const { return m_root; };
 
