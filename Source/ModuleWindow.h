@@ -24,7 +24,12 @@ public:
 	void WindowResized(unsigned _width, unsigned _height);
 	void DrawImGui();
 
-public:
+	// Getters
+	SDL_Window* GetWindow() const { return window; };
+	int GetWidth() const { return width; };
+	int GetHeight() const { return height; };
+
+private:
 	//The window we'll be rendering to
 	SDL_Window* window = NULL;
 

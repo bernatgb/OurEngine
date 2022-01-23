@@ -119,7 +119,7 @@ bool QuadtreeNode::IsLeaf()
 	return m_children[0] == nullptr;
 }
 
-void QuadtreeNode::GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goToPaint)
+void QuadtreeNode::SetObejctsInFrustum(Plane planes[6])
 {
 	float3 cornerPoints[8];
 	m_nodeAABB.GetCornerPoints(cornerPoints);
@@ -136,7 +136,7 @@ void QuadtreeNode::GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goT
 
 			if (!go->m_InFrustum && Intersects(planes, goCornerPoints))
 			{
-				goToPaint.push_back(go);
+				//goToPaint.push_back(go);
 				go->m_InFrustum = true;
 			}
 		}
@@ -144,7 +144,7 @@ void QuadtreeNode::GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goT
 		for (int i = 0; i < 4; ++i)
 		{
 			if (m_children[i] != nullptr)
-				m_children[i]->GetObjectsToPaint(planes, goToPaint);
+				m_children[i]->SetObejctsInFrustum(planes); //m_children[i]->GetObjectsToPaint(planes, goToPaint);
 		}
 	}
 }
@@ -208,12 +208,13 @@ void Quadtree::SetBoundaries(AABB aabb)
 	m_root = new QuadtreeNode(aabb, nullptr);
 }
 
-void Quadtree::GetObejctsToPaint(Frustum* frustum)
+void Quadtree::SetObejctsInFrustum(Frustum* frustum)
 {
 	Plane planes[6];
 	frustum->GetPlanes(planes);
 
-	std::list<GameObject*> goToPaint;
+	//std::list<GameObject*> goToPaint;
 
-	m_root->GetObjectsToPaint(planes, goToPaint);
+	//m_root->SetObejctsInFrustum(planes, goToPaint);
+	m_root->SetObejctsInFrustum(planes);
 }

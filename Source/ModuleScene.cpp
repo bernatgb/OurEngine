@@ -282,8 +282,8 @@ void ModuleScene::Draw(unsigned int program)
             currentGizmoOperation = ImGuizmo::SCALE;
 
         float4x4 mat4 = App->scene->GetSelectedGO()->m_Transform->m_AccumulativeModelMatrix.Transposed();
-        float4x4 view = App->camera->view.Transposed();
-        float4x4 proj = App->camera->proj.Transposed();
+        float4x4 view = App->camera->GetView().Transposed();
+        float4x4 proj = App->camera->GetProj().Transposed();
 
         const ImVec2 newViewportPosition = ImGui::GetWindowPos();
         const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
@@ -450,6 +450,38 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
 
     for (unsigned int i = 0; i < _go->m_Children.size(); ++i)
         RecursiveSearch(_go->m_Children[i], ancestors && _go->m_Active, firstFrame);
+}
+
+Model* ModuleScene::FindModel(std::string _modelName) 
+{
+    std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);
+    if (it != m_Models.end())
+        return it->second;
+    return nullptr;
+}
+
+Mesh* ModuleScene::FindMesh(unsigned int _meshId) 
+{
+    std::map<unsigned int, Mesh*>::iterator it = m_Meshes.find(_meshId);
+    if (it != m_Meshes.end())
+        return it->second;
+    return nullptr;
+}
+
+Material* ModuleScene::FindMaterial(unsigned int _materialId) 
+{
+    std::map<unsigned int, Material*>::iterator it = m_Materials.find(_materialId);
+    if (it != m_Materials.end())
+        return it->second;
+    return nullptr;
+}
+
+Texture* ModuleScene::FindTexture(unsigned int _textureId) 
+{
+    std::map<unsigned int, Texture*>::iterator it = m_Textures.find(_textureId);
+    if (it != m_Textures.end())
+        return it->second;
+    return nullptr;
 }
 
 

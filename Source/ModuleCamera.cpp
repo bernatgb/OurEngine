@@ -35,7 +35,7 @@ void ModuleCamera::ViewProjectionMatrix()
 
 	if (m_CullingCamera != nullptr)
 	{
-		gameCameraFrustum = m_CullingCamera->frustum;
+		gameCameraFrustum = *m_CullingCamera->GetCCameraFrustum();
 
 		/*gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
 		gameCameraFrustum.SetViewPlaneDistances(m_CullingCamera->zNear, m_CullingCamera->zFar);
@@ -69,7 +69,7 @@ bool ModuleCamera::Init()
 	//view = float4x4::LookAt(float3(0.0f, 4.0f, 8.0f), float3(0.0f, 0.0f, 0.0f), float3::unitY, float3::unitY);
 	//LookAt(camera forward(right), target dir, local up, world up)
 
-	aspect = (float)App->window->width / (float)App->window->height;
+	aspect = (float)App->window->GetWidth() / (float)App->window->GetHeight();
 
 	if (aspect >= 1.0f)
 		verticalFov = DEGTORAD * Config::m_Fov;
@@ -217,7 +217,7 @@ void ModuleCamera::SetCullingCamera(CCamera* _camera)
 	}
 	else 
 	{
-		m_CullingCamera->m_CullingCamera = false;
+		m_CullingCamera->SetCullingCamera(false);
 		m_CullingCamera = _camera;
 	}
 
@@ -358,7 +358,7 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 			if (hits[i]->m_Components[j]->m_Type == ComponentType::MESH)
 			{
 				CMesh* cMesh = (CMesh*)hits[i]->m_Components[j];
-				std::vector<Triangle> triangles = cMesh->m_Triangles;
+				std::vector<Triangle> triangles = cMesh->GetTriangles();
 				
 				for (int k = 0; k < triangles.size(); ++k)
 				{

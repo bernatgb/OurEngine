@@ -99,7 +99,7 @@ bool ModuleRender::Init()
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24); // depth buffer with 24 bits
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8); // stencil buffer with 8 bits
 
-	context = SDL_GL_CreateContext(App->window->window);
+	context = SDL_GL_CreateContext(App->window->GetWindow());
 
 	GLenum err = glewInit();
 	// … check for errors
@@ -191,7 +191,7 @@ update_status ModuleRender::PreUpdate()
 
 	int w;
 	int h;
-	SDL_GetWindowSize(App->window->window, &w, &h);
+	SDL_GetWindowSize(App->window->GetWindow(), &w, &h);
 	glViewport(0, 0, w, h);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -250,8 +250,8 @@ update_status ModuleRender::Update()
 	sceneWindowPos = float2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
 
 	glUseProgram(program);
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->GetView()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->GetProj()[0][0]);
 	// Model?
 	//GLfloat camPos = App->camera->GetFrustum()->Pos()[0];
 	//const GLfloat* constCamPos = &camPos;
@@ -335,7 +335,7 @@ update_status ModuleRender::Update()
 	// TODO: MOVE TO THE PREUPDATE
 	App->scene->m_Lights.clear();
 	App->scene->RecursiveSearch(App->scene->GetRoot(), true); 
-	App->scene->GetQuadtree()->GetObejctsToPaint(App->camera->GetCullingCamera());
+	App->scene->GetQuadtree()->SetObejctsInFrustum(App->camera->GetCullingCamera());
 
 	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();
 	int i = 0;
@@ -351,7 +351,7 @@ update_status ModuleRender::Update()
 
 
 	App->scene->Draw(program);
-	App->debugDraw->Draw(App->camera->view, App->camera->proj, viewportPanelSize.x, viewportPanelSize.y);
+	App->debugDraw->Draw(App->camera->GetView(), App->camera->GetProj(), viewportPanelSize.x, viewportPanelSize.y);
 
 	// Draw cubemap
 	cubeMap->Draw(0);
@@ -397,7 +397,7 @@ update_status ModuleRender::PostUpdate()
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	SDL_GL_SwapWindow(App->window->window);
+	SDL_GL_SwapWindow(App->window->GetWindow());
 
 	return UPDATE_CONTINUE;
 }

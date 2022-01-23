@@ -47,42 +47,12 @@ public:
 
 	void RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame = false);
 
-	Model* FindModel(std::string _modelName) {
-		std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);
-		if (it != m_Models.end())
-			return it->second;
-		return nullptr;
-	};
+	Model* FindModel(std::string _modelName); // TODO: delete?
+	Mesh* FindMesh(unsigned int _meshId);
+	Material* FindMaterial(unsigned int _materialId);
+	Texture* FindTexture(unsigned int _textureId);
 
-	Mesh* FindMesh(unsigned int _meshId) {
-		std::map<unsigned int, Mesh*>::iterator it = m_Meshes.find(_meshId);
-		if (it != m_Meshes.end())
-			return it->second;
-		return nullptr;
-	};
-
-	Material* FindMaterial(unsigned int _materialId) {
-		std::map<unsigned int, Material*>::iterator it = m_Materials.find(_materialId);
-		if (it != m_Materials.end())
-			return it->second;
-		return nullptr;
-	};
-
-	Texture* FindTexture(unsigned int _textureId) {
-		std::map<unsigned int, Texture*>::iterator it = m_Textures.find(_textureId);
-		if (it != m_Textures.end())
-			return it->second;
-		return nullptr;
-	};
-
-	std::map<std::string, Model*> m_Models;
-	std::map<unsigned int, Mesh*> m_Meshes;
-	std::map<unsigned int, Material*> m_Materials;
-	std::map<unsigned int, Texture*> m_Textures;
-
-	std::list<Light> m_Lights;
-
-	// Gets
+	// Getters
 	GameObject* GetRoot() const
 	{
 		return m_Root;
@@ -91,8 +61,37 @@ public:
 	{
 		return m_GOSelected;
 	};
+	Quadtree* GetQuadtree() const
+	{ 
+		return qt; 
+	};
+	std::map<std::string, Model*> GetModels()
+	{
+		return m_Models;
+	};
+	std::map<unsigned int, Mesh*> GetMeshes()
+	{
+		return m_Meshes;
+	};
+	std::map<unsigned int, Material*> GetMaterials()
+	{
+		return m_Materials;
+	};
+	std::map<unsigned int, Texture*> GetTextures()
+	{
+		return m_Textures;
+	};
+	std::list<Light> GetLights()
+	{
+		return m_Lights;
+	};
 
-	Quadtree* GetQuadtree() { return qt; };
+	std::map<std::string, Model*> m_Models;
+	std::map<unsigned int, Mesh*> m_Meshes;
+	std::map<unsigned int, Material*> m_Materials;
+	std::map<unsigned int, Texture*> m_Textures;
+
+	std::list<Light> m_Lights;
 
 private:
 	GameObject* m_Root = nullptr;

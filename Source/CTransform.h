@@ -23,8 +23,9 @@ public:
 	float3 GetForward(bool normalize = false) const;
 	float3 GetUp(bool normalize = false) const;
 	float3 GetRight(bool normalize = false) const;
-
+	float4x4 GetAccumulativeModelMatrix() const { return m_AccumulativeModelMatrix; };
 	float4x4 m_AccumulativeModelMatrix = float4x4::identity;
+	
 
 private:
 	void RecalculateModelMatrix();

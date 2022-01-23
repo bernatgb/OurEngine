@@ -22,13 +22,14 @@ public:
 	bool IsMin();
 	bool IsLeaf();
 
-	void GetObjectsToPaint(Plane planes[6], std::list<GameObject*> goToPaint);
+	//void SetObejctsInFrustum(Plane planes[6], std::list<GameObject*> goToPaint);
+	void SetObejctsInFrustum(Plane planes[6]);
 	bool Intersects(Plane planes[6], float3 cornerPoints[8]);
 
 	AABB GetAABB() { return m_nodeAABB; };
-	QuadtreeNode* GetParent() { return m_parent; }; // const x2
-	QuadtreeNode** GetChildren() { return m_children; }; // const x2
-	std::list<GameObject*> GetGameObjectsInThisNode() { return gameObjects; }; // const
+	const QuadtreeNode* GetParent() const { return m_parent; };
+	QuadtreeNode** GetChildren() { return m_children; }; 
+	std::list<GameObject*> GetGameObjectsInThisNode() const { return gameObjects; };
 
 private:
 	AABB m_nodeAABB;
@@ -48,9 +49,9 @@ public:
 
 	void SetBoundaries(AABB aabb);
 
-	void GetObejctsToPaint(Frustum* frustum); // const
+	void SetObejctsInFrustum(Frustum* frustum);
 
-	QuadtreeNode* GetRoot() { return m_root; };
+	QuadtreeNode* GetRoot() const { return m_root; };
 
 private:
 	QuadtreeNode* m_root = nullptr;

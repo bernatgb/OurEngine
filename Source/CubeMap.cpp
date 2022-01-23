@@ -96,10 +96,10 @@ void CubeMap::Draw(unsigned int index)
 {
 	glDepthMask(GL_FALSE);
 	glUseProgram(m_Program);
-	float4x4 viewMatrixWithoutTrans = float4x4(App->camera->view.Float3x3Part());
+	float4x4 viewMatrixWithoutTrans = float4x4(App->camera->GetView().Float3x3Part());
 	glUniformMatrix4fv(glGetUniformLocation(m_Program, "view"), 1, GL_TRUE, &viewMatrixWithoutTrans[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(m_Program, "view"), 1, GL_TRUE, &App->camera->view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_Program, "proj"), 1, GL_TRUE, &App->camera->proj[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_Program, "proj"), 1, GL_TRUE, &App->camera->GetProj()[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_Textures[index]);

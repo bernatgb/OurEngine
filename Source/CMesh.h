@@ -22,14 +22,19 @@ public:
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;
 
+	// Getters
+	//float3 GetBB() { return m_BB; };
+	float3 GetMinPoint() const { return m_MinPoint; };
+	float3 GetMaxPoint() const { return m_MaxPoint; };
+	std::vector<Triangle> GetTriangles() const { return m_Triangles; };
 	float3 m_BB[8];
-	float3 m_MinPoint, m_MaxPoint;
-	std::vector<Triangle> m_Triangles;
 
 private:
 	// Mesh
-	Mesh* m_Mesh;
+	Mesh* m_Mesh = nullptr;
 	bool m_ShowBoundingBox;
+	float3 m_MinPoint, m_MaxPoint;
+	std::vector<Triangle> m_Triangles;
 
 	// Material
 	Material* m_Material;

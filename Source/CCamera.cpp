@@ -105,13 +105,6 @@ void CCamera::OnLoad(const rapidjson::Value& node)
 	frustum.SetUp(m_Owner->m_Transform->GetUp());
 }
 
-Frustum* CCamera::GetCCameraFrustum()
-{
-	return &frustum;
-}
-
-
-
 void CCamera::DrawImGui()
 {
 	if (ImGui::CollapsingHeader("Camera"))
@@ -159,6 +152,20 @@ void CCamera::DrawImGui()
 		App->debugDraw->DrawBB(frustumPoints);
 		delete[] frustumPoints;
 	}
+}
+
+
+// Getters
+Frustum* CCamera::GetCCameraFrustum()
+{
+	return &frustum;
+}
+
+
+// Setters
+void CCamera::SetCullingCamera(bool setCullingCam)
+{
+	m_CullingCamera = setCullingCam;
 }
 
 void CCamera::SetFov(float _fov)

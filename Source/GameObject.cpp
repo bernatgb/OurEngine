@@ -85,7 +85,7 @@ void GameObject::Update()
 	//if (IsInFrustumViaQuadtree(App->scene->GetQuadtree()->GetRoot()))
 	if(m_InFrustum)
 	{
-		glUniformMatrix4fv(glGetUniformLocation(App->renderer->program, "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(App->renderer->GetProgram(), "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
 	}
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
@@ -318,16 +318,16 @@ void GameObject::RecalculateBB()
 			CMesh* cMesh = (CMesh*)m_Components[i];
 			if (firstMesh)
 			{
-				m_Min = cMesh->m_MinPoint.Min(cMesh->m_MaxPoint);
-				m_Max = cMesh->m_MaxPoint.Max(cMesh->m_MinPoint);
+				m_Min = cMesh->GetMinPoint().Min(cMesh->GetMaxPoint());
+				m_Max = cMesh->GetMaxPoint().Max(cMesh->GetMinPoint());
 				firstMesh = false;
 			}
 			else
 			{
-				m_Min = m_Min.Min(cMesh->m_MinPoint);
-				m_Min = m_Min.Min(cMesh->m_MaxPoint);
-				m_Max = m_Max.Max(cMesh->m_MinPoint);
-				m_Max = m_Max.Max(cMesh->m_MaxPoint);
+				m_Min = m_Min.Min(cMesh->GetMinPoint());
+				m_Min = m_Min.Min(cMesh->GetMaxPoint());
+				m_Max = m_Max.Max(cMesh->GetMinPoint());
+				m_Max = m_Max.Max(cMesh->GetMaxPoint());
 			}
 		}
 	}

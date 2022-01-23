@@ -37,13 +37,13 @@ public:
 	
 	void ActivateMaterial(Material* _material);
 
-	CubeMap* GetCubeMap();
 
-	void* context;
-	unsigned int program;
+	//void* context = nullptr;
+	//unsigned int program;
 
 
 	//Gets
+	CubeMap* GetCubeMap();
 	float2 GetSceneWindowSize() const
 	{
 		return viewportPanelSize;
@@ -60,8 +60,18 @@ public:
 	{
 		return viewportSizeChanged;
 	};
+	void* GetContext() 
+	{
+		return context; 
+	};
+	unsigned int GetProgram() const
+	{
+		return program; 
+	};
 
 private:
+	void* context = nullptr;
+	unsigned int program;
 
 	unsigned int fbo;
 	unsigned int fbo_texture;
@@ -70,7 +80,7 @@ private:
 
 	LightContainer m_LightsContainer;
 
-	CubeMap* cubeMap;
+	CubeMap* cubeMap = nullptr;
 
 	float2 viewportPanelSize;
 	float2 sceneWindowPos;

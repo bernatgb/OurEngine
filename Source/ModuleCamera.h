@@ -25,25 +25,29 @@ public:
 	void ViewProjectionMatrix();
 	void AdjustToGO(GameObject* _go);
 
-	void SetCullingCamera(CCamera* _camera);
-	
-	Frustum* GetFrustum();
-	//Frustum* GetGameCameraFrustum();
-	Frustum* GetCullingCamera();
 	bool BoxInFrustum(Frustum const& fru, const float3* box);
 
 	void FindIfRayIntersectsAnAABBandAddToHits(LineSegment ray, GameObject* go, std::vector<GameObject*>& hits);
 	void FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*>& hits);
 	void SortHits(std::vector<GameObject*>& hits);
 	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits, std::vector< std::pair<float, GameObject*> >& hitPointsDistances);
+	
+	// Getters
+	float4x4 GetView() const { return view; };
+	float4x4 GetProj() const { return proj; };
+	Frustum* GetFrustum();
+	Frustum* GetCullingCamera();
 
-	float4x4 view, proj;
-	//float3 eye;
+	// Setters
+	void SetCullingCamera(CCamera* _camera);
 
 private:
 	void Rotate(float _deltaPitch, float _deltaYaw);
 
-	CCamera* m_CullingCamera;
+	float4x4 view, proj;
+	//float3 eye;
+
+	CCamera* m_CullingCamera = nullptr;
 
 	//Quat m_CameraRotation;
 	float3 m_PitchYawRoll;

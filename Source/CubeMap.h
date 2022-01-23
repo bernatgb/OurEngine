@@ -13,6 +13,7 @@ public:
 	void Draw(unsigned int index);
 	void DrawImGui();
 
+private:
 	unsigned int m_Program;
 	unsigned int m_Vao;
 	unsigned int m_Vbo;

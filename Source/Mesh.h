@@ -33,7 +33,7 @@ public:
 	unsigned int m_Vbo;
 	unsigned int m_Ebo;
 
-	float3* m_BB;
+	float3* m_BB = nullptr;
 
 	std::vector<Triangle> m_Triangles;
 };

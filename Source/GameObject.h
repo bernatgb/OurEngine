@@ -48,12 +48,12 @@ public:
 	void DrawImGui();
 
 	unsigned int m_GUID;
-	char* m_Name;
+	char* m_Name = nullptr;
 	bool m_Active;
 	bool m_InFrustum;
 	CTransform* m_Transform;
 	std::vector<Component*> m_Components;
-	GameObject* m_Parent;
+	GameObject* m_Parent = nullptr;
 	std::vector<GameObject*> m_Children;
 	AABB m_aabb;
 	bool m_showAABB;

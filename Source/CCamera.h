@@ -20,12 +20,15 @@ public:
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;
 
+	// Getters
 	Frustum* GetCCameraFrustum();
 
-	// Sets
+	// Setters
+	void SetCullingCamera(bool setCullingCam);
 	void SetFov(float _fov);
 	void SetZNearAndFar(float _zNear, float _zFar);
 
+private:
 	bool m_MainCamera = false;
 	bool m_CullingCamera = false;
 
