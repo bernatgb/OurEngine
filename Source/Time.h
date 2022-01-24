@@ -60,8 +60,11 @@ private:
 	static std::vector<float> m_DeltaTimeGraph;
 
 	static double m_pause;
+	static double m_pauseMoment;
 	static double m_pausedTime;
+	static double m_notPlayedTime;
 	static bool m_gamePaused;
+	static bool m_gamePlayed;
 	static int m_stepFrame;
 };
 

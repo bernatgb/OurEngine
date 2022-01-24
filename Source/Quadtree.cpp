@@ -166,17 +166,7 @@ bool QuadtreeNode::Intersects(Plane planes[6], float3 cornerPoints[8])
 
 void QuadtreeNode::Clear()
 {
-	if (IsLeaf())
-		delete this;
-	else
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			m_children[i]->Clear();
-		}
-	}
-
-	delete this;
+	
 }
 
 /* QUADTREE */
@@ -236,5 +226,7 @@ void Quadtree::SetObejctsInFrustum(Frustum* frustum)
 
 void Quadtree::Clear()
 {
-	m_root->Clear();
+	AABB boundaries = m_root->GetAABB();
+	delete m_root;
+	SetBoundaries(boundaries);
 }

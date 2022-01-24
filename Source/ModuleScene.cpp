@@ -377,6 +377,7 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
         m_Root->AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
     }
 
+    qt->Clear();
     AddToQuadtreeIfHasMesh(qt, m_Root);
 }
 

@@ -32,8 +32,11 @@ std::vector<float> Time::m_FPSGraph = std::vector<float>(100);
 std::vector<float> Time::m_DeltaTimeGraph = std::vector<float>(100);
 
 double Time::m_pause = 0;
+double Time::m_pauseMoment = 0;
 double Time::m_pausedTime = 0;
-bool Time::m_gamePaused = true;
+double Time::m_notPlayedTime = 0;
+bool Time::m_gamePaused = false;
+bool Time::m_gamePlayed = false;
 int Time::m_stepFrame = 0;
 
 void Time::NewFrame()
@@ -98,13 +101,11 @@ void Time::LimitFramerate()
 void Time::PlayButton()
 {
 	m_pausedTime += GetTime() - m_pause;
-	m_gamePaused = false;
 }
 
 void Time::PauseButton()
 {
 	m_pause = GetTime();
-	m_gamePaused = true;
 	m_stepFrame = GetFrameCount();
 }
 
@@ -118,17 +119,14 @@ double Time::GetGameTime()
 {
 	if (m_gamePaused)
 	{
-		if (m_pausedTime == 0)
-			return m_pause;
-		else
-			return m_pause - m_pausedTime;
+		return m_pauseMoment;
 	}
 	else
 	{
-		if (m_pausedTime == 0)
-			return GetTime();
+		if (!m_gamePlayed)
+			return 0;
 		else
-			return GetTime() - m_pausedTime;
+			return GetTime() - (m_notPlayedTime + m_pausedTime);
 	}
 }
 
@@ -183,23 +181,36 @@ void Time::DrawImGui()
 
 		if (ImGui::Button("Play |>"))
 		{
-			if (m_gamePaused) 
+			if (!m_gamePlayed) 
 			{
 				App->scene->SaveTempScene();
-				PlayButton();
+				//PlayButton();
+				m_notPlayedTime = GetTime();
+				m_pausedTime = 0;
 			}
 			else
 			{
 				App->scene->LoadTempScene();
 			}
+			m_gamePlayed = !m_gamePlayed;
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Pause ||"))
 		{
-			if (!m_gamePaused) 
-				PauseButton();
+			if (m_gamePlayed)
+			{
+				if (!m_gamePaused)
+				{
+					m_pauseMoment = GetGameTime();
+					PauseButton();
+				}
+				else
+					PlayButton();
+
+				m_gamePaused = !m_gamePaused;
+			}
 		}
 
 		ImGui::SameLine();
@@ -208,8 +219,9 @@ void Time::DrawImGui()
 		{
 			// To Revise
 			ImGui::SetTooltip("Pause the game clock before");
-			if (m_gamePaused)
-				StepButton();
+			if (m_gamePlayed)
+				if (m_gamePaused)
+					StepButton();
 		}
 
 		ImGui::SameLine();
