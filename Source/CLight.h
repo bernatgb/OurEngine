@@ -34,9 +34,9 @@ public:
 	CLight(bool _enabled, GameObject* _owner, CLight* cLight);
 	~CLight() override;
 
-	/*void Enable() override;
-	void Update() override;
-	void Disable() override;*/
+	//void Enable() override;
+	//void Update() override;
+	//void Disable() override;
 
 	Component* GetAClone(GameObject* _owner) override;
 	//void NotifyMovement() override;
@@ -54,8 +54,8 @@ public:
 		light.innerAngle = m_InnerAngle * DEGTORAD;
 		light.outerAngle = m_OuterAngle * DEGTORAD;
 
-		light.direction = _direction; // m_Owner->m_Transform->GetForward(true);
-		light.position = _position; // m_Owner->m_Transform->GetPos();
+		light.direction = _direction;
+		light.position = _position;
 
 		return light;
 	};
@@ -68,7 +68,7 @@ private:
 	// Point light variables
 	float m_Radius = 5.0f;
 
-	// Spot light
+	// Spot light variables
 	float m_InnerAngle = 30.0f;
 	float m_OuterAngle = 60.0f;
 };

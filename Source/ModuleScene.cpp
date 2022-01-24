@@ -40,16 +40,15 @@ bool ModuleScene::Init()
 
     importer::LoadResources(m_Meshes, m_Textures, m_Materials, m_Models);
 
-    //GameObject* camera = m_Root->AddChild("Camera");
-    //camera->AddComponent(new CCamera(true, camera));
-
     qt = new Quadtree();
     AABB boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
     qt->SetBoundaries(boundaries);
 
+    //GameObject* camera = m_Root->AddChild("Camera");
+    //camera->AddComponent(new CCamera(true, camera));
+
     //LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
-    
-    m_GOSelected = nullptr;
+
     rapidjson::Document d;
     importer::LoadFile(".\\Assets\\Scene.scene", d);
     LoadScene(d);
@@ -208,8 +207,6 @@ void ModuleScene::DrawImGuiHierarchy()
     }
     if (m_GODrag && ImGui::IsMouseReleased(0))
         m_GODrag = nullptr;
-
-    
 }
 
 void ModuleScene::DrawImGuiResources()
@@ -368,6 +365,8 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
 {
     m_GOSelected = nullptr;
 
+    qt->Clear();
+
     delete m_Root;
     m_Root = new GameObject("Root", nullptr);
     m_Root->m_GUID = 0;
@@ -377,7 +376,6 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
         m_Root->AddChild((*itr)["Name"].GetString())->OnLoad(*itr);
     }
 
-    qt->Clear();
     AddToQuadtreeIfHasMesh(qt, m_Root);
 }
 
@@ -442,9 +440,17 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
         }
 
         unsigned int i = 0;
+        bool hasMesh = false;
+        unsigned int numberMeshes = 0;
         while (i < _go->m_Components.size())
         {
+            if (_go->m_Components[i]->m_Type == ComponentType::MESH) 
+            {
+                hasMesh = true;
+                numberMeshes += 1;
+            }
             if (_go->m_Components[i]->m_DeleteFlag) {
+                if (_go->m_Components[i]->m_Type == ComponentType::MESH) numberMeshes -= 1;
                 _go->m_Components[i]->Disable();
                 delete _go->m_Components[i];
 
@@ -463,6 +469,8 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
                 ++i;
             }
         }
+        if (hasMesh && numberMeshes <= 0) 
+            qt->EraseGO(_go);
     }
     
     if (ancestors && _go->m_Active)

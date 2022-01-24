@@ -67,7 +67,8 @@ void CCamera::NotifyMovement()
 	frustum.SetFront(m_Owner->m_Transform->GetForward());
 	frustum.SetUp(m_Owner->m_Transform->GetUp());
 
-	App->camera->ViewProjectionMatrix(); //TODO correct this
+	if (m_MainCamera || m_CullingCamera)
+		App->camera->ViewProjectionMatrix();
 }
 
 void CCamera::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const 
@@ -121,7 +122,8 @@ void CCamera::DrawImGui()
 			if (m_CullingCamera) App->camera->SetCullingCamera(this);
 			else App->camera->SetCullingCamera(nullptr);
 
-			App->camera->ViewProjectionMatrix(); //TODO correct this
+			if (m_MainCamera || m_CullingCamera)
+				App->camera->ViewProjectionMatrix();
 		}
 
 		if (ImGui::DragFloat("Vertical FOV", &initialVerticalFov, 1.0f, 10.0f, 160.0f, "%.2f")) {
@@ -131,19 +133,24 @@ void CCamera::DrawImGui()
 				fov = math::Atan(math::Tan(DEGTORAD * initialVerticalFov) / aspect);
 			frustum.SetVerticalFovAndAspectRatio(fov, aspect);
 
-			App->camera->ViewProjectionMatrix(); //TODO correct this
+			if (m_MainCamera || m_CullingCamera)
+				App->camera->ViewProjectionMatrix();
 		}
 			
 		if (ImGui::DragFloat("Z-near", &zNear, 1.0f, 0.1f, 5.0f, "%.2f")) 
 		{
 			frustum.SetViewPlaneDistances(zNear, zFar);
-			App->camera->ViewProjectionMatrix(); //TODO correct this
+
+			if (m_MainCamera || m_CullingCamera)
+				App->camera->ViewProjectionMatrix();
 		}
 
 		if (ImGui::DragFloat("Z-far", &zFar, 5.0f, 6.0f, 400.0f, "%.2f"))
 		{
 			frustum.SetViewPlaneDistances(zNear, zFar);
-			App->camera->ViewProjectionMatrix(); //TODO correct this
+			
+			if (m_MainCamera || m_CullingCamera)
+				App->camera->ViewProjectionMatrix();
 		}
 
 		//Draw frustum

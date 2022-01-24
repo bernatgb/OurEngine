@@ -58,9 +58,13 @@ public:
 		// Show enabled variable
 		ImGui::Checkbox("Enabled", &m_EnableFlag);
 
+		ImGui::SameLine();
+
 		// Delete button
 		if (ImGui::Button("Delete"))
 			m_DeleteFlag = true;
+
+		ImGui::Separator();
 	};
 	
 	virtual void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const 
@@ -81,6 +85,6 @@ public:
 	bool m_Enabled;
 	GameObject* m_Owner;
 
-	bool m_EnableFlag; // TODO: use flags
+	bool m_EnableFlag;
 	bool m_DeleteFlag;
 };

@@ -31,8 +31,6 @@ public:
 	QuadtreeNode** GetChildren() { return m_children; }; 
 	std::list<GameObject*> GetGameObjectsInThisNode() const { return gameObjects; };
 
-	void Clear();
-
 private:
 	AABB m_nodeAABB;
 	QuadtreeNode* m_parent = nullptr;

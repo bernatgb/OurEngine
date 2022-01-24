@@ -34,7 +34,6 @@ CMesh::CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh, Material* _material
 
 CMesh::~CMesh()
 {
-	//delete[] m_BB;
 }
 
 void CMesh::Enable()
@@ -82,9 +81,6 @@ void CMesh::NotifyMovement()
 	// Store new min and max point
 	m_MinPoint = m_BB[6];
 	m_MaxPoint = m_BB[0];
-
-	// TODO: CORRECT THIS
-	m_Triangles = m_Mesh->m_Triangles;
 }
 
 void CMesh::DrawImGui()
