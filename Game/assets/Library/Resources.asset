@@ -13,6 +13,10 @@
             "Path": ".\\Assets\\Library\\Meshes\\4866.asset"
         },
         {
+            "Id": 5866,
+            "Path": ".\\Assets\\Library\\Meshes\\5866.asset"
+        },
+        {
             "Id": 6279,
             "Path": ".\\Assets\\Library\\Meshes\\6279.asset"
         },
@@ -111,6 +115,10 @@
             "Path": ".\\Assets\\Library\\Textures\\7453.asset"
         },
         {
+            "Id": 7508,
+            "Path": ".\\Assets\\Library\\Textures\\7508.asset"
+        },
+        {
             "Id": 10096,
             "Path": ".\\Assets\\Library\\Textures\\10096.asset"
         },
@@ -137,6 +145,10 @@
         {
             "Id": 21171,
             "Path": ".\\Assets\\Library\\Textures\\21171.asset"
+        },
+        {
+            "Id": 22642,
+            "Path": ".\\Assets\\Library\\Textures\\22642.asset"
         },
         {
             "Id": 25597,
@@ -171,6 +183,10 @@
         {
             "Id": 264,
             "Path": ".\\Assets\\Library\\Materials\\264.asset"
+        },
+        {
+            "Id": 1318,
+            "Path": ".\\Assets\\Library\\Materials\\1318.asset"
         },
         {
             "Id": 4990,
@@ -233,6 +249,10 @@
         {
             "Id": "Clock.fbx",
             "Path": ".\\Assets\\Library\\Models\\Clock.fbx.asset"
+        },
+        {
+            "Id": "Dollhouse.fbx",
+            "Path": ".\\Assets\\Library\\Models\\Dollhouse.fbx.asset"
         },
         {
             "Id": "Drawers.fbx",

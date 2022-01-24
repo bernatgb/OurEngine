@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "ModelImporter.h"
 
+#include <assimp/Importer.hpp>
 #include "assimp/ai_assert.h"
 #include "assimp/scene.h"
 #include "assimp/cimport.h"
@@ -20,7 +21,10 @@
 
 Model* importer::LoadModel(const char* path)
 {
-	const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_Triangulate);
+	Assimp::Importer importer;
+	importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE);
+	const aiScene* scene = importer.ReadFile(path, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_Triangulate);
+	//const aiScene* scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_Triangulate);
 	if (scene)
 	{
 		Model* model = new Model();
