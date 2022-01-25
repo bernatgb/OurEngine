@@ -94,14 +94,19 @@ void ModuleScene::DrawImGuiModel()
 
 void ModuleScene::SelectGameObject(GameObject* go)
 {
-    if (m_GOSelected != nullptr && go != m_GOSelected)
+    if (m_GOSelected != nullptr && (go != m_GOSelected || go == nullptr))
         m_GOSelected->m_Selected = false;
 
-    go->m_Selected = !go->m_Selected;
-    if (go->m_Selected)
-        m_GOSelected = go;
-    else
+    if (go == nullptr)
         m_GOSelected = nullptr;
+    else 
+    {
+        go->m_Selected = !go->m_Selected;
+        if (go->m_Selected)
+            m_GOSelected = go;
+        else
+            m_GOSelected = nullptr;
+    }
 }
 
 void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
