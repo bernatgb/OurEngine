@@ -258,9 +258,9 @@ void ModuleImGui::About(bool& show)
 		ImGui::Text(TITLE);
 		ImGui::Unindent();
 
-		ImGui::Text("Author:");
+		ImGui::Text("Authors:");
 		ImGui::Indent();
-		ImGui::Text("miquelmiro3");
+		ImGui::Text("miquelmiro3 & bernatgb");
 		ImGui::Unindent();
 
 		ImGui::Text("Description:");
@@ -331,7 +331,10 @@ void ModuleImGui::SoftwareAndHardware()
 		ImGui::BulletText("DevIL v 1.8.0");
 		ImGui::BulletText("Glew v 2.1.0");
 		ImGui::BulletText("ImGui v 1.86 WIP");
+		ImGui::BulletText("ImGuizmo v 1.83");
 		ImGui::BulletText("MathGeoLib v 1.5");
+		ImGui::BulletText("RapidJSON v 1.1.0");
+		ImGui::BulletText("Optick v 1.3.2.0");
 		ImGui::BulletText("SDL v 2.0.16");
 
 		ImGui::Separator();
