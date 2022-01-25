@@ -183,63 +183,68 @@ void Time::DrawImGui()
 
 		// TODO: Make it work properly, put all images in an "Init()" & here only call them.
 
-		if (ImGui::Button("Play |>"))
-		{
-			if (!m_gamePlayed) 
-			{
-				App->scene->SaveTempScene();
-				//PlayButton();
-				m_notPlayedTime = GetTime();
-				m_pausedTime = 0;
-				m_gamePaused = false;
-			}
-			else
-			{
-
-				App->scene->LoadTempScene();
-			}
-			m_gamePlayed = !m_gamePlayed;
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Pause ||"))
-		{
-			if (m_gamePlayed)
-			{
-				if (!m_gamePaused)
-				{
-					m_pauseMoment = GetGameTime();
-					PauseButton();
-				}
-				else
-					PlayButton();
-
-				m_gamePaused = !m_gamePaused;
-			}
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Step |>|"))
-		{
-			// To Revise
-			ImGui::SetTooltip("Pause the game clock before");
-			if (m_gamePlayed)
-				if (m_gamePaused)
-					StepButton();
-		}
-
-		ImGui::SameLine();
-
-		ImGui::Text("<- what is suposed to do?");
-
 		ImGui::SliderFloat("Game clock scale", &m_TimeScale, 0.0f, 4.0f);
 
 		ImGui::Text("FPS: %f; Frame count: %d", Time::GetFPS(), Time::GetFrameCount());
 
 		ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f); //ImVec2(310, 100)
 		ImGui::PlotHistogram("##framerate", &m_DeltaTimeGraph[0], m_DeltaTimeGraph.size(), 0, "DeltaTime", 0.0f);
+	}
+}
+
+void Time::DrawImGuiToolBar()
+{
+	if (ImGui::Button("Play |>"))
+	{
+		if (!m_gamePlayed)
+		{
+			App->scene->SaveTempScene();
+			//PlayButton();
+			m_notPlayedTime = GetTime();
+			m_pausedTime = 0;
+			m_gamePaused = false;
+		}
+		else
+		{
+			App->scene->LoadTempScene();
+		}
+		m_gamePlayed = !m_gamePlayed;
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Pause ||"))
+	{
+		if (m_gamePlayed)
+		{
+			if (!m_gamePaused)
+			{
+				m_pauseMoment = GetGameTime();
+				PauseButton();
+			}
+			else
+				PlayButton();
+
+			m_gamePaused = !m_gamePaused;
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Step |>| (decorative)"))
+	{
+		// To Revise
+		ImGui::SetTooltip("Pause the game clock before");
+		if (m_gamePlayed)
+			if (m_gamePaused)
+				StepButton();
+	}
+
+
+	if (m_gamePlayed)
+	{
+		ImGui::SameLine();
+		ImGui::Text("PlayMode!");
 	}
 }
 

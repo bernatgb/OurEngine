@@ -280,6 +280,15 @@ void ModuleScene::DrawImGuiResources()
     }
 }
 
+void ModuleScene::DrawImGuiToolBar()
+{
+    if (ImGui::Button("Translate")) currentGizmoOperation = ImGuizmo::TRANSLATE;
+    ImGui::SameLine();
+    if (ImGui::Button("Rotate")) currentGizmoOperation = ImGuizmo::ROTATE;
+    ImGui::SameLine();
+    if (ImGui::Button("Scale")) currentGizmoOperation = ImGuizmo::SCALE;
+}
+
 void ModuleScene::Draw(unsigned int program)
 {
     // Gizmos // TODO gizmos controller

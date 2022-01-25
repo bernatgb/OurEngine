@@ -36,6 +36,7 @@ public:
 	static double GetGameTime();
 
 	static void DrawImGui();
+	static void DrawImGuiToolBar();
 
 private:
 	static void Shift();

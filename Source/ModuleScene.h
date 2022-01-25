@@ -34,6 +34,7 @@ public:
 	void DrawImGuiHierarchy();
 	void DrawImGuiModel();
 	void DrawImGuiResources();
+	void DrawImGuiToolBar();
 
 	void Draw(unsigned int program);
 	void LoadResource(const char* _fileName);
@@ -86,6 +87,7 @@ public:
 	{
 		return m_Lights;
 	};
+
 
 	std::map<std::string, Model*> m_Models;
 	std::map<unsigned int, Mesh*> m_Meshes;

@@ -14,6 +14,7 @@
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
 #include "ImGuizmo.h"
+#include <imgui_internal.h>
 
 ModuleImGui::ModuleImGui()
 {
@@ -73,6 +74,38 @@ bool ModuleImGui::Init()
 	return true;
 }
 
+void ModuleImGui::ToolbarUI()
+{
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + menuHeight));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, toolbarSize));
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	ImGuiWindowFlags window_flags = 0
+		| ImGuiWindowFlags_NoDocking
+		| ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoScrollbar
+		| ImGuiWindowFlags_NoSavedSettings //| ImGuiWindowFlags_NoBackground
+		;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+	ImGui::Begin("TOOLBAR", NULL, window_flags);
+	ImGui::PopStyleVar(1);
+
+	App->scene->DrawImGuiToolBar();
+	ImGui::SameLine();
+
+	ImGui::Spacing(); ImGui::SameLine();
+	ImGui::Spacing(); ImGui::SameLine();
+	ImGui::Spacing(); ImGui::SameLine();
+	ImGui::Spacing(); ImGui::SameLine();
+
+	Time::DrawImGuiToolBar();
+
+	ImGui::End();
+}
+
 update_status ModuleImGui::PreUpdate()
 {
 	OPTICK_CATEGORY("ModuleImGui::PreUpdate", Optick::Category::UI);
@@ -90,8 +123,10 @@ update_status ModuleImGui::PreUpdate()
 		ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
 
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(viewport->Pos);
-	ImGui::SetNextWindowSize(viewport->Size);
+	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + toolbarSize));// +menuHeight));
+	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - toolbarSize));// -menuHeight));
+	//ImGui::SetNextWindowPos(viewport->Pos);
+	//ImGui::SetNextWindowSize(viewport->Size);
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -101,7 +136,7 @@ update_status ModuleImGui::PreUpdate()
 	ImGui::Begin("Dockspace", nullptr, dockspace_flags);
 	ImGui::PopStyleVar(3);
 
-	const ImGuiID dockSpaceId = ImGui::GetID("DockspaceID");
+	dockSpaceId = ImGui::GetID("DockspaceID");
 
 	ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
@@ -128,46 +163,12 @@ update_status ModuleImGui::PreUpdate()
 	}
 	ImGui::EndMainMenuBar();
 
-	// ToolbarUI
-	float2 toolbarSize = float2(150, 10);
-	ImGuiViewport* viewport2 = ImGui::GetMainViewport();
-	ImVec2 vpCenter = viewport2->GetCenter();
-	ImGui::SetNextWindowPos(ImVec2(vpCenter.x - toolbarSize.x * 0.5, 0));
-	ImGui::SetNextWindowSize(ImVec2(toolbarSize.x, toolbarSize.y));
-	ImGui::SetNextWindowViewport(viewport2->ID);
-
-	ImGuiWindowFlags window_flags2 = 0
-		| ImGuiWindowFlags_NoDocking
-		| ImGuiWindowFlags_NoTitleBar
-		| ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoMove
-		| ImGuiWindowFlags_NoScrollbar
-		| ImGuiWindowFlags_NoSavedSettings
-		;
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
-	ImGui::Begin("TOOLBAR", NULL, window_flags2);
-	ImGui::PopStyleVar();
-
-	//ImGui::Button("Toolbar goes here", ImVec2(0, 37));
-	if (ImGui::Button("PLAY", ImVec2(0, 25)))
-	{
-		MY_LOG("Play time!");
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("PAUSE", ImVec2(0, 25)))
-	{
-		MY_LOG("Time paused!");
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("STEP", ImVec2(0, 25)))
-	{
-		MY_LOG("What I have to do?");
-	}
+	// Save off menu bar height for later.
+	menuHeight = ImGui::GetCurrentWindow()->MenuBarHeight();
 
 	ImGui::End();
-	// Toolbar end
 
-	ImGui::End();
+	ToolbarUI();
 
 	return UPDATE_CONTINUE;
 }
@@ -331,6 +332,7 @@ void ModuleImGui::SoftwareAndHardware()
 		ImGui::BulletText("DevIL v 1.8.0");
 		ImGui::BulletText("Glew v 2.1.0");
 		ImGui::BulletText("ImGui v 1.86 WIP");
+		ImGui::BulletText("ImGuiFileDialog v 0.6.3");
 		ImGui::BulletText("ImGuizmo v 1.83");
 		ImGui::BulletText("MathGeoLib v 1.5");
 		ImGui::BulletText("RapidJSON v 1.1.0");

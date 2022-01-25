@@ -1,6 +1,8 @@
 #pragma once
 #include "Module.h"
 
+typedef unsigned int ImGuiID;
+
 class ModuleImGui : public Module
 {
 public:
@@ -15,6 +17,13 @@ public:
 	std::list<char*> Items;
 
 private:
+	void DockSpaceUI();
+	void ToolbarUI();
+
+	ImGuiID dockSpaceId;
+	float toolbarSize = 34;
+	unsigned int menuHeight;
+
 	void About(bool& show);
 	void Console(bool& show);
 	void SoftwareAndHardware();
@@ -32,4 +41,6 @@ private:
 	bool autoScroll;
 
 	char* license;
+
+
 };
