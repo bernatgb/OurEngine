@@ -325,7 +325,7 @@ void ModuleCamera::FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineS
 			if (ray.Intersects(go->m_aabb))
 			{
 				hits.push_back(go); 
-				ImGui::Text("Ray intersects with %s", go->m_Name);
+				//ImGui::Text("Ray intersects with %s", go->m_Name);
 			}
 		}
 
@@ -412,7 +412,7 @@ void ModuleCamera::DrawImGui()
 		/// <summary>
 		/// 
 		/// </summary>
-		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT)
+		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN)
 		{
 			int mouse_x, mouse_y;
 			App->input->GetMousePosition(mouse_x, mouse_y);
@@ -463,12 +463,19 @@ void ModuleCamera::DrawImGui()
 			if (!hits.empty())
 			{
 				SortHits(hits); // With ray.length?
-				//ImGui::Text("Mouse is pointing nt %s", hits[4]->m_Name);
 				std::vector< std::pair<float, GameObject*> > hitPointsDistances;
 				FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
 				std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
-				if (!hitPointsDistances.empty()) 
+				if (!hitPointsDistances.empty())
+				{
 					ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
+					if (App->scene->GetSelectedGO() != hitPointsDistances[0].second)
+						App->scene->SelectGameObject(hitPointsDistances[0].second);
+					else
+						App->scene->SelectGameObject(hitPointsDistances[0].second->m_Parent);
+				}
+				else
+					App->scene->SelectGameObject(App->scene->GetSelectedGO());
 			}
 		}
 		

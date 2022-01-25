@@ -117,16 +117,20 @@ void Time::StepButton()
 
 double Time::GetGameTime()
 {
-	if (m_gamePaused)
+	if (!m_gamePlayed)
 	{
-		return m_pauseMoment;
+		return 0;
 	}
-	else
+	else 
 	{
-		if (!m_gamePlayed)
-			return 0;
+		if (m_gamePaused)
+		{
+		return m_pauseMoment;
+		}
 		else
+		{
 			return GetTime() - (m_notPlayedTime + m_pausedTime);
+		}
 	}
 }
 
@@ -187,9 +191,11 @@ void Time::DrawImGui()
 				//PlayButton();
 				m_notPlayedTime = GetTime();
 				m_pausedTime = 0;
+				m_gamePaused = false;
 			}
 			else
 			{
+
 				App->scene->LoadTempScene();
 			}
 			m_gamePlayed = !m_gamePlayed;

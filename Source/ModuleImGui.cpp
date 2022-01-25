@@ -128,6 +128,45 @@ update_status ModuleImGui::PreUpdate()
 	}
 	ImGui::EndMainMenuBar();
 
+	// ToolbarUI
+	float2 toolbarSize = float2(150, 10);
+	ImGuiViewport* viewport2 = ImGui::GetMainViewport();
+	ImVec2 vpCenter = viewport2->GetCenter();
+	ImGui::SetNextWindowPos(ImVec2(vpCenter.x - toolbarSize.x * 0.5, 0));
+	ImGui::SetNextWindowSize(ImVec2(toolbarSize.x, toolbarSize.y));
+	ImGui::SetNextWindowViewport(viewport2->ID);
+
+	ImGuiWindowFlags window_flags2 = 0
+		| ImGuiWindowFlags_NoDocking
+		| ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoMove
+		| ImGuiWindowFlags_NoScrollbar
+		| ImGuiWindowFlags_NoSavedSettings
+		;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
+	ImGui::Begin("TOOLBAR", NULL, window_flags2);
+	ImGui::PopStyleVar();
+
+	//ImGui::Button("Toolbar goes here", ImVec2(0, 37));
+	if (ImGui::Button("PLAY", ImVec2(0, 25)))
+	{
+		MY_LOG("Play time!");
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("PAUSE", ImVec2(0, 25)))
+	{
+		MY_LOG("Time paused!");
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("STEP", ImVec2(0, 25)))
+	{
+		MY_LOG("What I have to do?");
+	}
+
+	ImGui::End();
+	// Toolbar end
+
 	ImGui::End();
 
 	return UPDATE_CONTINUE;
