@@ -5,7 +5,7 @@
 #include "GL/glew.h"
 
 #include "Application.h"
-#include "ModuleScene.h"
+#include "ModuleResources.h"
 #include "ModuleRender.h"
 #include "ModuleDebugDraw.h"
 
@@ -100,7 +100,7 @@ void CMesh::DrawImGui()
 		{
 			ImGui::Text("Mesh");
 			ImGui::Separator();
-			for (auto it = App->scene->m_Meshes.begin(); it != App->scene->m_Meshes.end(); ++it)
+			for (auto it = App->resources->m_Meshes.begin(); it != App->resources->m_Meshes.end(); ++it)
 			{
 				if (ImGui::Selectable(std::to_string(it->first).c_str()))
 					m_Mesh = it->second;
@@ -131,7 +131,7 @@ void CMesh::DrawImGui()
 		{
 			ImGui::Text("Material");
 			ImGui::Separator();
-			for (auto it = App->scene->m_Materials.begin(); it != App->scene->m_Materials.end(); ++it)
+			for (auto it = App->resources->m_Materials.begin(); it != App->resources->m_Materials.end(); ++it)
 			{
 				if (ImGui::Selectable(it->second->m_Name.c_str()))
 					m_Material = it->second;
@@ -162,11 +162,11 @@ void CMesh::OnLoad(const rapidjson::Value& node)
 	Component::OnLoad(node);
 
 	unsigned int meshId = node["MeshId"].GetInt();
-	m_Mesh = App->scene->m_Meshes[meshId];
+	m_Mesh = App->resources->m_Meshes[meshId];
 	m_ShowBoundingBox = node["ShowBB"].GetBool();
 
 	unsigned int materialId = node["MaterialId"].GetInt();
-	m_Material = App->scene->m_Materials[materialId];
+	m_Material = App->resources->m_Materials[materialId];
 
 	// Mesh initialization
 	for (unsigned int i = 0; i < 8; ++i)

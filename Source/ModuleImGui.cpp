@@ -3,6 +3,7 @@
 #include "ModuleImGui.h"
 #include "ModuleRender.h"
 #include "ModuleScene.h"
+#include "ModuleResources.h"
 #include "ModuleWindow.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
@@ -204,7 +205,7 @@ update_status ModuleImGui::Update()
 	{
 		if (ImGui::Begin("Resources", &resources))
 		{
-			App->scene->DrawImGuiResources();
+			App->resources->DrawImGuiResources();
 		}
 		ImGui::End();
 	}
@@ -213,7 +214,7 @@ update_status ModuleImGui::Update()
 	{
 		if (ImGui::Begin("Inspector", &inspector))
 		{
-			App->scene->DrawImGuiModel();
+			App->scene->DrawImGuiInspector();
 		}
 		ImGui::End();
 	}

@@ -4,8 +4,7 @@
 #include "ModuleCamera.h"
 #include "ModuleInput.h"
 #include "ModuleRender.h"
-
-#include "SceneImporter.h"
+#include "ModuleResources.h"
 
 #include "Model.h"
 
@@ -15,7 +14,6 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
-#include "ImGuiFileDialog.h"
 
 #include <string>
 
@@ -38,8 +36,6 @@ bool ModuleScene::Init()
     m_Root->m_GUID = 0;
     m_GOSelected = nullptr;
 
-    importer::LoadResources(m_Meshes, m_Textures, m_Materials, m_Models);
-
     qt = new Quadtree();
     AABB boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
     qt->SetBoundaries(boundaries);
@@ -50,7 +46,7 @@ bool ModuleScene::Init()
     //LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
     rapidjson::Document d;
-    importer::LoadFile(".\\Assets\\Scene.scene", d);
+    App->resources->LoadFile(".\\Assets\\Scene.scene", d);
     LoadScene(d);
     
     currentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -60,23 +56,9 @@ bool ModuleScene::Init()
 
 bool ModuleScene::CleanUp()
 {
-    importer::SaveResources(m_Meshes, m_Textures, m_Materials, m_Models);
-
     delete qt;
 
     delete m_Root;
-
-    for (auto it = m_Meshes.begin(); it != m_Meshes.end(); ++it)
-        delete it->second;
-
-    for (auto it = m_Textures.begin(); it != m_Textures.end(); ++it)
-        delete it->second;
-
-    for (auto it = m_Materials.begin(); it != m_Materials.end(); ++it)
-        delete it->second;
-
-    for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
-        delete it->second;
 
 	return true;
 }
@@ -86,7 +68,7 @@ GameObject* ModuleScene::CreateGameObject(const char* _name)
     return m_Root->AddChild(_name);
 }
 
-void ModuleScene::DrawImGuiModel()
+void ModuleScene::DrawImGuiInspector()
 {
     if (m_GOSelected != nullptr) 
         m_GOSelected->DrawImGui();
@@ -214,72 +196,6 @@ void ModuleScene::DrawImGuiHierarchy()
         m_GODrag = nullptr;
 }
 
-void ModuleScene::DrawImGuiResources()
-{
-    // Load scene
-    if (ImGui::Button("Load Scene"))
-        ImGuiFileDialog::Instance()->OpenDialog("LoadScene", "Load Scene", ".scene", ".");
-
-    if (ImGuiFileDialog::Instance()->Display("LoadScene"))
-    {
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-
-            MY_LOG("Loading scene: %s", filePathName.c_str());
-            m_GOSelected = nullptr;
-            rapidjson::Document d;
-            if (importer::LoadFile(filePathName.c_str(), d))
-            {
-                LoadScene(d);
-                MY_LOG("Scene Loaded");
-            }
-            else
-                MY_LOG("Error while loading scene: %s", filePathName.c_str());
-        }
-
-        ImGuiFileDialog::Instance()->Close();
-    }
-
-    ImGui::SameLine();
-
-    // Save scene
-    if (ImGui::Button("Save Scene"))
-        ImGuiFileDialog::Instance()->OpenDialog("SaveScene", "Save Scene", ".scene", ".");
-
-    if (ImGuiFileDialog::Instance()->Display("SaveScene"))
-    {
-        if (ImGuiFileDialog::Instance()->IsOk())
-        {
-            std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-            std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
-
-            MY_LOG("Saving scene at: %s", filePathName.c_str());
-            rapidjson::Document d;
-            SaveScene(d);
-            importer::SaveFile(filePathName.c_str(), d);
-            MY_LOG("Scene Saved");
-        }
-
-        ImGuiFileDialog::Instance()->Close();
-    }
-
-    // TODO: CREATE MATERIAL
-
-    ImGui::Separator();
-
-    for (auto it = m_Models.begin(); it != m_Models.end(); ++it)
-    {
-        if (ImGui::Button(it->first.c_str())) 
-        {
-            GameObject* exportedGO = it->second->ExportToGO(m_Root);
-            AddToQuadtreeIfHasMesh(qt, exportedGO);
-            SelectGameObject(exportedGO);
-        }
-    }
-}
-
 void ModuleScene::DrawImGuiToolBar()
 {
     if (ImGui::Button("Translate")) currentGizmoOperation = ImGuizmo::TRANSLATE;
@@ -310,6 +226,7 @@ void ModuleScene::Draw(unsigned int program)
         const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
 
         float2 viewportPanelSize = App->renderer->GetSceneWindowSize();
+        ImGuizmo::AllowAxisFlip(false);
         ImGuizmo::SetRect(newViewportPosition.x + vMin.x, newViewportPosition.y + vMin.y, viewportPanelSize.x, viewportPanelSize.y);
         if (ImGuizmo::Manipulate(&view[0][0], &proj[0][0], currentGizmoOperation, ImGuizmo::LOCAL, &mat4[0][0], NULL, NULL))
             m_GOSelected->m_Transform->GizmoTransformChange(mat4.Transposed());
@@ -330,42 +247,9 @@ void ModuleScene::Draw(unsigned int program)
     }
 }
 
-void ModuleScene::LoadResource(const char* _fileName)
+void ModuleScene::LoadModel(Model* _model)
 {
-    std::string extension = _fileName;
-    const size_t last_slash_idx = extension.rfind('.');
-    extension = extension.substr(last_slash_idx + 1, extension.length());
-
-    if (extension == "fbx" || extension == "FBX")
-        LoadModel(_fileName);
-    else if (extension == "png" || extension == "jpg" || extension == "tif" || extension == "PNG" || extension == "JPG" || extension == "TIF")
-    {
-        Texture* newTexture = new Texture();
-        importer::texture::Import(_fileName, newTexture, nullptr);
-        m_Textures[newTexture->m_GUID] = newTexture;
-    }
-}
-
-void ModuleScene::LoadModel(const char* _fileName)
-{
-    std::string modelName = _fileName;
-    const size_t last_slash_idx = modelName.rfind('\\');
-    if (std::string::npos != last_slash_idx)
-        modelName = modelName.substr(last_slash_idx + 1, modelName.length());
-
-    std::map<std::string, Model*>::iterator it = m_Models.find(modelName.c_str());
-    if (it != m_Models.end()) 
-    {
-        GameObject* exportedGO = it->second->ExportToGO(m_Root);
-        AddToQuadtreeIfHasMesh(qt, exportedGO);
-        SelectGameObject(exportedGO);        
-        return;
-    }
-    
-    Model* model = importer::LoadModel(_fileName);
-    m_Models[model->m_Name] = model;
-
-    GameObject* exportedGO = m_Models[model->m_Name]->ExportToGO(m_Root);
+    GameObject* exportedGO = _model->ExportToGO(m_Root);
     AddToQuadtreeIfHasMesh(qt, exportedGO);
     SelectGameObject(exportedGO);
 }
@@ -498,38 +382,6 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
 
     for (unsigned int i = 0; i < _go->m_Children.size(); ++i)
         RecursiveSearch(_go->m_Children[i], ancestors && _go->m_Active, firstFrame);
-}
-
-Model* ModuleScene::FindModel(std::string _modelName) 
-{
-    std::map<std::string, Model*>::iterator it = m_Models.find(_modelName);
-    if (it != m_Models.end())
-        return it->second;
-    return nullptr;
-}
-
-Mesh* ModuleScene::FindMesh(unsigned int _meshId) 
-{
-    std::map<unsigned int, Mesh*>::iterator it = m_Meshes.find(_meshId);
-    if (it != m_Meshes.end())
-        return it->second;
-    return nullptr;
-}
-
-Material* ModuleScene::FindMaterial(unsigned int _materialId) 
-{
-    std::map<unsigned int, Material*>::iterator it = m_Materials.find(_materialId);
-    if (it != m_Materials.end())
-        return it->second;
-    return nullptr;
-}
-
-Texture* ModuleScene::FindTexture(unsigned int _textureId) 
-{
-    std::map<unsigned int, Texture*>::iterator it = m_Textures.find(_textureId);
-    if (it != m_Textures.end())
-        return it->second;
-    return nullptr;
 }
 
 

@@ -31,7 +31,6 @@ public:
 	bool IsInFrustumViaQuadtree(QuadtreeNode* qtn);
 
 	void NotifyMovement(bool notifiedByTransform);
-	void NotifySonMovement();
 
 	//void OnDestroy();
 	void RecalculateBB();
@@ -67,6 +66,8 @@ public:
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Min.x, m_Min.y, m_Min.z, 1.0f);
 	};
 	float4 GetCenter() const {
+		if (m_Min.IsZero() && m_Max.IsZero())
+			return m_Transform->m_AccumulativeModelMatrix * float4(0.0f, 0.0f, 0.0f, 1.0f);
 		return float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y + (m_Max.y - m_Min.y) / 2.0f, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 		return m_Transform->m_AccumulativeModelMatrix * float4(m_Min.x + (m_Max.x - m_Min.x) / 2.0f, m_Min.y + (m_Max.y - m_Min.y) / 2.0f, m_Min.z + (m_Max.z - m_Min.z) / 2.0f, 1.0f);
 	};
@@ -84,7 +85,7 @@ public:
 	bool m_ActiveFlag;
 	bool m_Selected;
 
-	template<typename T> ComponentType TypeToComponentType(T type) {
+	template<typename T> static ComponentType TypeToComponentType(T type) {
 		switch (T)
 		{
 		case CTransform:
@@ -99,7 +100,7 @@ public:
 		return ComponentType::UNDEFINED;
 	}
 
-	template<typename T> T TypeToComponentType(ComponentType componentType) {
+	template<typename T> static T TypeToComponentType(ComponentType componentType) {
 		switch (componentType)
 		{
 		case ComponentType::TRANSFORM:

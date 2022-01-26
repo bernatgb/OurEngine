@@ -334,6 +334,7 @@ update_status ModuleRender::Update()
 	glUniform3fv(loc, 1, &m_AmbientColor[0]);
 
 	// TODO: MOVE TO THE PREUPDATE
+	//std::list<Light> lights = App->scene->GetLights();
 	App->scene->m_Lights.clear();
 	App->scene->RecursiveSearch(App->scene->GetRoot(), true); 
 	App->scene->GetQuadtree()->SetObejctsInFrustum(App->camera->GetCullingCamera());

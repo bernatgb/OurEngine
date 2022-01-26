@@ -1,7 +1,7 @@
 #include "Material.h"
 
 #include "Application.h"
-#include "ModuleScene.h"
+#include "ModuleResources.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -46,7 +46,7 @@ void Material::DrawImGui()
 		ImGui::Text("Texture");
 		ImGui::Separator();
 		if (ImGui::Selectable("None")) m_DiffuseTexture = nullptr;
-		for (auto it = App->scene->m_Textures.begin(); it != App->scene->m_Textures.end(); ++it)
+		for (auto it = App->resources->m_Textures.begin(); it != App->resources->m_Textures.end(); ++it)
 		{
 			if (ImGui::Selectable(it->second->m_Name.c_str()))
 				m_DiffuseTexture = it->second;
@@ -73,7 +73,7 @@ void Material::DrawImGui()
 		ImGui::Text("Texture");
 		ImGui::Separator();
 		if (ImGui::Selectable("None")) m_SpecularTexture = nullptr;
-		for (auto it = App->scene->m_Textures.begin(); it != App->scene->m_Textures.end(); ++it)
+		for (auto it = App->resources->m_Textures.begin(); it != App->resources->m_Textures.end(); ++it)
 		{
 			if (ImGui::Selectable(it->second->m_Name.c_str()))
 				m_SpecularTexture = it->second;

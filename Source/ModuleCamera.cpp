@@ -194,30 +194,36 @@ void ModuleCamera::WindowResized(unsigned width, unsigned height)
 	ViewProjectionMatrix();
 }
 
+GameObject* RecursiveSearchBiggestGO(GameObject* _go) 
+{
+	GameObject* posibleResult = _go;
+	float diameter = 0;
+	if (!_go->m_Min.IsZero() || !_go->m_Max.IsZero())
+		diameter = _go->GetDiameter();
+
+	for (int i = 0; i < _go->m_Children.size(); ++i)
+	{
+		GameObject* aux = RecursiveSearchBiggestGO(_go->m_Children[i]);
+
+		if (!aux->m_Min.IsZero() || !aux->m_Max.IsZero()) 
+		{
+			float newDiameter = aux->GetDiameter();
+			if (newDiameter > diameter)
+			{
+				diameter = newDiameter;
+				posibleResult = aux;
+			}
+		}
+	}
+	return posibleResult;
+}
+
 void ModuleCamera::AdjustToGO(GameObject* _go)
 {
-	bool meshFounded = false;
-	for (int i = 0; i < _go->m_Components.size(); ++i)
-	{
-		if (_go->m_Components[i]->m_Type == ComponentType::MESH)
-		{
-			meshFounded = true;
-			CMesh* mesh = (CMesh*)_go->m_Components[i];
-			float4 newPos = float4(mesh->GetMinPoint().x + (mesh->GetMaxPoint().x - mesh->GetMinPoint().x) / 2.0f, mesh->GetMinPoint().y + (mesh->GetMaxPoint().y - mesh->GetMinPoint().y) / 2.0f, mesh->GetMinPoint().z + (mesh->GetMaxPoint().z - mesh->GetMinPoint().z) / 2.0f, 1.0f);
-			Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * Distance3(float4(mesh->GetMaxPoint(), 0.0f), float4(mesh->GetMinPoint(), 0.0f));
-		}
-	}
+	GameObject* gameObject = RecursiveSearchBiggestGO(_go);
 
-	if (!meshFounded)
-	{
-		for (int i = 0; i < _go->m_Children.size(); ++i)
-		{
-			AdjustToGO(_go->m_Children[i]);
-		}
-	}
-
-	//float4 newPos = _go->GetCenter();
-	//Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * _go->GetDiameter();
+	float4 newPos = gameObject->GetCenter();
+	Config::m_CamPosition = float3(newPos.x, newPos.y, newPos.z) - Config::m_CamRotation.WorldZ().Normalized() * gameObject->GetDiameter();
 
 	// TODO: USE THE FOLLOWING FORMULA FOR THE DISTANCE
 	//dist = height / 2 / Math.tan(Math.PI * fov / 360);
@@ -256,12 +262,7 @@ Frustum* ModuleCamera::GetFrustum()
 {
 	return &frustum;
 }
-/*
-Frustum* ModuleCamera::GetGameCameraFrustum()
-{
-	return &gameCameraFrustum;
-}
-*/
+
 // false if fully outside, true if inside or intersects
 bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 {

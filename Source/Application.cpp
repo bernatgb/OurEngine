@@ -8,6 +8,7 @@
 #include "ModuleDebugDraw.h"
 #include "ModuleTexture.h"
 #include "ModuleCamera.h"
+#include "ModuleResources.h"
 #include "ModuleScene.h"
 #include "SDL.h"
 #include "Config.h"
@@ -25,6 +26,7 @@ Application::Application()
 	modules.push_back(texture = new ModuleTexture());
 	modules.push_back(program = new ModuleProgram());
 	modules.push_back(renderer = new ModuleRender());
+	modules.push_back(resources = new ModuleResources());
 	modules.push_back(scene = new ModuleScene());
 	modules.push_back(debugDraw = new ModuleDebugDraw());
 	modules.push_back(imGui = new ModuleImGui());

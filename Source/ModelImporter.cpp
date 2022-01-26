@@ -5,7 +5,7 @@
 #include "MaterialImporter.h"
 
 #include "Application.h"
-#include "ModuleScene.h"
+#include "ModuleResources.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
@@ -60,7 +60,7 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		ourModel->m_Meshes[i] = new Mesh();
 		importer::mesh::Import(model->mMeshes[i], ourModel->m_Meshes[i]);
 		//ourModel->m_Meshes[i] = new Mesh(model->mMeshes[i]);
-		App->scene->m_Meshes[ourModel->m_Meshes[i]->m_GUID] = ourModel->m_Meshes[i];
+		App->resources->m_Meshes[ourModel->m_Meshes[i]->m_GUID] = ourModel->m_Meshes[i];
 	}
 
 	MY_LOG("Assimp: Loading the textures");
@@ -75,7 +75,7 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		{
 			ourModel->m_Textures[i] = new Texture(file.data, fullPath.c_str());
 		}*/
-		App->scene->m_Materials[ourModel->m_Materials[i]->m_GUID] = ourModel->m_Materials[i];
+		App->resources->m_Materials[ourModel->m_Materials[i]->m_GUID] = ourModel->m_Materials[i];
 	}
 
 	ourModel->m_Min = (ourModel->m_Meshes.size() >= 1) ? ourModel->m_Meshes[0]->m_Min : float3::zero;
@@ -202,7 +202,7 @@ void RecusiveNodeFromJson(const rapidjson::Value& node, ModelNode*& modelNode) {
 	//Get meshes
 	for (rapidjson::Value::ConstValueIterator itr = it->value.Begin(); itr != it->value.End(); ++itr)
 	{
-		Mesh* mesh = App->scene->FindMesh(itr->GetInt());
+		Mesh* mesh = App->resources->FindMesh(itr->GetInt());
 		if (mesh == nullptr)
 		{
 			MY_LOG("Error when loading Model");
@@ -233,7 +233,7 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 
 	for (rapidjson::Value::ConstValueIterator itr = d["Meshes"].Begin(); itr != d["Meshes"].End(); ++itr)
 	{
-		Mesh* mesh = App->scene->FindMesh(itr->GetInt());
+		Mesh* mesh = App->resources->FindMesh(itr->GetInt());
 		if (mesh == nullptr) 
 		{
 			MY_LOG("Error when loading Model");
@@ -244,7 +244,7 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 
 	for (rapidjson::Value::ConstValueIterator itr = d["Materials"].Begin(); itr != d["Materials"].End(); ++itr)
 	{
-		Material* material = App->scene->FindMaterial(itr->GetInt());
+		Material* material = App->resources->FindMaterial(itr->GetInt());
 		if (material == nullptr)
 		{
 			MY_LOG("Error when loading Model");

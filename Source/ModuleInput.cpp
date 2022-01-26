@@ -4,7 +4,7 @@
 #include "ModuleCamera.h"
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
-#include "ModuleScene.h"
+#include "ModuleResources.h"
 #include "imgui_impl_sdl.h"
 
 ModuleInput::ModuleInput()
@@ -114,7 +114,7 @@ update_status ModuleInput::PreUpdate()
                 break;
             case SDL_DROPFILE: {
                 MY_LOG("File dropped %s", sdlEvent.drop.file);
-                App->scene->LoadResource(sdlEvent.drop.file);
+                App->resources->LoadResource(sdlEvent.drop.file);
                 SDL_free(sdlEvent.drop.file);
                 break;
             }

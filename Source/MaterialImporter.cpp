@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include "ModuleTexture.h"
-#include "ModuleScene.h"
+#include "ModuleResources.h"
 
 #include "assimp/ai_assert.h"
 #include "assimp/scene.h"
@@ -182,7 +182,7 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 		ourMaterial->m_DiffuseTexture = new Texture();
 		bool loaded = importer::texture::Import(file.data, ourMaterial->m_DiffuseTexture, fullPath);
 		if (loaded)
-			App->scene->m_Textures[ourMaterial->m_DiffuseTexture->m_GUID] = ourMaterial->m_DiffuseTexture;
+			App->resources->m_Textures[ourMaterial->m_DiffuseTexture->m_GUID] = ourMaterial->m_DiffuseTexture;
 		else 
 		{
 			delete ourMaterial->m_DiffuseTexture;
@@ -197,7 +197,7 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 		ourMaterial->m_SpecularTexture = new Texture();
 		bool loaded = importer::texture::Import(file.data, ourMaterial->m_SpecularTexture, fullPath);
 		if (loaded)
-			App->scene->m_Textures[ourMaterial->m_SpecularTexture->m_GUID] = ourMaterial->m_SpecularTexture;
+			App->resources->m_Textures[ourMaterial->m_SpecularTexture->m_GUID] = ourMaterial->m_SpecularTexture;
 		else
 		{
 			delete ourMaterial->m_SpecularTexture;
@@ -273,9 +273,9 @@ void importer::material::Load(const char* fileBuffer, Material* ourMaterial)
 	ourMaterial->m_ShininessAlpha = header[3];
 
 	if (m_DiffuseGUID != 0)
-		ourMaterial->m_DiffuseTexture = App->scene->m_Textures[m_DiffuseGUID];
+		ourMaterial->m_DiffuseTexture = App->resources->m_Textures[m_DiffuseGUID];
 	if (m_SpecularGUID != 0)
-		ourMaterial->m_SpecularTexture = App->scene->m_Textures[m_SpecularGUID];
+		ourMaterial->m_SpecularTexture = App->resources->m_Textures[m_SpecularGUID];
 
 	float values[7];
 	bytes = sizeof(values);

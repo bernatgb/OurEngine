@@ -32,13 +32,11 @@ public:
 	void RecursiveHierarchy(GameObject* go, GameObject*& node_clicked);
 	void CheckHoverHierarchy(GameObject* go);
 	void DrawImGuiHierarchy();
-	void DrawImGuiModel();
-	void DrawImGuiResources();
+	void DrawImGuiInspector();
 	void DrawImGuiToolBar();
 
 	void Draw(unsigned int program);
-	void LoadResource(const char* _fileName);
-	void LoadModel(const char* _fileName);
+	void LoadModel(Model* _model);
 
 	void LoadTempScene();
 	void SaveTempScene();
@@ -48,11 +46,6 @@ public:
 	void AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go);
 
 	void RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame = false);
-
-	Model* FindModel(std::string _modelName); // TODO: delete?
-	Mesh* FindMesh(unsigned int _meshId);
-	Material* FindMaterial(unsigned int _materialId);
-	Texture* FindTexture(unsigned int _textureId);
 
 	// Getters
 	GameObject* GetRoot() const
@@ -67,32 +60,10 @@ public:
 	{ 
 		return qt; 
 	};
-	std::map<std::string, Model*> GetModels()
-	{
-		return m_Models;
-	};
-	std::map<unsigned int, Mesh*> GetMeshes()
-	{
-		return m_Meshes;
-	};
-	std::map<unsigned int, Material*> GetMaterials()
-	{
-		return m_Materials;
-	};
-	std::map<unsigned int, Texture*> GetTextures()
-	{
-		return m_Textures;
-	};
-	std::list<Light> GetLights()
+	std::list<Light> & GetLights()
 	{
 		return m_Lights;
 	};
-
-
-	std::map<std::string, Model*> m_Models;
-	std::map<unsigned int, Mesh*> m_Meshes;
-	std::map<unsigned int, Material*> m_Materials;
-	std::map<unsigned int, Texture*> m_Textures;
 
 	std::list<Light> m_Lights;
 
@@ -103,6 +74,7 @@ private:
 	GameObject* m_GODragParent = nullptr;
 
 	Quadtree* qt = nullptr;
+
 
 	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 	rapidjson::Document m_TempScene;
