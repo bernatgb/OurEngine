@@ -258,9 +258,7 @@ void importer::material::Load(const char* fileBuffer, Material* ourMaterial)
 	ourMaterial->m_Name = "";
 	for (unsigned int i = 0; i < bytes; ++i)
 		ourMaterial->m_Name += cursor[i + 1];
-	strcpy(ourMaterial->m_AuxName, (ourMaterial->m_Name + "\n").c_str());
 	cursor += (bytes + 1);
-
 
 	unsigned int header[4];
 	bytes = sizeof(header);

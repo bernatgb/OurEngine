@@ -6,23 +6,19 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 
 Material::Material()
 {
-	m_Name = "Material";
-	m_AuxName = new char[100];
-	strcpy(m_AuxName, "Material\n");
 }
 
 Material::~Material()
 {
-	delete[] m_AuxName;
 }
 
 void Material::DrawImGui()
 {
-	if (ImGui::InputText("Material name", m_AuxName, 100)) 
-		m_Name = m_AuxName;
+	ImGui::InputText("Material name", &m_Name);
 
 	ImGui::ColorEdit3("Diffuse color", &m_DiffuseColor[0]);
 	ImGui::ColorEdit3("Specular color", &m_SpecularColor[0]);

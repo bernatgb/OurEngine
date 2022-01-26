@@ -12,14 +12,13 @@
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 
 GameObject::GameObject(const char* _name, GameObject* _parent)
 {
 	m_GUID = rand();
 
-	m_Name = new char[100];
-	strcpy(m_Name, _name);
-
+	m_Name = _name;
 	m_Active = true;
 	m_ActiveFlag = true;
 	m_Selected = false;
@@ -34,8 +33,6 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 
 GameObject::~GameObject()
 {
-	delete[] m_Name;
-
 	delete m_Transform;
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
@@ -99,7 +96,7 @@ void GameObject::OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorTy
 {
 	// Store GUID, Name, Active, Parend GUID
 	node.AddMember("GUID", rapidjson::Value(m_GUID), allocator);
-	node.AddMember("Name", rapidjson::Value(m_Name, allocator), allocator);
+	node.AddMember("Name", rapidjson::Value(m_Name.c_str(), allocator), allocator);
 	node.AddMember("Active", rapidjson::Value(m_Active), allocator);
 	node.AddMember("Parent", rapidjson::Value(m_Parent->m_GUID), allocator);
 
@@ -141,7 +138,7 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 {
 	// Load GUID, Name, Active, Parend GUID
 	m_GUID = node["GUID"].GetInt();
-	strcpy(m_Name, node["Name"].GetString());
+	m_Name = node["Name"].GetString();
 	m_Active = node["Active"].GetBool();
 	unsigned int parentId = node["Parent"].GetInt();
 
@@ -197,7 +194,7 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 
 GameObject* GameObject::Clone(GameObject* _parent)
 {
-	GameObject* newGO = _parent->AddChild(m_Name);
+	GameObject* newGO = _parent->AddChild(m_Name.c_str());
 
 	newGO->m_Active = m_Active;
 	newGO->m_Transform->Copy(m_Transform);
@@ -376,7 +373,7 @@ void GameObject::RemoveChild(GameObject* _go)
 
 void GameObject::DrawImGui()
 {
-	ImGui::InputText("Name", m_Name, 100);
+	ImGui::InputText("Name", &m_Name);
 	ImGui::Checkbox("Active", &m_ActiveFlag);
 	if (m_InFrustum) ImGui::Text("Visible");
 	else ImGui::Text("Not visible");

@@ -47,7 +47,7 @@ public:
 	void DrawImGui();
 
 	unsigned int m_GUID;
-	char* m_Name = nullptr;
+	std::string m_Name = "GameObject";
 	bool m_Active;
 	bool m_InFrustum;
 	CTransform* m_Transform;

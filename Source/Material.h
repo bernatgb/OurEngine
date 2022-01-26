@@ -13,8 +13,7 @@ public:
 
 	void DrawImGui();
 
-	std::string m_Name = "";
-	char* m_AuxName = nullptr;
+	std::string m_Name = "Material";
 	unsigned int m_GUID = 0;
 
 	Texture* m_DiffuseTexture = nullptr;
