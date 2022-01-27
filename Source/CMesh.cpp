@@ -59,7 +59,7 @@ void CMesh::Update()
 	m_Mesh->Draw();
 
 	// Draw bounding box if needed
-	if (m_ShowBoundingBox)
+	if (m_ShowBoundingBox || m_Owner->m_SelectedFlag)
 		App->debugDraw->DrawBB(m_BB);
 }
 
