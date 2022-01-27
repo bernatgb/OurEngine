@@ -3,7 +3,6 @@
 
 #include "GameObject.h"
 #include "Quadtree.h"
-#include "Octotree.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -35,6 +34,7 @@ public:
 	void DrawImGuiHierarchy();
 	void DrawImGuiInspector();
 	void DrawImGuiToolBar();
+	void DrawImGui();
 
 	void Draw(unsigned int program);
 	void LoadModel(Model* _model);
@@ -75,8 +75,8 @@ private:
 	GameObject* m_GODragParent = nullptr;
 
 	Quadtree* qt = nullptr;
-	Octotree* ot = nullptr;
 
+	bool m_drawQuadtree = false;
 
 	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
 	rapidjson::Document m_TempScene;

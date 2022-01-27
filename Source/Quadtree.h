@@ -26,6 +26,8 @@ public:
 	void SetObejctsInFrustum(Plane planes[6]);
 	bool Intersects(Plane planes[6], float3 cornerPoints[8]);
 
+	void DrawAABB();
+
 	AABB GetAABB() { return m_nodeAABB; };
 	const QuadtreeNode* GetParent() const { return m_parent; };
 	QuadtreeNode** GetChildren() { return m_children; }; 
@@ -51,10 +53,13 @@ public:
 
 	void SetObejctsInFrustum(Frustum* frustum);
 
+	void DrawAABB();
+
 	void Clear();
 
 	QuadtreeNode* GetRoot() const { return m_root; };
 
 private:
 	QuadtreeNode* m_root = nullptr;
+	bool m_drawAABB = false;
 };

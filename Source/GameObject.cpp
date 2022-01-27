@@ -342,7 +342,7 @@ GameObject* GameObject::AddChild(const char* _name)
 {
 	GameObject* child = new GameObject(_name, this);
 	m_Children.push_back(child);
-	NotifyMovement(false);
+	child->NotifyMovement(false);
 
 	return child;
 }
@@ -351,7 +351,7 @@ void GameObject::AddChild(GameObject* _go)
 {
 	_go->m_Parent = this;
 	m_Children.push_back(_go);
-	NotifyMovement(false);
+	_go->NotifyMovement(false);
 }
 
 void GameObject::RemoveChild(GameObject* _go)

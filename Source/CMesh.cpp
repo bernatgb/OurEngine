@@ -24,8 +24,8 @@ CMesh::CMesh(bool _enabled, GameObject* _owner, Mesh* _mesh, Material* _material
 	for (unsigned int i = 0; i < 8; ++i)
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
 
-	m_MinPoint = m_BB[6];
-	m_MaxPoint = m_BB[0];
+	m_MinPoint = m_BB[5];
+	m_MaxPoint = m_BB[3];
 
 	m_Triangles = _mesh->m_Triangles;
 
@@ -79,8 +79,8 @@ void CMesh::NotifyMovement()
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
 
 	// Store new min and max point
-	m_MinPoint = m_BB[6];
-	m_MaxPoint = m_BB[0];
+	m_MinPoint = m_BB[5];
+	m_MaxPoint = m_BB[3];
 }
 
 void CMesh::DrawImGui()
@@ -172,8 +172,8 @@ void CMesh::OnLoad(const rapidjson::Value& node)
 	for (unsigned int i = 0; i < 8; ++i)
 		m_BB[i] = (m_Owner->m_Transform->m_AccumulativeModelMatrix * m_Mesh->m_BB[i].ToPos4()).Float3Part();
 
-	m_MinPoint = m_BB[6];
-	m_MaxPoint = m_BB[0];
+	m_MinPoint = m_BB[5];
+	m_MaxPoint = m_BB[3];
 
 	m_Triangles = m_Mesh->m_Triangles;
 }

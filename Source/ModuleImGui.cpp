@@ -196,6 +196,7 @@ update_status ModuleImGui::Update()
 			App->camera->DrawImGui();
 			App->window->DrawImGui();
 			App->renderer->DrawImGui();
+			App->scene->DrawImGui();
 			SoftwareAndHardware();
 		}
 		ImGui::End();

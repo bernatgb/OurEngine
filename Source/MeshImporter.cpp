@@ -88,14 +88,14 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	
 	//CREATING THE BB
 	ourMesh->m_BB = new float3[8];
-	ourMesh->m_BB[0] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[0] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
+	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
 	ourMesh->m_BB[4] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[6] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
 
 	//CREATING TRIANGLES VECTOR
 	ourMesh->m_Triangles = std::vector<Triangle>(ourMesh->m_NumIndices / 3);
@@ -248,14 +248,14 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 
 	//CREATING THE BB
 	ourMesh->m_BB = new float3[8];
-	ourMesh->m_BB[0] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[0] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
+	ourMesh->m_BB[1] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[2] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[3] = float3(ourMesh->m_Max.x, ourMesh->m_Max.y, ourMesh->m_Max.z);
 	ourMesh->m_BB[4] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Max.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
-	ourMesh->m_BB[6] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[6] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
+	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
 
 	//RESTORING TRIANGLES VECTOR
 	bytes = sizeof(Triangle) * ourMesh->m_NumIndices / 3;

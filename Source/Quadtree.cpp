@@ -1,5 +1,12 @@
 #include "Quadtree.h"
 
+#include "Application.h"
+#include "ModuleDebugDraw.h"
+
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
+
 /* QUADTREENODE */
 
 QuadtreeNode::QuadtreeNode(AABB _aabb, QuadtreeNode* _parent)
@@ -163,6 +170,37 @@ bool QuadtreeNode::Intersects(Plane planes[6], float3 cornerPoints[8])
 	return true;
 }
 
+void QuadtreeNode::DrawAABB()
+{
+	if (!IsLeaf())
+	{
+		for (int i = 0; i < 4; ++i)
+		{
+			m_children[i]->DrawAABB();
+		}
+	}
+	else
+	{
+		float3* badAABB = new float3[8];
+		m_nodeAABB.GetCornerPoints(badAABB);
+
+		float3* goodAABB = new float3[8];
+		goodAABB[0] = badAABB[3];
+		goodAABB[1] = badAABB[2];
+		goodAABB[2] = badAABB[6];
+		goodAABB[3] = badAABB[7];
+		goodAABB[4] = badAABB[1];
+		goodAABB[5] = badAABB[0];
+		goodAABB[6] = badAABB[4];
+		goodAABB[7] = badAABB[5];
+
+		App->debugDraw->DrawBB(goodAABB);
+
+		delete badAABB;
+		delete goodAABB;
+	}
+}
+
 /* QUADTREE */
 
 Quadtree::Quadtree()
@@ -197,6 +235,11 @@ void Quadtree::SetObejctsInFrustum(Frustum* frustum)
 	frustum->GetPlanes(planes);
 
 	m_root->SetObejctsInFrustum(planes);
+}
+
+void Quadtree::DrawAABB()
+{
+	m_root->DrawAABB();
 }
 
 void Quadtree::Clear()
