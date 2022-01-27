@@ -39,6 +39,10 @@ bool ModuleScene::Init()
     qt = new Quadtree();
     AABB boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
     qt->SetBoundaries(boundaries);
+    
+    ot = new Octotree();
+    boundaries = AABB(MIN_BOUNDARY, MAX_BOUNDARY);
+    ot->SetBoundaries(boundaries);
 
     //GameObject* camera = m_Root->AddChild("Camera");
     //camera->AddComponent(new CCamera(true, camera));
@@ -57,6 +61,7 @@ bool ModuleScene::Init()
 bool ModuleScene::CleanUp()
 {
     delete qt;
+    delete ot;
 
     delete m_Root;
 
@@ -264,6 +269,7 @@ void ModuleScene::LoadScene(const rapidjson::Document& d)
     m_GOSelected = nullptr;
 
     qt->Clear();
+    ot->Clear();
 
     delete m_Root;
     m_Root = new GameObject("Root", nullptr);
@@ -303,6 +309,7 @@ void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
         if (go->m_Components[i]->m_Type == ComponentType::MESH) 
         {
             qt->InsertGO(go);
+            ot->InsertGO(go);
             break;
         }
     }
@@ -367,8 +374,11 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
                 ++i;
             }
         }
-        if (hasMesh && numberMeshes <= 0) 
+        if (hasMesh && numberMeshes <= 0)
+        {
             qt->EraseGO(_go);
+            ot->EraseGO(_go);
+        }
     }
     
     if (ancestors && _go->m_Active)

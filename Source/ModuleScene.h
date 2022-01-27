@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "Quadtree.h"
+#include "Octotree.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -74,6 +75,7 @@ private:
 	GameObject* m_GODragParent = nullptr;
 
 	Quadtree* qt = nullptr;
+	Octotree* ot = nullptr;
 
 
 	ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;

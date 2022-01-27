@@ -300,6 +300,7 @@
     <ClCompile Include="ModuleScene.cpp" />
     <ClCompile Include="ModuleTexture.cpp" />
     <ClCompile Include="ModuleWindow.cpp" />
+    <ClCompile Include="Octotree.cpp" />
     <ClCompile Include="Quadtree.cpp" />
     <ClCompile Include="ModuleResources.cpp" />
     <ClCompile Include="SceneImporter.cpp" />
@@ -551,6 +552,7 @@
     <ClInclude Include="ModuleScene.h" />
     <ClInclude Include="ModuleTexture.h" />
     <ClInclude Include="ModuleWindow.h" />
+    <ClInclude Include="Octotree.h" />
     <ClInclude Include="Quadtree.h" />
     <ClInclude Include="ModuleResources.h" />
     <ClInclude Include="SceneImporter.h" />
