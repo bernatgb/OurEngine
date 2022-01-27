@@ -336,7 +336,7 @@ update_status ModuleRender::Update()
 	// TODO: MOVE TO THE PREUPDATE
 	//std::list<Light> lights = App->scene->GetLights();
 	App->scene->m_Lights.clear();
-	App->scene->RecursiveSearch(App->scene->GetRoot(), true); 
+	App->scene->RecursiveSearch(App->scene->GetRoot(), true, false); 
 	App->scene->GetQuadtree()->SetObejctsInFrustum(App->camera->GetCullingCamera());
 
 	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();

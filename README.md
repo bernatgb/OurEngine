@@ -4,9 +4,9 @@ This engine is the result of the Master in ADVANCED PROGRAMMING FOR AAA VIDEO GA
 
 Able in: [Github](https://github.com/miquelmiro3/MyEngine)
 
-Made by: miquelmiro3
+Made by: miquelmiro3 & bernatgb
 
-## Engine controls:
+## Camera controls:
 - Right mouse button -> rotate camera
 - Right mouse button + ALT -> zoom
 - Right mouse button + WASD -> movement
@@ -15,8 +15,17 @@ Made by: miquelmiro3
 - Mouse wheel -> zoom
 - F -> focus the loaded model
 
+## Engine features:
+- Gizmos (translate, rotate, scale)
+- Time control
+- Load models / textures
+- Frustrum culling with quadtree
+- 
+
 ## Windows:
 - Console (logs output)
-- Inspector (model information)
+- Inspector (gameObjects information)
+- Hierarchy (scene gameObjects)
+- Resources (loaded models)
 - About (general information)
-- Config (time, camera, window, about software & hardware)
+- Config (time, camera, window, renderer, quadtree, about software & hardware)

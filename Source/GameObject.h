@@ -79,11 +79,12 @@ public:
 		return Distance3(GetMaxPoint(), GetMinPoint());
 	};
 
-	float3 m_Min;
-	float3 m_Max;
+	float3 m_Min = float3::zero;
+	float3 m_Max = float3::zero;
 
-	bool m_ActiveFlag;
-	bool m_Selected;
+	bool m_ActiveFlag = true;
+	bool m_DeleteFlag = false;
+	bool m_SelectedFlag = false;
 
 	template<typename T> static ComponentType TypeToComponentType(T type) {
 		switch (T)

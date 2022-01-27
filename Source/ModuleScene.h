@@ -46,7 +46,7 @@ public:
 
 	void AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go);
 
-	void RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame = false);
+	void RecursiveSearch(GameObject* _go, bool ancestors, bool remove, bool firstFrame = false);
 
 	// Getters
 	GameObject* GetRoot() const

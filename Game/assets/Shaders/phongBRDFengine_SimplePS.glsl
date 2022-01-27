@@ -91,7 +91,7 @@ vec3 GetPhongBRDFSpot(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 pos, v
 	else if (C < cos(innerAngle) && C >= cos(outerAngle))
 		Catt = (C - cos(outerAngle))/(cos(innerAngle) - cos(outerAngle));
 		
-	float dist = dot(L, light.direction);
+	float dist = distance(light.position, pos);
 	float Fatt = pow(max(1 - pow(dist / radius, 4.0), 0.0), 2.0)/(dist * dist + 1);
 	vec3 R = reflect(L, N);
 	vec3 Li = light.lightColor * intensity * Fatt * Catt;
@@ -120,7 +120,7 @@ void main()
  	vec3 part1 = (Cd * (1.0 - Cs));
  	
  	vec3 finalColor = vec3(0.0, 0.0, 0.0);
-    for (int i = 0; i < MAX_NUM_TOTAL_LIGHTS; ++i) 
+    for (int i = 0; i < min(numLights, MAX_NUM_TOTAL_LIGHTS); ++i) 
     {
 		if (lights[i].lightType == 0)
 			finalColor += GetPhongBRDFDirectional(lights[i], Cs, N, V, n, part1);

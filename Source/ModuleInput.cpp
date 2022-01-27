@@ -81,7 +81,9 @@ update_status ModuleInput::PreUpdate()
         //ImGuiIO& io = ImGui::GetIO();
         
         //if (io.WantCaptureMouse)
-        //    break;
+            //break;
+
+        //MY_LOG("%i", ImGui::IsAnyItemActive());
 
         switch (sdlEvent.type)
         {
