@@ -82,14 +82,14 @@ void ModuleScene::DrawImGuiInspector()
 void ModuleScene::SelectGameObject(GameObject* go)
 {
     if (m_GOSelected != nullptr && (go != m_GOSelected || go == nullptr))
-        m_GOSelected->m_Selected = false;
+        m_GOSelected->m_SelectedFlag = false;
 
     if (go == nullptr)
         m_GOSelected = nullptr;
     else 
     {
-        go->m_Selected = !go->m_Selected;
-        if (go->m_Selected)
+        go->m_SelectedFlag = !go->m_SelectedFlag;
+        if (go->m_SelectedFlag)
             m_GOSelected = go;
         else
             m_GOSelected = nullptr;
@@ -100,7 +100,7 @@ void ModuleScene::RecursiveHierarchy(GameObject* go, GameObject*& node_clicked)
 {
     ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanFullWidth;
 
-    if (go->m_Selected)
+    if (go->m_SelectedFlag)
         node_flags |= ImGuiTreeNodeFlags_Selected;
 
     if (go->m_Children.size() <= 0)
@@ -241,8 +241,7 @@ void ModuleScene::Draw(unsigned int program)
 
     if (App->input->GetKey(SDL_SCANCODE_DELETE) == KEY_DOWN && m_GOSelected != nullptr)
     {
-        m_GOSelected->m_Parent->RemoveChild(m_GOSelected);
-        delete m_GOSelected;
+        m_GOSelected->m_DeleteFlag = true;
         m_GOSelected = nullptr;
     }
 
@@ -318,21 +317,43 @@ void ModuleScene::AddToQuadtreeIfHasMesh(Quadtree* qt, GameObject* go)
         AddToQuadtreeIfHasMesh(qt, go->m_Children[i]);
 }
 
-void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFrame) //TODO: check start/enable/disable behaviours
+void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestorsActive, bool remove, bool firstFrame) //TODO: check start/enable/disable behaviours
 {
     _go->m_InFrustum = false;
+
+    if (_go->m_DeleteFlag || remove)
+    {
+        for (unsigned int i = 0; i < _go->m_Children.size(); ++i) 
+            RecursiveSearch(_go->m_Children[i], ancestorsActive, true, firstFrame);
+
+        for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
+        {
+            if (_go->m_Components[i]->m_Type == ComponentType::MESH)
+            {
+                qt->EraseGO(_go);
+                break;
+            }
+        }
+
+        if (_go->m_DeleteFlag)
+        {
+            _go->m_Parent->RemoveChild(_go);
+            delete _go;
+        }
+        return;
+    }
 
     // First frame
     if (firstFrame)
     {
         _go->m_ActiveFlag = _go->m_Active;
-        if (ancestors && _go->m_Active) 
+        if (ancestorsActive && _go->m_Active)
             _go->Start();
 
         for (unsigned int i = 0; i < _go->m_Components.size(); ++i)
         {
             _go->m_Components[i]->m_EnableFlag = _go->m_Components[i]->m_Enabled;
-            if (ancestors && _go->m_Active && _go->m_Components[i]->m_Enabled)
+            if (ancestorsActive && _go->m_Active && _go->m_Components[i]->m_Enabled)
                 _go->m_Components[i]->Enable();
         }
     }
@@ -340,7 +361,7 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
         if (_go->m_ActiveFlag != _go->m_Active)
         {
             _go->m_Active = _go->m_ActiveFlag;
-            if (ancestors && _go->m_Active)
+            if (ancestorsActive && _go->m_Active)
                 _go->Start();
         }
 
@@ -381,7 +402,7 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
         }
     }
     
-    if (ancestors && _go->m_Active)
+    if (ancestorsActive && _go->m_Active)
     {
         for (unsigned int i = 0;  i < _go->m_Components.size(); ++i) 
         {
@@ -391,7 +412,7 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestors, bool firstFra
     }
 
     for (unsigned int i = 0; i < _go->m_Children.size(); ++i)
-        RecursiveSearch(_go->m_Children[i], ancestors && _go->m_Active, firstFrame);
+        RecursiveSearch(_go->m_Children[i], ancestorsActive && _go->m_Active, firstFrame);
 }
 
 

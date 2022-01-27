@@ -21,7 +21,8 @@ GameObject::GameObject(const char* _name, GameObject* _parent)
 	m_Name = _name;
 	m_Active = true;
 	m_ActiveFlag = true;
-	m_Selected = false;
+	m_SelectedFlag = false;
+	m_DeleteFlag = false;
 	m_InFrustum = false;
 	m_Parent = _parent;
 
@@ -421,8 +422,20 @@ void GameObject::DrawImGui()
 		}
 		if (ImGui::Selectable("Camera"))
 		{
-			CCamera* newCCamera = new CCamera(true, this);
-			AddComponent(newCCamera);
+			bool noCamera = true;
+			for (unsigned int i = 0; i < m_Components.size(); ++i) 
+			{
+				if (m_Components[i]->m_Type == ComponentType::CAMERA)
+				{
+					noCamera = false;
+					break;
+				}
+			}
+			if (noCamera) 
+			{
+				CCamera* newCCamera = new CCamera(true, this);
+				AddComponent(newCCamera);
+			}
 		}
 		if (ImGui::Selectable("Light"))
 		{
