@@ -633,4 +633,7 @@ void ModuleDebugDraw::Draw(const float4x4& view, const float4x4& proj, unsigned 
     dd::flush();
 }
 
-
+void ModuleDebugDraw::DrawRay(float3 from, float3 to)
+{
+    dd::line(from, to, float3(0.7f, 1.0f, 0.0f));
+}

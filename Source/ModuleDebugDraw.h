@@ -18,6 +18,7 @@ public:
 
     void DrawBB(const float3* vertex);
     void Draw(const float4x4& view, const float4x4& proj, unsigned width, unsigned height);
+    void DrawRay(float3 from, float3 to);
 
 private:
     static DDRenderInterfaceCoreGL* implementation;

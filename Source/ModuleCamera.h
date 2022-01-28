@@ -64,4 +64,7 @@ private:
 	float mouseSpeedForRotation = 5.0f;
 	float mouseSpeedForMovement = 2.5f;
 	float mouseWheelSpeed = 20.0f;
+
+	float3 rayFrom, rayTo;
+	bool m_drawRay = false;
 };

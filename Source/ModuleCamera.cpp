@@ -5,6 +5,7 @@
 #include "ModuleWindow.h"
 #include "ModuleRender.h"
 #include "ModuleScene.h"
+#include "ModuleDebugDraw.h"
 #include "SDL.h"
 
 #include "CCamera.h"
@@ -178,6 +179,75 @@ update_status ModuleCamera::Update()
 		if (selectedGO != nullptr)
 			AdjustToGO(selectedGO);
 	}
+	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN)
+	{
+		int mouse_x, mouse_y;
+		App->input->GetMousePosition(mouse_x, mouse_y);
+		ImGui::Text("x clicked = %i, y clicked = %i", mouse_x, mouse_y);
+
+		ImVec2 v2 = ImGui::GetMousePos();
+		ImGui::Text("mouse x = %i, mouse y = %i", (int)v2.x, (int)v2.y);
+
+		const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
+		//const ImVec2 vContentRegionMax = ImGui::GetWindowContentRegionMax();
+
+		mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
+		mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
+
+		//ImGui::Text("scene starts at:");
+		//ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
+
+		float width = App->renderer->GetSceneWindowSize().x;
+		float height = App->renderer->GetSceneWindowSize().y;
+
+		//ImGui::Text("width = %i, height = %i", (int)width, (int)height);
+
+		float x = (2.0f * mouse_x) / width - 1.0f;
+		float y = 1.0f - (2.0f * mouse_y) / height;
+		float z = 1.0f;
+		vec ray_nds = vec(x, y, z);
+		ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
+
+		float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
+
+		float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
+		ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
+
+		float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
+		ray_world = (ray_world - frustum.Pos()).Normalized();
+		ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
+
+		LineSegment ray = frustum.UnProjectLineSegment(x, y);
+		//rayFrom = ray.a;
+		//rayTo = ray.b;
+
+		std::vector<GameObject*> hits;
+		/*
+		const GameObject* root = App->scene->GetRoot();
+		for (int i = 0; i < root->m_Children.size(); ++i)
+			FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
+		*/
+		QuadtreeNode* qtRoot = App->scene->GetQuadtree()->GetRoot();
+		FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtRoot, hits);
+
+		if (!hits.empty())
+		{
+			SortHits(hits); // With ray.length?
+			std::vector< std::pair<float, GameObject*> > hitPointsDistances;
+			FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
+			std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
+			if (!hitPointsDistances.empty())
+			{
+				ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
+				if (App->scene->GetSelectedGO() != hitPointsDistances[0].second)
+					App->scene->SelectGameObject(hitPointsDistances[0].second);
+				else
+					App->scene->SelectGameObject(hitPointsDistances[0].second->m_Parent);
+			}
+			else
+				App->scene->SelectGameObject(App->scene->GetSelectedGO());
+		}
+	}
 
 	return UPDATE_CONTINUE;
 }
@@ -289,15 +359,15 @@ bool ModuleCamera::BoxInFrustum(Frustum const& fru, const float3* box)
 	float3* fPoints = new float3[8];
 	fru.GetCornerPoints(fPoints);
 
-	// box[0] = all max components
-	// box[6] = all min components
+	// box[3] = all max components
+	// box[5] = all min components
 	
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x > box[0].x) ? 1 : 0); if (out == 8) return false;
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x < box[6].x) ? 1 : 0); if (out == 8) return false;
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y > box[0].y) ? 1 : 0); if (out == 8) return false;
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y < box[6].y) ? 1 : 0); if (out == 8) return false;
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z > box[0].z) ? 1 : 0); if (out == 8) return false;
-	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z < box[6].z) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x > box[3].x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].x < box[5].x) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y > box[3].y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].y < box[5].y) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z > box[3].z) ? 1 : 0); if (out == 8) return false;
+	out = 0; for (int i = 0; i < 8; i++) out += ((fPoints[i].z < box[5].z) ? 1 : 0); if (out == 8) return false;
 	
 	delete fPoints;
 
@@ -370,9 +440,13 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 		// Transform once the ray into Game Object space to test against all triangles
 		float4x4 modelMatrix = hits[i]->m_Transform->m_AccumulativeModelMatrix;
 		modelMatrix.Inverse();
-		vec rayOrigin = (modelMatrix * float4(ray.a, 1.0f)).xyz();
-		vec rayDir = ((modelMatrix * float4(ray.Dir().xyz(), 0.0f)).Normalized()).xyz();
-		LineSegment rayLocalSpace = LineSegment(Ray(rayOrigin, rayDir), 500.0f);
+		LineSegment rayLocalSpace = ray;
+		rayLocalSpace.Transform(modelMatrix);
+
+		// For debug
+		rayFrom = (hits[i]->m_Transform->m_AccumulativeModelMatrix * rayLocalSpace).a;
+		rayTo = (hits[i]->m_Transform->m_AccumulativeModelMatrix * rayLocalSpace).b;
+
 
 		for (int j = 0; j < hits[i]->m_Components.size(); ++j)
 		{
@@ -380,14 +454,16 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 			{
 				CMesh* cMesh = (CMesh*)hits[i]->m_Components[j];
 				std::vector<Triangle> triangles = cMesh->GetTriangles();
+				float dist = 500.0f;
 				
 				for (int k = 0; k < triangles.size(); ++k)
 				{
 					Triangle triangle = triangles[k];
-					float dist = 500.0f;
 					vec hitPoint;
 					if (rayLocalSpace.Intersects(triangles[k], &dist, &hitPoint))
-						hitPoints.push_back(std::pair<float, GameObject*>(Distance(hitPoint, rayOrigin), hits[i]));
+					{
+						hitPoints.push_back(std::pair<float, GameObject*>(Distance(hitPoint, rayLocalSpace.a), hits[i]));
+					}
 				}
 			}
 		}
@@ -410,74 +486,11 @@ void ModuleCamera::DrawImGui()
 	
 		ImGui::Text("Vectors");
 		ImGui::DragFloat3("Cam pos", &Config::m_CamPosition[0], 1.0f, -25.0f, 25.0f, "%.2f");
-		/// <summary>
-		/// 
-		/// </summary>
-		if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN)
+
+		ImGui::Checkbox("Draw ray", &m_drawRay);
+		if (m_drawRay)
 		{
-			int mouse_x, mouse_y;
-			App->input->GetMousePosition(mouse_x, mouse_y);
-			ImGui::Text("x clicked = %i, y clicked = %i", mouse_x, mouse_y);
-
-			ImVec2 v2 = ImGui::GetMousePos();
-			ImGui::Text("mouse x = %i, mouse y = %i", (int)v2.x, (int)v2.y);
-			
-			const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
-			//const ImVec2 vContentRegionMax = ImGui::GetWindowContentRegionMax();
-
-			mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
-			mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
-
-			//ImGui::Text("scene starts at:");
-			//ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
-
-			float width = App->renderer->GetSceneWindowSize().x; 
-			float height = App->renderer->GetSceneWindowSize().y; 
-
-			//ImGui::Text("width = %i, height = %i", (int)width, (int)height);
-
-			float x = (2.0f * mouse_x) / width - 1.0f;
-			float y = 1.0f - (2.0f * mouse_y) / height;
-			float z = 1.0f;
-			vec ray_nds = vec(x, y, z);
-			ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
-
-			float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
-			
-			float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
-			ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
-			
-			float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
-			ray_world = (ray_world - frustum.Pos()).Normalized();
-			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
-
-			LineSegment ray = frustum.UnProjectLineSegment(x, y);
-			std::vector<GameObject*> hits;
-			/*
-			const GameObject* root = App->scene->GetRoot();
-			for (int i = 0; i < root->m_Children.size(); ++i)
-				FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
-			*/
-			QuadtreeNode* qtRoot = App->scene->GetQuadtree()->GetRoot();
-			FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtRoot, hits);
-
-			if (!hits.empty())
-			{
-				SortHits(hits); // With ray.length?
-				std::vector< std::pair<float, GameObject*> > hitPointsDistances;
-				FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
-				std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
-				if (!hitPointsDistances.empty())
-				{
-					ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
-					if (App->scene->GetSelectedGO() != hitPointsDistances[0].second)
-						App->scene->SelectGameObject(hitPointsDistances[0].second);
-					else
-						App->scene->SelectGameObject(hitPointsDistances[0].second->m_Parent);
-				}
-				else
-					App->scene->SelectGameObject(App->scene->GetSelectedGO());
-			}
+			App->debugDraw->DrawRay(rayFrom, rayTo);
 		}
 		
 		ViewProjectionMatrix();
