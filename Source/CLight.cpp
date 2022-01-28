@@ -1,6 +1,9 @@
 #include "CLight.h"
 
+#include "Application.h"
+#include "ModuleDebugDraw.h"
 #include "SceneImporter.h"
+#include "GameObject.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
@@ -76,6 +79,28 @@ void CLight::DrawImGui()
 			ImGui::DragFloat("Light inner angle", &m_InnerAngle, 0.01f, 0.0f);
 			ImGui::DragFloat("Light outer angle", &m_OuterAngle, 0.01f, 0.0f);
 			break;
+		}
+
+		ImGui::Checkbox("Draw light", &m_drawLight);
+		if (m_drawLight)
+		{
+			if (m_Type == (LightType)0) // directional light
+			{
+				float3 from = m_Owner->m_Transform->GetPos() - m_Owner->m_Transform->GetForward() * 2;
+				float3 to = m_Owner->m_Transform->GetPos() + m_Owner->m_Transform->GetForward() * 2;
+				App->debugDraw->DrawDirectionalLight(from, to);
+			}
+			else if (m_Type == (LightType)1) // point light
+			{
+				float3 center = m_Owner->m_Transform->GetPos();
+				App->debugDraw->DrawPointLight(center, m_Radius * 0.5 + m_Intensity * 0.25); // TODO: Revise
+			}
+			else if (m_Type == (LightType)2) // spot light
+			{
+				float3 apex = m_Owner->m_Transform->GetPos();
+				float3 direction = m_Owner->m_Transform->GetForward() * m_Intensity;
+				App->debugDraw->DrawSpotLight(apex, direction, m_Radius * 0.2 + m_Intensity * 0.5, m_OuterAngle * 0.01);
+			}
 		}
 	}
 }

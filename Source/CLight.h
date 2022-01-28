@@ -64,6 +64,7 @@ private:
 	LightType m_Type = LightType::DIRECTIONAL;
 	float3 m_Color = float3::one;
 	float m_Intensity = 1.0f;
+	bool m_drawLight = false;
 
 	// Point light variables
 	float m_Radius = 5.0f;

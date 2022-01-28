@@ -179,7 +179,7 @@ update_status ModuleCamera::Update()
 		if (selectedGO != nullptr)
 			AdjustToGO(selectedGO);
 	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN)
+	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN && !ImGuizmo::IsOver())
 	{
 		int mouse_x, mouse_y;
 		App->input->GetMousePosition(mouse_x, mouse_y);

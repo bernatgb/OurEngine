@@ -637,3 +637,18 @@ void ModuleDebugDraw::DrawRay(float3 from, float3 to)
 {
     dd::line(from, to, float3(0.7f, 1.0f, 0.0f));
 }
+
+void ModuleDebugDraw::DrawDirectionalLight(float3 from, float3 to)
+{
+    dd::arrow(from, to, float3(0.7f, 1.0f, 0.0f), 1.0f);
+}
+
+void ModuleDebugDraw::DrawPointLight(float3 center, float radius)
+{
+    dd::sphere(center, float3(0.7f, 1.0f, 0.0f), radius);
+}
+
+void ModuleDebugDraw::DrawSpotLight(float3 apex, float3 direction, float baseRadius, float apexRadius)
+{
+    dd::cone(apex, direction, float3(0.7f, 1.0f, 0.0f), baseRadius, apexRadius);
+}

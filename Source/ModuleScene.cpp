@@ -409,7 +409,7 @@ void ModuleScene::RecursiveSearch(GameObject* _go, bool ancestorsActive, bool re
 
 void ModuleScene::DrawImGui()
 {
-    if (ImGui::CollapsingHeader("Quadtree"))
+    if (ImGui::CollapsingHeader("Scene"))
     {
         ImGui::Checkbox("Draw quadtree nodes", &m_drawQuadtree);
         if (m_drawQuadtree)
