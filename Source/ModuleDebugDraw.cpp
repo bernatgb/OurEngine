@@ -648,7 +648,7 @@ void ModuleDebugDraw::DrawPointLight(float3 center, float radius)
     dd::sphere(center, float3(0.7f, 1.0f, 0.0f), radius);
 }
 
-void ModuleDebugDraw::DrawSpotLight(float3 apex, float3 direction, float baseRadius, float apexRadius)
+void ModuleDebugDraw::DrawSpotLight(float3 apex, float3 direction, float baseRadius, float apexRadius, float3 color)
 {
-    dd::cone(apex, direction, float3(0.7f, 1.0f, 0.0f), baseRadius, apexRadius);
+    dd::cone(apex, direction, color, baseRadius, apexRadius);
 }

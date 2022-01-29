@@ -21,7 +21,7 @@ public:
     void DrawRay(float3 from, float3 to);
     void DrawDirectionalLight(float3 from, float3 to);
     void DrawPointLight(float3 center, float radius);
-    void DrawSpotLight(float3 apex, float3 direction, float baseRadius, float apexRadius);
+    void DrawSpotLight(float3 apex, float3 direction, float baseRadius, float apexRadius, float3 color);
 
 private:
     static DDRenderInterfaceCoreGL* implementation;

@@ -67,6 +67,10 @@ private:
 	float mouseSpeedForMovement = 2.5f;
 	float mouseWheelSpeed = 20.0f;
 
+	bool m_CameraRotation = false;
+	bool m_CameraScrolling = false;
+	bool m_CameraZooming = false;
+
 	float3 rayFrom, rayTo;
 	bool m_drawRay = false;
 };

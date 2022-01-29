@@ -84,22 +84,25 @@ void CLight::DrawImGui(int index)
 		ImGui::Checkbox("Draw light", &m_drawLight);
 		if (m_drawLight)
 		{
-			if (m_Type == (LightType)0) // directional light
+			if (m_Type == LightType::DIRECTIONAL)
 			{
 				float3 from = m_Owner->m_Transform->GetPos() - m_Owner->m_Transform->GetForward() * 2;
 				float3 to = m_Owner->m_Transform->GetPos() + m_Owner->m_Transform->GetForward() * 2;
 				App->debugDraw->DrawDirectionalLight(from, to);
 			}
-			else if (m_Type == (LightType)1) // point light
+			else if (m_Type == LightType::POINT)
 			{
 				float3 center = m_Owner->m_Transform->GetPos();
-				App->debugDraw->DrawPointLight(center, m_Radius * 0.5 + m_Intensity * 0.25); // TODO: Revise
+				App->debugDraw->DrawPointLight(center, m_Radius);
 			}
-			else if (m_Type == (LightType)2) // spot light
+			else if (m_Type == LightType::SPOT)
 			{
 				float3 apex = m_Owner->m_Transform->GetPos();
-				float3 direction = m_Owner->m_Transform->GetForward() * m_Intensity;
-				App->debugDraw->DrawSpotLight(apex, direction, m_Radius * 0.2 + m_Intensity * 0.5, m_OuterAngle * 0.01);
+				float3 direction = m_Owner->m_Transform->GetForward() * m_Radius;
+				float baseRadiusOuterCone = atan(m_OuterAngle * DEGTORAD) * m_Radius;
+				float baseRadiusInnerCone = atan(m_InnerAngle * DEGTORAD) * m_Radius;
+				App->debugDraw->DrawSpotLight(apex, direction, baseRadiusOuterCone, 0, float3(0.7f, 1.0f, 0.0f));
+				App->debugDraw->DrawSpotLight(apex, direction, baseRadiusInnerCone, 0, float3(0.2f, 1.0f, 0.0f));
 			}
 		}
 	}

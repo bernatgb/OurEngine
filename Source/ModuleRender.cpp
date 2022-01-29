@@ -449,14 +449,6 @@ void ModuleRender::DrawImGui()
 
 void ModuleRender::ActivateMaterial(Material* _material)
 {
-	/*glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _texture->m_Texture);
-	glUniform1i(glGetUniformLocation(program, "texture"), 0);
-
-	return;*/
-
-	////////////////////////////////////////////////////////////////////////
-
 	unsigned int loc;
 
 	loc = glGetUniformLocation(program, "hasDiffuseTex");
