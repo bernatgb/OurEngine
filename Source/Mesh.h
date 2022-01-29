@@ -37,4 +37,3 @@ public:
 
 	std::vector<Triangle> m_Triangles;
 };
-

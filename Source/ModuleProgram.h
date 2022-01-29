@@ -25,4 +25,3 @@ public:
 
 	std::vector<unsigned int> m_Shaders;
 };
-

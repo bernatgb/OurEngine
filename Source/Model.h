@@ -67,4 +67,3 @@ public:
 private:
 	GameObject* RecursiveExportToGORoot(ModelNode* ourNode, GameObject* parent);
 };
-

@@ -297,31 +297,6 @@ void importer::LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<un
 	}
 }
 
-
-void importer::LoadMeshes(std::map<unsigned int, Mesh*>& _meshes)
-{
-	std::string path = ".\\Assets\\Library\\Meshes";
-
-	//for (const auto& entry : std::filesystem::directory_iterator(path))
-	{
-		/*char* data = nullptr;
-		LoadFile(entry.path(), data);
-		Mesh* mesh = new Mesh();
-		mesh::Load(data, mesh);
-		delete[] data;
-
-		_meshes[mesh->m_GUID] = mesh;*/
-	}
-}
-
-void importer::LoadTextures(std::map<unsigned int, Texture*>& _textures)
-{
-}
-
-void importer::LoadModels(std::map<std::string, Model*>& _models)
-{
-}
-
 // UTILS
 
 float3 importer::ValueToFloat3(const rapidjson::Value& value)

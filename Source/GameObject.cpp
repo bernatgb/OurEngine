@@ -59,28 +59,6 @@ void GameObject::Update()
 	if (!m_Active)
 		return;
 
-	// Hierarchical frustum culling
-	bool parentInFrustum = true;
-	if (m_Parent != NULL) 
-		parentInFrustum = m_Parent->m_InFrustum;
-
-	/*
-	std::vector<bool> childInFrustum;
-	for (unsigned int i = 0; i < m_Children.size(); ++i)
-	{
-		childInFrustum.push_back(m_Children[i]->IsInFrustum());
-	}
-
-	bool allChildrenInFrustum = true;
-	for (int i = 0; i < childInFrustum.size(); ++i)
-		if (childInFrustum[i] == false)
-			allChildrenInFrustum = false;
-
-	m_InFrustum = allChildrenInFrustum;
-	*/
-
-	//if (parentInFrustum && IsInFrustum())
-	//if (IsInFrustumViaQuadtree(App->scene->GetQuadtree()->GetRoot()))
 	if(m_InFrustum)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(App->renderer->GetProgram(), "model"), 1, GL_TRUE, &m_Transform->m_AccumulativeModelMatrix[0][0]);
@@ -177,8 +155,6 @@ void GameObject::OnLoad(const rapidjson::Value& node)
 		}
 		}
 	}
-	// Load the transform component at the end
-	//m_Transform->OnLoad(*node["Components"].Begin());
 
 	// Load children
 	for (rapidjson::Value::ConstValueIterator itr = node["Children"].Begin(); itr != node["Children"].End(); ++itr)
@@ -226,15 +202,8 @@ bool GameObject::IsInFrustum()
 	{
 		if (m_Components[i]->m_Type == ComponentType::MESH)
 		{
-			//ImGui::Text("%s", m_Name);
 			CMesh* cMesh = (CMesh*)m_Components[i];
 			inFrustum = App->camera->BoxInFrustum(*App->camera->GetCullingCamera(), cMesh->m_BB);
-			//ImGui::SameLine();
-			//std::string sb = "no";
-			//if (inFrustum)
-				//sb = "yes";
-			//ImGui::Text("should be painted? %s", sb.c_str());
-			// Better if we do this in another part?
 		}
 	}
 
@@ -385,24 +354,6 @@ void GameObject::DrawImGui()
 
 	m_Transform->DrawImGui(0);
 
-	/*
-	for (unsigned int i = 0; i < m_Components.size(); ++i)
-	{
-		if (m_Components[i]->m_Type == ComponentType::MESH)
-		{
-			if (ImGui::Checkbox("Show AABB", &m_showAABB)) // DEBUG NEEDS FIXING
-			{
-				//Draw GameObject BB
-				float3* aabbPoints = new float3[8];
-				m_aabb.GetCornerPoints(aabbPoints);
-				App->debugDraw->DrawBB(aabbPoints);
-				delete[] aabbPoints;
-			}
-			break;
-		}
-	}
-	*/
-
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 
 		m_Components[i]->DrawImGui(i);
 
@@ -484,15 +435,3 @@ void GameObject::AddComponent(Component* _newComponent)
 	if (_newComponent->m_Type == ComponentType::MESH)
 		RecalculateBB();
 }
-
-/*template<typename T>
-void GameObject::AddComponent(T* _newComponent)
-{
-	m_Components.push_back(_newComponent);
-}*/
-
-/*template CTransform* GameObject::GetComponent<CTransform>();
-template CMaterial* GameObject::GetComponent<CMaterial>();
-template CMesh* GameObject::GetComponent<CMesh>();
-
-template void GameObject::AddComponent<CMesh>(CMesh*);*/

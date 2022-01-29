@@ -23,10 +23,10 @@ public:
 	void OnLoad(const rapidjson::Value& node) override;
 
 	// Getters
-	//float3* GetBB() const { return &m_BB[0]; };
 	float3 GetMinPoint() const { return m_MinPoint; };
 	float3 GetMaxPoint() const { return m_MaxPoint; };
 	std::vector<Triangle> GetTriangles() const { return m_Triangles; };
+
 	float3 m_BB[8];
 
 private:

@@ -39,8 +39,6 @@ update_status ModuleInput::PreUpdate()
 {
     OPTICK_CATEGORY("ModuleInput::PreUpdate", Optick::Category::Input);
 
-    //SDL_PumpEvents();
-
     SDL_Event sdlEvent;
 
     mouse_motion_x = mouse_motion_y = 0;
@@ -77,13 +75,6 @@ update_status ModuleInput::PreUpdate()
     while (SDL_PollEvent(&sdlEvent) != 0)
     {
         ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
-        //ImGui::IsItemHovered
-        //ImGuiIO& io = ImGui::GetIO();
-        
-        //if (io.WantCaptureMouse)
-            //break;
-
-        //MY_LOG("%i", ImGui::IsAnyItemActive());
 
         switch (sdlEvent.type)
         {

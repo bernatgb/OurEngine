@@ -35,12 +35,7 @@ private:
 	bool console;
 	bool about;
 
-	//TODO: REMOVE
-	bool showInfoWindow;
-
 	bool autoScroll;
 
 	char* license;
-
-
 };

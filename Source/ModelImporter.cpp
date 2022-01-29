@@ -39,12 +39,6 @@ void RecursiveRoot(const Model* ourModel, const aiNode* node, ModelNode* ourNode
 
 void importer::model::Import(const aiScene* model, Model* ourModel, std::string fullPath)
 {
-	//m_Name = new char[strlen(_fileName) + 1];
-	//strcpy(m_Name, _fileName);
-
-	//ourModel->m_Name = new char[strlen(model->GetShortFilename()) + 1];
-	//strcpy(ourModel->m_Name, model->GetShortFilename());
-	
 	MY_LOG("Assimp (%s): Loading the model", fullPath);
 	ourModel->m_Name = fullPath;
 	const size_t last_slash_idx = ourModel->m_Name.rfind('\\');
@@ -59,7 +53,6 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		MY_LOG("Assimp: Loading the mesh %i", i);
 		ourModel->m_Meshes[i] = new Mesh();
 		importer::mesh::Import(model->mMeshes[i], ourModel->m_Meshes[i]);
-		//ourModel->m_Meshes[i] = new Mesh(model->mMeshes[i]);
 		App->resources->m_Meshes[ourModel->m_Meshes[i]->m_GUID] = ourModel->m_Meshes[i];
 	}
 
@@ -71,10 +64,6 @@ void importer::model::Import(const aiScene* model, Model* ourModel, std::string 
 		MY_LOG("Assimp: Loading the material %i", i);
 		ourModel->m_Materials[i] = new Material();
 		importer::material::Import(model->mMaterials[i], ourModel->m_Materials[i], fullPath.c_str());
-		/*if (model->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &file) == AI_SUCCESS)
-		{
-			ourModel->m_Textures[i] = new Texture(file.data, fullPath.c_str());
-		}*/
 		App->resources->m_Materials[ourModel->m_Materials[i]->m_GUID] = ourModel->m_Materials[i];
 	}
 
@@ -155,10 +144,6 @@ int importer::model::Save(const Model* ourModel, char*& fileBuffer)
 	d.AddMember("Min", Float3ToValue(ourModel->m_Min, allocator), allocator);
 	d.AddMember("Max", Float3ToValue(ourModel->m_Max, allocator), allocator);
 
-	//rapidjson::StringBuffer buffer;
-	//rapidjson::Writer<char*> writer(fileBuffer);
-	//d.Accept(writer);
-
 	rapidjson::Value root(rapidjson::kObjectType);
 	RecusiveNodeToJson(root, ourModel->m_RootStructure, allocator);
 	d.AddMember("Root", root, allocator);
@@ -206,7 +191,6 @@ void RecusiveNodeFromJson(const rapidjson::Value& node, ModelNode*& modelNode) {
 		if (mesh == nullptr)
 		{
 			MY_LOG("Error when loading Model");
-			//return;
 		}
 		modelNode->m_Meshes.push_back(mesh);
 	}
@@ -237,7 +221,6 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 		if (mesh == nullptr) 
 		{
 			MY_LOG("Error when loading Model");
-			//return;
 		}
 		ourModel->m_Meshes.push_back(mesh);
 	}
@@ -248,7 +231,6 @@ void importer::model::Load(const char* fileBuffer, Model* ourModel)
 		if (material == nullptr)
 		{
 			MY_LOG("Error when loading Model");
-			//return;
 		}
 		ourModel->m_Materials.push_back(material);
 	}

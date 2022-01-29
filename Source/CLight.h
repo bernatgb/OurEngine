@@ -34,12 +34,7 @@ public:
 	CLight(bool _enabled, GameObject* _owner, CLight* cLight);
 	~CLight() override;
 
-	//void Enable() override;
-	//void Update() override;
-	//void Disable() override;
-
 	Component* GetAClone(GameObject* _owner) override;
-	//void NotifyMovement() override;
 	void DrawImGui(int index) override;
 
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;

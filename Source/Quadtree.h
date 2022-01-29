@@ -22,7 +22,6 @@ public:
 	bool IsMin();
 	bool IsLeaf();
 
-	//void SetObejctsInFrustum(Plane planes[6], std::list<GameObject*> goToPaint);
 	void SetObejctsInFrustum(Plane planes[6]);
 	bool Intersects(Plane planes[6], float3 cornerPoints[8]);
 

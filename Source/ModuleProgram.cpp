@@ -62,13 +62,6 @@ bool ModuleProgram::Init()
 	m_Shaders.push_back(0);
 	m_Shaders.push_back(0);
 
-	// TEXTURE SHADER
-	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag"));
-	// PHONG SHADER
-	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag"));
-	// CUBE_MAP SHADER
-	//m_Shaders.push_back(CreateProgram(".\\assets\\Shaders\\vertex_shader_cubemap.vert", ".\\assets\\Shaders\\fragment_shader_cubemap.frag"));
-
 	return true;
 }
 

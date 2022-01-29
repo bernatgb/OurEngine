@@ -265,4 +265,3 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 
 	MY_LOG("MeshImporter_Load: Loading complete");
 }
-

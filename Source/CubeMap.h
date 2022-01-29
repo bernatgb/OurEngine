@@ -11,7 +11,6 @@ public:
 
 	void LoadTexture(const std::vector<std::string>& _faces);
 	void Draw(unsigned int index);
-	void DrawImGui();
 
 private:
 	unsigned int m_Program;

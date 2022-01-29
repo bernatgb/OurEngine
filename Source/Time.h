@@ -45,7 +45,6 @@ private:
 	static double m_Time; // second since game start(Game Clock)
 	static float m_TimeScale; // scale at which time is passing(Game Clock)
 	static double m_DeltaTime; // last frame time expressed in seconds(Game Clock)
-	//static uint32_t m_RealTimeSinceStartup; // seconds since game start(Real Time Clock)
 	static double m_RealTimeDeltaTime; // last frame time expressed in seconds(Real Time Clock)
 
 	static bool m_LimitFramerate;
@@ -68,4 +67,3 @@ private:
 	static bool m_gamePlayed;
 	static int m_stepFrame;
 };
-

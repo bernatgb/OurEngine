@@ -39,12 +39,7 @@ public:
 
 	void ActivateMaterial(Material* _material);
 
-
-	//void* context = nullptr;
-	//unsigned int program;
-
-
-	//Gets
+	//Getters
 	CubeMap* GetCubeMap();
 	float2 GetSceneWindowSize() const
 	{

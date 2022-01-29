@@ -142,11 +142,6 @@ void importer::texture::Load(const char* fileBuffer, Texture* ourTexture)
 	memcpy(ourTexture->m_TextureData->data, cursor, bytes);
 	cursor += bytes;
 
-	//m_Name = new char[strlen(_fileName) + 1];
-	//strcpy(m_Name, _fileName);
-
-	//MY_LOG("Assimp texture (%s): Loading the texture file and setting its configuration", _fileName);
-
 	// CREATING THE VBO
 	MY_LOG("MaterialImporter_Load: Reading texture buffer");
 	glGenTextures(1, &ourTexture->m_Texture);
@@ -159,8 +154,6 @@ void importer::texture::Load(const char* fileBuffer, Texture* ourTexture)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, ourTexture->m_TextureData->format, ourTexture->m_TextureData->width, ourTexture->m_TextureData->height, 0, ourTexture->m_TextureData->format, GL_UNSIGNED_BYTE, ourTexture->m_TextureData->data);
 
-	//glGenerateTextureMipmap(ourMaterial->m_Texture);
-	
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -169,8 +162,6 @@ void importer::texture::Load(const char* fileBuffer, Texture* ourTexture)
 void importer::material::Import(const aiMaterial* material, Material* ourMaterial, const char* fullPath)
 {
 	ourMaterial->m_GUID = rand();
-	//ourTexture->m_Name;
-
 	ourMaterial->m_DiffuseColor = float3(0.0f, 0.0f, 0.0f);
 	ourMaterial->m_SpecularColor = float3(0.0f, 0.0f, 0.0f);
 	ourMaterial->m_ShininessAlpha = false;

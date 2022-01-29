@@ -15,4 +15,3 @@ private:
 	uint32_t startTime;
 	uint32_t timer;
 };
-

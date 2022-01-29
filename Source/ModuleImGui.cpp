@@ -54,8 +54,6 @@ bool ModuleImGui::Init()
 	config = false;
 	console = true;
 
-	showInfoWindow = false;
-
 	autoScroll = true;
 
 	FILE* file = nullptr;
@@ -126,8 +124,6 @@ update_status ModuleImGui::PreUpdate()
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + toolbarSize));// +menuHeight));
 	ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - toolbarSize));// -menuHeight));
-	//ImGui::SetNextWindowPos(viewport->Pos);
-	//ImGui::SetNextWindowSize(viewport->Size);
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -178,10 +174,6 @@ update_status ModuleImGui::Update()
 {
 	OPTICK_CATEGORY("ModuleImGui::Update", Optick::Category::UI);
 
-	//ImGui::ShowDemoWindow();
-
-	//ImageButton()
-
 	if (console)
 		Console(console);
 
@@ -229,25 +221,12 @@ update_status ModuleImGui::Update()
 		ImGui::End();
 	}
 
-	//ImGui::EndFrame();
-
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleImGui::PostUpdate()
 {
 	OPTICK_CATEGORY("ModuleImGui::PostUpdate", Optick::Category::UI);
-
-	/*ImGuiIO& io = ImGui::GetIO();
-
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		const auto win = SDL_GL_GetCurrentWindow();
-		const auto ctx = SDL_GL_GetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		SDL_GL_MakeCurrent(win, ctx);
-	}*/
 
 	return UPDATE_CONTINUE;
 }

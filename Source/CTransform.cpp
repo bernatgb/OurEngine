@@ -141,7 +141,7 @@ void CTransform::RecalculateModelMatrix()
 	// Notify movement
 	NotifyMovement();
 	// Notify movement to parent
-	m_Owner->NotifyMovement(true); // TODO: MOVE
+	m_Owner->NotifyMovement(true);
 }
 
 float3 CTransform::GetPos() const

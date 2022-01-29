@@ -126,9 +126,6 @@ bool ModuleRender::Init()
 	// Framebuffer
 
 	MY_LOG("Shaders: Creating program");
-	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader.frag");
-	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phong.vert", ".\\assets\\Shaders\\fragment_shader_phong.frag");
-	//program = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader_phongBRDF.vert", ".\\assets\\Shaders\\fragment_shader_phongBRDF.frag");
 	program = App->program->CreateProgram(".\\assets\\Shaders\\phongBRDFengine_SimpleVS.glsl", ".\\assets\\Shaders\\phongBRDFengine_SimplePS.glsl");
 
 	MY_LOG("Framebuffer: Creating framebuffer");
@@ -198,6 +195,17 @@ update_status ModuleRender::PreUpdate()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	App->scene->m_Lights.clear();
+	App->scene->RecursiveSearch(App->scene->GetRoot(), true, false);
+	App->scene->GetQuadtree()->SetObejctsInFrustum(App->camera->GetCullingCamera());
+
+	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();
+	int i = 0;
+	for (auto it = App->scene->m_Lights.cbegin(); it != App->scene->m_Lights.cend(); ++it) {
+		m_LightsContainer.lights[i] = *it;
+		++i;
+	}
+
 	return UPDATE_CONTINUE;
 }
 
@@ -231,98 +239,14 @@ update_status ModuleRender::Update()
 	}
 
 	glViewport(0, 0, viewportPanelSize.x, viewportPanelSize.y);
-	/*
-	ImGui::Text("x=%f, y=%f", viewportPanelSize.x, viewportPanelSize.y);
-	int mx, my;
-	ImVec2 v2 = ImGui::GetMousePos();
-	ImGui::Text("mx = %f, my = %f", v2.x, v2.y);
-	ImGuiViewport* v1 = ImGui::GetMainViewport();
-	ImVec2 v = v1->GetCenter();
-	//v = v1->GetWorkCenter();
-	ImGui::Text("vx = %f, vy = %f", v.x, v.y);
-	ImGuiViewport* vp = ImGui::GetWindowViewport();
-	ImVec2 vpp = ImGui::GetWindowPos(); 
-	ImVec2 vpi = vpp;
-	//vpp = vp->DrawData->DisplaySize;
-	ImGui::Text("vpx = %f, vpy = %f", vpp.x, vpp.y);
-	//ImGui::Text("dx = %f, dy = %f", dd.DisplaySize.x, dd.DisplaySize.y);
 
-	ImGui::Text("rx = %f, ry = %f", viewportPanelSize.x / 2 + vpi.x, viewportPanelSize.y / 2 + vpi.y);
-	*/
 	sceneWindowPos = float2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_TRUE, &App->camera->GetView()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(program, "proj"), 1, GL_TRUE, &App->camera->GetProj()[0][0]);
-	// Model?
-	//GLfloat camPos = App->camera->GetFrustum()->Pos()[0];
-	//const GLfloat* constCamPos = &camPos;
-	//glUniform3fv(glGetUniformLocation(program, "cameraPosition"), 1, constCamPos);
-
 
 	unsigned int loc;
-	/*
-	float3 light_pos = float3(5.0f, 5.0f, 5.0f);
-	loc = glGetUniformLocation(program, "light_pos");
-	if (loc < 0) MY_LOG("Uniform location not found: light_pos");
-	glUniform3fv(loc, 1, &light_pos[0]);
-
-	loc = glGetUniformLocation(program, "cam_pos");
-	if (loc < 0) MY_LOG("Uniform location not found: cam_pos");
-	float3 cam_pos = float3(App->camera->GetFrustum()->Pos()[0], App->camera->GetFrustum()->Pos()[1], App->camera->GetFrustum()->Pos()[2]);
-	glUniform3fv(loc, 1, &cam_pos[0]);
-
-	float3 color_a = float3(0.25f, 0.25f, 0.25f);
-	loc = glGetUniformLocation(program, "color_a");
-	if (loc < 0) MY_LOG("Uniform location not found: color_a");
-	glUniform3fv(loc, 1, &color_a[0]);
-
-	float3 color_l = float3(1.0f, 1.0f, 1.0f);
-	loc = glGetUniformLocation(program, "color_l");
-	if (loc < 0) MY_LOG("Uniform location not found: color_l");
-	glUniform3fv(loc, 1, &color_l[0]);
-
-
-	float kd = 1.0f;
-	loc = glGetUniformLocation(program, "kd");
-	if (loc < 0) MY_LOG("Uniform location not found: kd");
-	glUniform1f(loc, kd);
-
-	float ks = 0.0f;
-	loc = glGetUniformLocation(program, "ks");
-	if (loc < 0) MY_LOG("Uniform location not found: ks");
-	glUniform1f(loc, ks);
-
-	float n = 0.0f;
-	loc = glGetUniformLocation(program, "n");
-	if (loc < 0) MY_LOG("Uniform location not found: n");
-	glUniform1f(loc, n);*/
-	
-	/*float3 lightDirection = float3(1.0, -1.0, 1.0);
-	lightDirection.Normalize();
-	loc = glGetUniformLocation(program, "lightDirection");
-	if (loc < 0) MY_LOG("Uniform location not found: lightDirection");
-	glUniform3fv(loc, 1, &lightDirection[0]);
-
-	float3 ambientColor = float3(0.1, 0.1, 0.1);
-	loc = glGetUniformLocation(program, "ambientColor");
-	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
-	glUniform3fv(loc, 1, &ambientColor[0]);
-
-	float3 specularColor = float3(0.08, 0.08, 0.08);
-	loc = glGetUniformLocation(program, "specularColor");
-	if (loc < 0) MY_LOG("Uniform location not found: specularColor");
-	glUniform3fv(loc, 1, &specularColor[0]);
-
-	float shininess = 1.0;
-	loc = glGetUniformLocation(program, "shininess");
-	if (loc < 0) MY_LOG("Uniform location not found: shininess");
-	glUniform1f(loc, shininess);
-
-	float3 lightColor = float3(1.0, 1.0, 1.0);
-	loc = glGetUniformLocation(program, "lightColor");
-	if (loc < 0) MY_LOG("Uniform location not found: lightColor");
-	glUniform3fv(loc, 1, &lightColor[0]);*/
 
 	loc = glGetUniformLocation(program, "camPos");
 	if (loc < 0) MY_LOG("Uniform location not found: camPos");
@@ -332,19 +256,6 @@ update_status ModuleRender::Update()
 	loc = glGetUniformLocation(program, "ambientColor");
 	if (loc < 0) MY_LOG("Uniform location not found: ambientColor");
 	glUniform3fv(loc, 1, &m_AmbientColor[0]);
-
-	// TODO: MOVE TO THE PREUPDATE
-	//std::list<Light> lights = App->scene->GetLights();
-	App->scene->m_Lights.clear();
-	App->scene->RecursiveSearch(App->scene->GetRoot(), true, false); 
-	App->scene->GetQuadtree()->SetObejctsInFrustum(App->camera->GetCullingCamera());
-
-	m_LightsContainer.numberOfLights = App->scene->m_Lights.size();
-	int i = 0;
-	for (auto it = App->scene->m_Lights.cbegin(); it != App->scene->m_Lights.cend(); ++it) {
-		m_LightsContainer.lights[i] = *it;
-		++i;
-	}
 
 	// TODO: ACTIVATE ALL LIGHTS AND THINGS
 	glBindBuffer(GL_UNIFORM_BUFFER, m_lightsUBO);
@@ -360,32 +271,6 @@ update_status ModuleRender::Update()
 		cubeMap->Draw(m_ActiveCubeMap);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	/*
-	//Selection highlighting
-	glEnable(GL_DEPTH_TEST);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	glStencilMask(0x00); // make sure we don't update the stencil buffer while drawing the floor
-	//normalShader.use();
-	//DrawFloor()
-
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilMask(0xFF);
-	//DrawTwoContainers();
-
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilMask(0x00);
-	glDisable(GL_DEPTH_TEST);
-	unsigned singleColorProgram = App->program->CreateProgram(".\\assets\\Shaders\\vertex_shader.vert", ".\\assets\\Shaders\\fragment_shader_single_color.frag");
-	//".\\assets\\Shaders\\fragment_shader_single_color.frag".use();
-	//DrawTwoScaledUpContainers();
-	glStencilMask(0xFF);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glEnable(GL_DEPTH_TEST);
-	// End selection highlighting */
 
 	ImGui::Image((void*)fbo_texture, ImVec2{ viewportPanelSize.x, viewportPanelSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 	ImGui::End();
@@ -440,10 +325,6 @@ void ModuleRender::DrawImGui()
 
 		ImGui::Checkbox("Draw axis", &Config::m_DrawAxis);
 		ImGui::Checkbox("Draw grid", &Config::m_DrawGrid);
-
-		ImGui::DragInt("Active cubemap", &m_ActiveCubeMap);
-
-		cubeMap->DrawImGui();
 	}
 }
 
@@ -483,7 +364,6 @@ void ModuleRender::ActivateMaterial(Material* _material)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _material->m_DiffuseTexture->m_Texture);
 		glUniform1i(loc, 0);
-		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	
 	if (_material->m_SpecularTexture != nullptr)
@@ -494,7 +374,6 @@ void ModuleRender::ActivateMaterial(Material* _material)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, _material->m_SpecularTexture->m_Texture);
 		glUniform1i(loc, 0);
-		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
 
@@ -502,68 +381,3 @@ CubeMap* ModuleRender::GetCubeMap()
 {
 	return cubeMap;
 }
-
-
-/*
-void ModuleImGui::EditTransform() // (const Camera& camera, matrix_t& matrix)
-{
-	static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
-	static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
-	if (ImGui::IsKeyPressed(90))
-		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-	if (ImGui::IsKeyPressed(69))
-		mCurrentGizmoOperation = ImGuizmo::ROTATE;
-	if (ImGui::IsKeyPressed(82)) // r Key
-		mCurrentGizmoOperation = ImGuizmo::SCALE;
-	if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
-		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
-		mCurrentGizmoOperation = ImGuizmo::ROTATE;
-	ImGui::SameLine();
-	if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
-		mCurrentGizmoOperation = ImGuizmo::SCALE;
-	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-
-	float4x4 matrix = float4x4::identity;
-
-	ImGuizmo::DecomposeMatrixToComponents(&matrix[0][0], matrixTranslation, matrixRotation, matrixScale);
-	ImGui::InputFloat3("Tr", matrixTranslation, "%.3f");
-	ImGui::InputFloat3("Rt", matrixRotation, "%.3f");
-	ImGui::InputFloat3("Sc", matrixScale, "%.3f");
-	ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, &matrix[0][0]);
-
-	if (mCurrentGizmoOperation != ImGuizmo::SCALE)
-	{
-		if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
-			mCurrentGizmoMode = ImGuizmo::LOCAL;
-		ImGui::SameLine();
-		if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
-			mCurrentGizmoMode = ImGuizmo::WORLD;
-	}
-	static bool useSnap(false);
-	if (ImGui::IsKeyPressed(83))
-		useSnap = !useSnap;
-	ImGui::Checkbox("", &useSnap);
-	ImGui::SameLine();
-	vec snap; // WTF is this?
-	switch (mCurrentGizmoOperation)
-	{
-	case ImGuizmo::TRANSLATE:
-		//snap = config.mSnapTranslation;
-		ImGui::InputFloat3("Snap", &snap.x);
-		break;
-	case ImGuizmo::ROTATE:
-		//snap = config.mSnapRotation;
-		ImGui::InputFloat("Angle Snap", &snap.x);
-		break;
-	case ImGuizmo::SCALE:
-		//snap = config.mSnapScale;
-		ImGui::InputFloat("Scale Snap", &snap.x);
-		break;
-	}
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
-	ImGuizmo::Manipulate(&App->camera->view[0][0], &App->camera->proj[0][0], mCurrentGizmoOperation, mCurrentGizmoMode, &matrix[0][0], NULL, useSnap ? &snap.x : NULL);
-}
-*/

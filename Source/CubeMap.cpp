@@ -112,23 +112,3 @@ void CubeMap::Draw(unsigned int index)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glDepthMask(GL_TRUE);
 }
-
-void CubeMap::DrawImGui()
-{
-	if (ImGui::CollapsingHeader("Skybox"))
-	{
-
-		/*ImGui::Image((void*)m_Textures[0], ImVec2(100, 100));
-		ImGui::Text("Textures used for the skybox:");
-		for (int i = 0; i < m_TexturesNames.size(); ++i)
-		{
-			ImGui::BulletText("%s:", m_TexturesNames[i].c_str());
-
-			TextureData* textureInfo = App->texture->LoadAndReturnTextureData(m_TexturesNames[i].c_str(), false);
-
-			ImGui::Image((void*)textureInfo->texture, ImVec2(50, 50));
-			App->texture->DeleteTextureData(textureInfo);
-			// TODO: change skybox cubemap files using imgui
-		}*/
-	}
-}

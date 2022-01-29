@@ -111,4 +111,3 @@ void ModuleWindow::DrawImGui()
 		ImGui::Text("Screen height: %i", current.h);
 	}
 }
-

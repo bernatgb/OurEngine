@@ -38,10 +38,6 @@ void ModuleCamera::ViewProjectionMatrix()
 	{
 		gameCameraFrustum = *m_CullingCamera->GetCCameraFrustum();
 
-		/*gameCameraFrustum.SetKind(FrustumSpaceGL, FrustumRightHanded);
-		gameCameraFrustum.SetViewPlaneDistances(m_CullingCamera->zNear, m_CullingCamera->zFar);
-		gameCameraFrustum.SetVerticalFovAndAspectRatio(verticalFov, aspect);*/
-
 		// To visualize what gameCamera sees
 		//frustum = gameCameraFrustum;
 	}
@@ -256,11 +252,6 @@ update_status ModuleCamera::Update()
 			Quat(Config::m_CamRotation.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
 			vector;
 
-		/*float aux = Dot(vector, float4::unitY);
-		if (aux > -0.98f && aux < 0.98f)
-		{
-		}*/
-
 		Config::m_CamPosition = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
 
 		float3 front = (float3(target.x, target.y, target.z) - Config::m_CamPosition).Normalized();
@@ -419,7 +410,6 @@ void ModuleCamera::FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineS
 			if (ray.Intersects(go->m_aabb))
 			{
 				hits.push_back(go); 
-				//ImGui::Text("Ray intersects with %s", go->m_Name);
 			}
 		}
 
@@ -433,19 +423,6 @@ void ModuleCamera::FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineS
 
 void ModuleCamera::SortHits(std::vector<GameObject*>& hits)
 {
-	/* With ints
-	std::vector <std::pair<float, int> > hitsDistances(hits.size());
-	for (int i = 0; i < hitsDistances.size(); ++i)
-		hitsDistances[i] = std::pair<float, int> (hits[i]->m_aabb.Distance(frustum.Pos()), i);
-
-	std::sort(hitsDistances.begin(), hitsDistances.end());
-
-	std::vector<GameObject*> hitsCopy = hits;
-	for (int i = 0; i < hitsDistances.size(); ++i)
-		hits[i] = hitsCopy[hitsDistances[i].second];
-	*/
-
-	/* With GameObjects */
 	std::vector< std::pair<float, GameObject*> > hitsDistances(hits.size());
 	for (int i = 0; i < hitsDistances.size(); ++i)
 		hitsDistances[i] = std::pair<float, GameObject*>(hits[i]->m_aabb.Distance(frustum.Pos()), hits[i]);

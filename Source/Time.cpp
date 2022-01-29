@@ -152,42 +152,13 @@ void Time::DrawImGui()
 		ImGui::Text("Real time since start: %f; Real time dt: %f", Time::GetRealTimeSinceStartup(), Time::GetRealTimeDeltaTime());
 		ImGui::Text("Game time since start: %f; Game time dt: %f", Time::GetGameTime(), Time::GetDeltaTime());
 
-		/*const char* image = "assets\\Textures\\Lenna.png";
-		unsigned imageID;
-		ilGenImages(1, &imageID);
-		ilBindImage(imageID);
-		ilLoadImage(image);
-		iluFlipImage();
-
-		glGenTextures(1, &imageID);
-		glBindTexture(GL_TEXTURE_2D, imageID);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-			ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-			ilGetData());
-
-		ilDeleteImages(1, &imageID);
-
-		ImGui::Image((ImTextureID)(intptr_t)imageID, ImVec2(50, 50));
-
-		ImGui::SameLine();
-
-		TextureData* textureInfo = App->texture->LoadAndReturnTextureData(image, false);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, textureInfo->format, textureInfo->width, textureInfo->height, 0, textureInfo->format, GL_UNSIGNED_BYTE, textureInfo->data);
-
-		ImGui::Image((ImTextureID)(intptr_t)textureInfo->texture, ImVec2(50, 50));
-
-		App->texture->DeleteTextureData(textureInfo);
-		glDeleteTextures(1, &imageID);*/
-
-		// TODO: Make it work properly, put all images in an "Init()" & here only call them.
+		// TODO: Add images, put them all in an "Init()" & here only call them.
 
 		ImGui::SliderFloat("Game clock scale", &m_TimeScale, 0.0f, 4.0f);
 
 		ImGui::Text("FPS: %f; Frame count: %d", Time::GetFPS(), Time::GetFrameCount());
 
-		ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f); //ImVec2(310, 100)
+		ImGui::PlotHistogram("##framerate", &m_FPSGraph[0], m_FPSGraph.size(), 0, "FPS", 0.0f, 120.0f);
 		ImGui::PlotHistogram("##framerate", &m_DeltaTimeGraph[0], m_DeltaTimeGraph.size(), 0, "DeltaTime", 0.0f);
 	}
 }
@@ -199,7 +170,6 @@ void Time::DrawImGuiToolBar()
 		if (!m_gamePlayed)
 		{
 			App->scene->SaveTempScene();
-			//PlayButton();
 			m_notPlayedTime = GetTime();
 			m_pausedTime = 0;
 			m_gamePaused = false;

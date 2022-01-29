@@ -24,6 +24,4 @@ public:
 
 	bool m_ShininessAlpha = false;
 	float m_Shininess = 0.0f;
-
-	Shaders m_Shader; // currently not used
 };

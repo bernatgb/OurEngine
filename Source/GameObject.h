@@ -32,11 +32,9 @@ public:
 
 	void NotifyMovement(bool notifiedByTransform);
 
-	//void OnDestroy();
 	void RecalculateBB();
 
 	template<typename T> T* GetComponent();
-	//template<typename T> void AddComponent(T* _newComponent);
 	void AddComponent(Component* _newComponent);
 
 	void SetParent(GameObject* _go);

@@ -22,10 +22,6 @@ namespace importer {
 	void SaveResources(const std::map<unsigned int, Mesh*>& _meshes, const std::map<unsigned int, Texture*>& _texture, const std::map<unsigned int, Material*>& _materials, const std::map<std::string, Model*>& _models);
 	void LoadResources(std::map<unsigned int, Mesh*>& _meshes, std::map<unsigned int, Texture*>& _textures, std::map<unsigned int, Material*>& _materials, std::map<std::string, Model*>& _models);
 
-	void LoadMeshes(std::map<unsigned int, Mesh*>& _meshes);
-	void LoadTextures(std::map<unsigned int, Texture*>& _textures);
-	void LoadModels(std::map<std::string, Model*>& _models);
-
 	// UTILS
 	float3 ValueToFloat3(const rapidjson::Value& value);
 	rapidjson::Value Float3ToValue(const float3& value, rapidjson::Document::AllocatorType& allocator);
