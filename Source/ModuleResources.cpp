@@ -108,9 +108,9 @@ void ModuleResources::DrawImGuiResources()
     }
 }
 
-void ModuleResources::LoadFile(const char* _fileName, rapidjson::Document& d)
+bool ModuleResources::LoadFile(const char* _fileName, rapidjson::Document& d)
 {
-    importer::LoadFile(_fileName, d);
+    return importer::LoadFile(_fileName, d);
 }
 
 void ModuleResources::LoadResource(const char* _fileName)

@@ -20,7 +20,6 @@ Made by: miquelmiro3 & bernatgb
 - Time control
 - Load models / textures
 - Frustrum culling with quadtree
-- 
 
 ## Windows:
 - Console (logs output)

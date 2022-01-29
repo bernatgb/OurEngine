@@ -247,7 +247,7 @@ void ModuleImGui::About(bool& show)
 
 		ImGui::Text("Description:");
 		ImGui::Indent();
-		ImGui::Text("This is MyEngine");
+		ImGui::Text("This is OurEngine");
 		ImGui::Unindent();
 
 		if (ImGui::Button("Github"))
