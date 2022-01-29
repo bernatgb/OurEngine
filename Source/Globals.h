@@ -23,7 +23,7 @@ enum update_status
 #define SCREEN_HEIGHT 480
 #define FULLSCREEN false
 #define VSYNC true
-#define TITLE "Super Awesome Engine"
+#define TITLE "OurEngine"
 
 #define GITHUB "https://github.com/miquelmiro3/MyEngine"
 #define LICENSE_DIR "..\\LICENSE"

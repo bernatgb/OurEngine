@@ -28,7 +28,7 @@ public:
 
 	void DrawImGuiResources();
 
-	void LoadFile(const char* _fileName, rapidjson::Document& d);
+	bool LoadFile(const char* _fileName, rapidjson::Document& d);
 	void LoadResource(const char* _fileName);
 	void LoadModel(const char* _fileName);
 

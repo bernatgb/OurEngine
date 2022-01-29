@@ -46,8 +46,8 @@ bool ModuleScene::Init()
     //LoadModel(".\\Assets\\Models\\BakerHouse.fbx");
 
     rapidjson::Document d;
-    App->resources->LoadFile(".\\Assets\\Scene.scene", d);
-    LoadScene(d);
+    if (App->resources->LoadFile(".\\Assets\\Scene.scene", d))
+        LoadScene(d);
     
     currentGizmoOperation = ImGuizmo::TRANSLATE;
 
