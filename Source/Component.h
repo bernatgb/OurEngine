@@ -53,7 +53,7 @@ public:
 	virtual void NotifyMovement()
 	{
 	};
-	virtual void DrawImGui() 
+	virtual void DrawImGui(int index) 
 	{
 		// Show enabled variable
 		ImGui::Checkbox("Enabled", &m_EnableFlag);
