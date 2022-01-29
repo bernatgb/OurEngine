@@ -414,7 +414,9 @@ void ModuleScene::DrawImGui()
         ImGui::Checkbox("Draw quadtree nodes", &m_drawQuadtree);
         if (m_drawQuadtree)
         {
-            qt->DrawAABB();
+            int numberOfNodes = 0;
+            qt->DrawAABB(numberOfNodes);
+            ImGui::Text("There are %i nodes.", numberOfNodes);
         }
     }
 }

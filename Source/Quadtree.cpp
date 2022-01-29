@@ -170,13 +170,15 @@ bool QuadtreeNode::Intersects(Plane planes[6], float3 cornerPoints[8])
 	return true;
 }
 
-void QuadtreeNode::DrawAABB()
+void QuadtreeNode::DrawAABB(int& numberOfNodes)
 {
+	++numberOfNodes;
+
 	if (!IsLeaf())
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			m_children[i]->DrawAABB();
+			m_children[i]->DrawAABB(numberOfNodes);
 		}
 	}
 	else
@@ -237,9 +239,9 @@ void Quadtree::SetObejctsInFrustum(Frustum* frustum)
 	m_root->SetObejctsInFrustum(planes);
 }
 
-void Quadtree::DrawAABB()
+void Quadtree::DrawAABB(int& numberOfNodes)
 {
-	m_root->DrawAABB();
+	m_root->DrawAABB(numberOfNodes);
 }
 
 void Quadtree::Clear()

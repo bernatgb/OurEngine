@@ -86,166 +86,159 @@ update_status ModuleCamera::Update()
 {
 	OPTICK_CATEGORY("ModuleCamera::Update", Optick::Category::Camera);
 
-	if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KeyState::KEY_REPEAT)
+	if (IsMouseInScene())
 	{
-		int deltaX, deltaY;
-		App->input->GetMouseMotion(deltaX, deltaY);
-
-		if (App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KeyState::KEY_REPEAT)
 		{
-			Config::m_CamPosition += Config::m_CamRotation.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
-		}
-		else
-		{
-			float deltaPitch = deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD;
-			float deltaYaw = -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD;
+			int deltaX, deltaY;
+			App->input->GetMouseMotion(deltaX, deltaY);
 
-			Rotate(deltaPitch, deltaYaw);
-
-			float multiplier = 1.0f;
-			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KeyState::KEY_REPEAT)
-				multiplier = 3.0f;
-
-			if (App->input->GetKey(SDL_SCANCODE_W) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition += Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_S) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition -= Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_A) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition += Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_D) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition -= Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_Q) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition += Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
-			if (App->input->GetKey(SDL_SCANCODE_E) == KeyState::KEY_REPEAT)
-				Config::m_CamPosition -= Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
-		}
-
-		ViewProjectionMatrix();
-	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KeyState::KEY_REPEAT)
-	{
-		int deltaX, deltaY;
-		App->input->GetMouseMotion(deltaX, deltaY);
-
-		Config::m_CamPosition += Config::m_CamRotation.WorldX() * deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
-			Config::m_CamRotation.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
-
-		ViewProjectionMatrix();
-	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
-	{
-		int deltaX, deltaY;
-		App->input->GetMouseMotion(deltaX, deltaY);
-
-		float4 target = float4(0.0f, 0.0f, 0.0f, 1.0f);
-		GameObject* selectedGO = App->scene->GetSelectedGO();
-		if (selectedGO != nullptr)
-			target = selectedGO->GetCenter();
-
-		float4 vector = float4(Config::m_CamPosition.x - target.x, Config::m_CamPosition.y - target.y, Config::m_CamPosition.z - target.z, 0);
-
-		vector = 
-			Quat(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-			Quat(Config::m_CamRotation.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
-			vector;
-
-		/*float aux = Dot(vector, float4::unitY);
-		if (aux > -0.98f && aux < 0.98f)
-		{
-		}*/
-
-		Config::m_CamPosition = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
-
-		float3 front = (float3(target.x, target.y, target.z) - Config::m_CamPosition).Normalized();
-		float3 right = Cross(float3::unitY, front).Normalized();
-		float3 up = Cross(front, right).Normalized();
-
-		Config::m_CamRotation = float3x3(right, up, front).ToQuat();
-
-		ViewProjectionMatrix();
-	}
-	else if (App->input->MouseWheel()) 
-	{
-		int wheelX, wheelY;
-		App->input->GetMouseWheel(wheelX, wheelY);
-
-		Config::m_CamPosition += Config::m_CamRotation.WorldZ() * wheelY * Time::GetDeltaTime() * mouseWheelSpeed;
-
-		ViewProjectionMatrix();
-	}
-	else if (App->input->GetKey(SDL_SCANCODE_F) == KeyState::KEY_REPEAT)
-	{
-		GameObject* selectedGO = App->scene->GetSelectedGO();
-		if (selectedGO != nullptr)
-			AdjustToGO(selectedGO);
-	}
-	else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN && !ImGuizmo::IsOver())
-	{
-		int mouse_x, mouse_y;
-		App->input->GetMousePosition(mouse_x, mouse_y);
-		ImGui::Text("x clicked = %i, y clicked = %i", mouse_x, mouse_y);
-
-		ImVec2 v2 = ImGui::GetMousePos();
-		ImGui::Text("mouse x = %i, mouse y = %i", (int)v2.x, (int)v2.y);
-
-		const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
-		//const ImVec2 vContentRegionMax = ImGui::GetWindowContentRegionMax();
-
-		mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
-		mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
-
-		//ImGui::Text("scene starts at:");
-		//ImGui::Text("x = %i, y = %i", (int)App->renderer->GetSceneWindowStartPos().x + 8, (int)App->renderer->GetSceneWindowStartPos().y + 37);
-
-		float width = App->renderer->GetSceneWindowSize().x;
-		float height = App->renderer->GetSceneWindowSize().y;
-
-		//ImGui::Text("width = %i, height = %i", (int)width, (int)height);
-
-		float x = (2.0f * mouse_x) / width - 1.0f;
-		float y = 1.0f - (2.0f * mouse_y) / height;
-		float z = 1.0f;
-		vec ray_nds = vec(x, y, z);
-		ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
-
-		float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
-
-		float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
-		ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
-
-		float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
-		ray_world = (ray_world - frustum.Pos()).Normalized();
-		ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
-
-		LineSegment ray = frustum.UnProjectLineSegment(x, y);
-		//rayFrom = ray.a;
-		//rayTo = ray.b;
-
-		std::vector<GameObject*> hits;
-		/*
-		const GameObject* root = App->scene->GetRoot();
-		for (int i = 0; i < root->m_Children.size(); ++i)
-			FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
-		*/
-		QuadtreeNode* qtRoot = App->scene->GetQuadtree()->GetRoot();
-		FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtRoot, hits);
-
-		if (!hits.empty())
-		{
-			SortHits(hits); // With ray.length?
-			std::vector< std::pair<float, GameObject*> > hitPointsDistances;
-			FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
-			std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
-			if (!hitPointsDistances.empty())
+			if (App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
 			{
-				ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
-				if (App->scene->GetSelectedGO() != hitPointsDistances[0].second)
-					App->scene->SelectGameObject(hitPointsDistances[0].second);
-				else
-					App->scene->SelectGameObject(hitPointsDistances[0].second->m_Parent);
+				Config::m_CamPosition += Config::m_CamRotation.WorldZ() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 			}
 			else
-				App->scene->SelectGameObject(App->scene->GetSelectedGO());
+			{
+				float deltaPitch = deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD;
+				float deltaYaw = -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD;
+
+				Rotate(deltaPitch, deltaYaw);
+
+				float multiplier = 1.0f;
+				if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KeyState::KEY_REPEAT)
+					multiplier = 3.0f;
+
+				if (App->input->GetKey(SDL_SCANCODE_W) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition += Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
+				if (App->input->GetKey(SDL_SCANCODE_S) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition -= Config::m_CamRotation.WorldZ() * Time::GetDeltaTime() * speed * multiplier;
+				if (App->input->GetKey(SDL_SCANCODE_A) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition += Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
+				if (App->input->GetKey(SDL_SCANCODE_D) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition -= Config::m_CamRotation.WorldX() * Time::GetDeltaTime() * speed * multiplier;
+				if (App->input->GetKey(SDL_SCANCODE_Q) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition += Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
+				if (App->input->GetKey(SDL_SCANCODE_E) == KeyState::KEY_REPEAT)
+					Config::m_CamPosition -= Config::m_CamRotation.WorldY() * Time::GetDeltaTime() * speed * multiplier;
+			}
+
+			ViewProjectionMatrix();
+		}
+		else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KeyState::KEY_REPEAT)
+		{
+			int deltaX, deltaY;
+			App->input->GetMouseMotion(deltaX, deltaY);
+
+			Config::m_CamPosition += Config::m_CamRotation.WorldX() * deltaX * Time::GetDeltaTime() * mouseSpeedForMovement +
+				Config::m_CamRotation.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
+
+			ViewProjectionMatrix();
+		}
+		else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
+		{
+			int deltaX, deltaY;
+			App->input->GetMouseMotion(deltaX, deltaY);
+
+			float4 target = float4(0.0f, 0.0f, 0.0f, 1.0f);
+			GameObject* selectedGO = App->scene->GetSelectedGO();
+			if (selectedGO != nullptr)
+				target = selectedGO->GetCenter();
+
+			float4 vector = float4(Config::m_CamPosition.x - target.x, Config::m_CamPosition.y - target.y, Config::m_CamPosition.z - target.z, 0);
+
+			vector =
+				Quat(float3::unitY, -deltaX * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+				Quat(Config::m_CamRotation.WorldX(), deltaY * Time::GetDeltaTime() * mouseSpeedForRotation * DEGTORAD) *
+				vector;
+
+			/*float aux = Dot(vector, float4::unitY);
+			if (aux > -0.98f && aux < 0.98f)
+			{
+			}*/
+
+			Config::m_CamPosition = float3(target.x + vector.x, target.y + vector.y, target.z + vector.z);
+
+			float3 front = (float3(target.x, target.y, target.z) - Config::m_CamPosition).Normalized();
+			float3 right = Cross(float3::unitY, front).Normalized();
+			float3 up = Cross(front, right).Normalized();
+
+			Config::m_CamRotation = float3x3(right, up, front).ToQuat();
+
+			ViewProjectionMatrix();
+		}
+		else if (App->input->MouseWheel())
+		{
+			int wheelX, wheelY;
+			App->input->GetMouseWheel(wheelX, wheelY);
+
+			Config::m_CamPosition += Config::m_CamRotation.WorldZ() * wheelY * Time::GetDeltaTime() * mouseWheelSpeed;
+
+			ViewProjectionMatrix();
+		}
+		else if (App->input->GetKey(SDL_SCANCODE_F) == KeyState::KEY_REPEAT)
+		{
+			GameObject* selectedGO = App->scene->GetSelectedGO();
+			if (selectedGO != nullptr)
+				AdjustToGO(selectedGO);
+		}
+		else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN && !ImGuizmo::IsOver())
+		{
+			int mouse_x, mouse_y;
+			App->input->GetMousePosition(mouse_x, mouse_y);
+
+			const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
+
+			mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
+			mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
+
+			float width = App->renderer->GetSceneWindowSize().x;
+			float height = App->renderer->GetSceneWindowSize().y;
+
+			float x = (2.0f * mouse_x) / width - 1.0f;
+			float y = 1.0f - (2.0f * mouse_y) / height;
+			float z = 1.0f;
+			vec ray_nds = vec(x, y, z);
+			ImGui::Text("ray_nds = (%f, %f, %f)", x, y, z);
+
+			float4 ray_clip = float4(ray_nds.xy(), -1.0, 1.0);
+
+			float4 ray_eye = frustum.ProjectionMatrix().Inverse() * ray_clip;
+			ray_eye = float4(ray_eye.xy(), -1.0f, 0.0f);
+
+			float3 ray_world = float3((frustum.ViewMatrix().Inverse() * ray_eye).xyz());
+			ray_world = (ray_world - frustum.Pos()).Normalized();
+			ImGui::Text("ray_world = (%f, %f, %f)", ray_world.x, ray_world.y, ray_world.z);
+
+			LineSegment ray = frustum.UnProjectLineSegment(x, y);
+			//rayFrom = ray.a;
+			//rayTo = ray.b;
+
+			std::vector<GameObject*> hits;
+			/*
+			const GameObject* root = App->scene->GetRoot();
+			for (int i = 0; i < root->m_Children.size(); ++i)
+				FindIfRayIntersectsAnAABBandAddToHits(ray, root->m_Children[i], hits);
+			*/
+			QuadtreeNode* qtRoot = App->scene->GetQuadtree()->GetRoot();
+			FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(ray, qtRoot, hits);
+
+			if (!hits.empty())
+			{
+				SortHits(hits); // With ray.length?
+				std::vector< std::pair<float, GameObject*> > hitPointsDistances;
+				FindIfRayIntersectsATriangle(ray, hits, hitPointsDistances);
+				std::sort(hitPointsDistances.begin(), hitPointsDistances.end());
+				if (!hitPointsDistances.empty())
+				{
+					ImGui::Text("Mouse is pointing %s", hitPointsDistances[0].second->m_Name);
+					if (App->scene->GetSelectedGO() != hitPointsDistances[0].second)
+						App->scene->SelectGameObject(hitPointsDistances[0].second);
+					else
+						App->scene->SelectGameObject(hitPointsDistances[0].second->m_Parent);
+				}
+				else
+					App->scene->SelectGameObject(App->scene->GetSelectedGO());
+			}
 		}
 	}
 
@@ -468,6 +461,22 @@ void ModuleCamera::FindIfRayIntersectsATriangle(LineSegment ray, std::vector<Gam
 			}
 		}
 	}
+}
+
+bool ModuleCamera::IsMouseInScene()
+{
+	int mouse_x, mouse_y;
+	App->input->GetMousePosition(mouse_x, mouse_y);
+
+	const ImVec2 vContentRegionMin = ImGui::GetWindowContentRegionMin();
+
+	mouse_x -= App->renderer->GetSceneWindowStartPos().x + vContentRegionMin.x;
+	mouse_y -= App->renderer->GetSceneWindowStartPos().y + vContentRegionMin.y;
+
+	float width = App->renderer->GetSceneWindowSize().x;
+	float height = App->renderer->GetSceneWindowSize().y;
+
+	return mouse_x > 0 && mouse_x < width && mouse_y > 0 && mouse_y < height;
 }
 
 void ModuleCamera::DrawImGui()

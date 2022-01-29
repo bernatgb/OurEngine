@@ -31,6 +31,8 @@ public:
 	void FindIfRayIntersectsQuadtreeAreasAndAddGameObjectsToHits(LineSegment ray, QuadtreeNode* qtn, std::vector<GameObject*>& hits);
 	void SortHits(std::vector<GameObject*>& hits);
 	void FindIfRayIntersectsATriangle(LineSegment ray, std::vector<GameObject*>& hits, std::vector< std::pair<float, GameObject*> >& hitPointsDistances);
+
+	bool IsMouseInScene();
 	
 	// Getters
 	float4x4 GetView() const { return view; };
