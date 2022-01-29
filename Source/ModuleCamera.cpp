@@ -108,15 +108,15 @@ update_status ModuleCamera::Update()
 
 	if (IsMouseInScene())
 	{
-		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KeyState::KEY_REPEAT)
+		if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KeyState::KEY_DOWN)
 		{
 			m_CameraRotation = true;
 		}
-		else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KeyState::KEY_REPEAT)
+		else if (App->input->GetMouseButton(SDL_BUTTON_MIDDLE) == KeyState::KEY_DOWN)
 		{
 			m_CameraScrolling = true;
 		}
-		else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT)
+		else if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KeyState::KEY_DOWN && (App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_DOWN || App->input->GetKey(SDL_SCANCODE_LALT) == KeyState::KEY_REPEAT) && !ImGuizmo::IsOver())
 		{
 			m_CameraZooming = true;
 		}
