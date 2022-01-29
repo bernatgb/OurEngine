@@ -40,11 +40,11 @@ Component* CLight::GetAClone(GameObject* _owner)
 	return new CLight(m_Enabled, _owner, this);
 }
 
-void CLight::DrawImGui()
+void CLight::DrawImGui(int index)
 {
-	if (ImGui::CollapsingHeader("Light"))
+	if (ImGui::CollapsingHeader(std::string("Light_" + std::to_string(index)).c_str()))
 	{
-		Component::DrawImGui();
+		Component::DrawImGui(index);
 
 		// Selected light type
 		if (ImGui::Button("Light type..."))

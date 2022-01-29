@@ -383,7 +383,7 @@ void GameObject::DrawImGui()
 	ImGui::Text("Min: %f %f %f", m_Min.x, m_Min.y, m_Min.z);
 	ImGui::Text("Max: %f %f %f", m_Max.x, m_Max.y, m_Max.z);
 
-	m_Transform->DrawImGui();
+	m_Transform->DrawImGui(0);
 
 	/*
 	for (unsigned int i = 0; i < m_Components.size(); ++i)
@@ -404,7 +404,7 @@ void GameObject::DrawImGui()
 	*/
 
 	for (unsigned int i = 0; i < m_Components.size(); ++i) 
-		m_Components[i]->DrawImGui();
+		m_Components[i]->DrawImGui(i);
 
 	// Add component button
 	ImGui::Spacing();

@@ -106,11 +106,11 @@ void CCamera::OnLoad(const rapidjson::Value& node)
 	frustum.SetUp(m_Owner->m_Transform->GetUp());
 }
 
-void CCamera::DrawImGui()
+void CCamera::DrawImGui(int index)
 {
-	if (ImGui::CollapsingHeader("Camera"))
+	if (ImGui::CollapsingHeader(std::string("Camera_" + std::to_string(index)).c_str()))
 	{
-		Component::DrawImGui();
+		Component::DrawImGui(index);
 
 		if (ImGui::Checkbox("Main camera (in progress)", &m_MainCamera))
 		{

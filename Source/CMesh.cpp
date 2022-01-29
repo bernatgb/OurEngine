@@ -83,11 +83,11 @@ void CMesh::NotifyMovement()
 	m_MaxPoint = m_BB[3];
 }
 
-void CMesh::DrawImGui()
+void CMesh::DrawImGui(int index)
 {
-	if (ImGui::CollapsingHeader("Mesh"))
+	if (ImGui::CollapsingHeader(std::string("Mesh_" + std::to_string(index)).c_str()))
 	{
-		Component::DrawImGui();
+		Component::DrawImGui(index);
 
 		// Selected mesh
 		if (ImGui::Button("Select Mesh..."))
@@ -118,7 +118,7 @@ void CMesh::DrawImGui()
 			m_Mesh->DrawImGui();
 		}
 	}
-	if (ImGui::CollapsingHeader("Material"))
+	if (ImGui::CollapsingHeader(std::string("Material_" + std::to_string(index)).c_str()))
 	{
 		// Select material
 		if (ImGui::Button("Select Material..."))

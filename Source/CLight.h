@@ -40,7 +40,7 @@ public:
 
 	Component* GetAClone(GameObject* _owner) override;
 	//void NotifyMovement() override;
-	void DrawImGui() override;
+	void DrawImGui(int index) override;
 
 	void OnSave(rapidjson::Value& node, rapidjson::Document::AllocatorType& allocator) const override;
 	void OnLoad(const rapidjson::Value& node) override;

@@ -56,7 +56,7 @@ void CTransform::NotifyMovement()
 		m_AccumulativeModelMatrix = m_ModelMatrix;
 }
 
-void CTransform::DrawImGui()
+void CTransform::DrawImGui(int index)
 {
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
