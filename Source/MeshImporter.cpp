@@ -45,6 +45,10 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 		*(pointer++) = mesh->mNormals[i].x;
 		*(pointer++) = mesh->mNormals[i].y;
 		*(pointer++) = mesh->mNormals[i].z;
+
+		//*(pointer++) = mesh->mTangents[i].x;
+		//*(pointer++) = mesh->mTangents[i].y;
+		//*(pointer++) = mesh->mTangents[i].z;
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -56,6 +60,8 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	unsigned index_size = sizeof(unsigned int) * ourMesh->m_NumIndices;
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, nullptr, GL_STATIC_DRAW);
 	unsigned* indices = (unsigned*)(glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, index_size, GL_MAP_WRITE_BIT));
+		
+	ourMesh->m_Triangles = std::vector<Triangle>(ourMesh->m_NumIndices / 3);
 
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
 	{
@@ -63,6 +69,13 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 		*(indices++) = mesh->mFaces[i].mIndices[0];
 		*(indices++) = mesh->mFaces[i].mIndices[1];
 		*(indices++) = mesh->mFaces[i].mIndices[2];
+
+		//CREATING TRIANGLES VECTOR
+		ourMesh->m_Triangles[i] = Triangle(
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[0]].x, mesh->mVertices[mesh->mFaces[i].mIndices[0]].y, mesh->mVertices[mesh->mFaces[i].mIndices[0]].z),
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[1]].x, mesh->mVertices[mesh->mFaces[i].mIndices[1]].y, mesh->mVertices[mesh->mFaces[i].mIndices[1]].z),
+			float3(mesh->mVertices[mesh->mFaces[i].mIndices[2]].x, mesh->mVertices[mesh->mFaces[i].mIndices[2]].y, mesh->mVertices[mesh->mFaces[i].mIndices[2]].z)
+		);
 	}
 
 	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
@@ -84,6 +97,9 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
+	//glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
+
 	glBindVertexArray(0);
 	
 	//CREATING THE BB
@@ -96,17 +112,6 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	ourMesh->m_BB[5] = float3(ourMesh->m_Min.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[6] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Min.z);
 	ourMesh->m_BB[7] = float3(ourMesh->m_Max.x, ourMesh->m_Min.y, ourMesh->m_Max.z);
-
-	//CREATING TRIANGLES VECTOR
-	ourMesh->m_Triangles = std::vector<Triangle>(ourMesh->m_NumIndices / 3);
-	for (int i = 0; i < mesh->mNumFaces; ++i)
-	{
-		ourMesh->m_Triangles[i] = Triangle(
-			float3(mesh->mVertices[mesh->mFaces[i].mIndices[0]].x, mesh->mVertices[mesh->mFaces[i].mIndices[0]].y, mesh->mVertices[mesh->mFaces[i].mIndices[0]].z),
-			float3(mesh->mVertices[mesh->mFaces[i].mIndices[1]].x, mesh->mVertices[mesh->mFaces[i].mIndices[1]].y, mesh->mVertices[mesh->mFaces[i].mIndices[1]].z),
-			float3(mesh->mVertices[mesh->mFaces[i].mIndices[2]].x, mesh->mVertices[mesh->mFaces[i].mIndices[2]].y, mesh->mVertices[mesh->mFaces[i].mIndices[2]].z)
-		);
-	}
 
 	MY_LOG("Assimp mesh: Create correctly");
 }
@@ -243,6 +248,9 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
+
+	//glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
 	glBindVertexArray(0);
 

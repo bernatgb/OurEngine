@@ -197,6 +197,21 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	}
 	else
 		MY_LOG("MaterialImporter: No specular texture");
+	
+	if (material->GetTexture(aiTextureType_HEIGHT, 0, &file) == AI_SUCCESS)
+	{
+		ourMaterial->m_NormalMap = new Texture();
+		bool loaded = importer::texture::Import(file.data, ourMaterial->m_NormalMap, fullPath);
+		if (loaded)
+			App->resources->m_Textures[ourMaterial->m_NormalMap->m_GUID] = ourMaterial->m_NormalMap;
+		else
+		{
+			delete ourMaterial->m_NormalMap;
+			ourMaterial->m_NormalMap = nullptr;
+		}
+	}
+	else
+		MY_LOG("MaterialImporter: No normal map");
 }
 
 int importer::material::Save(const Material* ourMaterial, char*& fileBuffer)

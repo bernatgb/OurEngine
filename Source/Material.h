@@ -18,6 +18,7 @@ public:
 
 	Texture* m_DiffuseTexture = nullptr;
 	Texture* m_SpecularTexture = nullptr;
+	Texture* m_NormalMap = nullptr;
 
 	float3 m_DiffuseColor = float3(0.3f);
 	float3 m_SpecularColor = float3(1.0f);

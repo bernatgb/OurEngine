@@ -6,6 +6,7 @@
 #include "ModuleRender.h"
 #include "ModuleScene.h"
 #include "ModuleDebugDraw.h"
+#include "ModuleImGui.h"
 #include "SDL.h"
 
 #include "CCamera.h"
@@ -218,6 +219,8 @@ update_status ModuleCamera::Update()
 		}
 
 		ViewProjectionMatrix();
+
+		App->imGui->WrapMouseInWindow();
 	}
 	else if (m_CameraScrolling)
 	{
@@ -231,6 +234,8 @@ update_status ModuleCamera::Update()
 			Config::m_CamRotation.WorldY() * deltaY * Time::GetDeltaTime() * mouseSpeedForMovement;
 
 		ViewProjectionMatrix();
+
+		App->imGui->WrapMouseInWindow();
 	}
 	else if (m_CameraZooming)
 	{
@@ -261,6 +266,8 @@ update_status ModuleCamera::Update()
 		Config::m_CamRotation = float3x3(right, up, front).ToQuat();
 
 		ViewProjectionMatrix();
+
+		App->imGui->WrapMouseInWindow();
 	}
 
 	return UPDATE_CONTINUE;

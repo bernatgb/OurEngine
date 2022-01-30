@@ -561,9 +561,6 @@
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Game\assets\Shaders\fragment_shader_phongBRDF.frag" />
-    <None Include="..\Game\assets\Shaders\fragment_shader_single_color.frag" />
-    <None Include="..\Game\assets\Shaders\vertex_shader_phongBRDF.vert" />
     <None Include="assimp-4.1.0\include\assimp\color4.inl" />
     <None Include="assimp-4.1.0\include\assimp\config.h.in" />
     <None Include="assimp-4.1.0\include\assimp\material.inl" />
@@ -587,6 +584,8 @@
     <None Include="MathGeoLib_Source\Geometry\TriangleMesh_IntersectRay_SSE.inl" />
     <None Include="MathGeoLib_Source\Math\float2.inl" />
     <None Include="MathGeoLib_Source\Math\Matrix.inl" />
+    <None Include="phongBRDFandNormalMap_PS.glsl" />
+    <None Include="phongBRDFandNormalMap_VS.glsl" />
     <None Include="shaders\fragment_shader.frag" />
     <None Include="shaders\fragment_shader_phong.frag" />
     <None Include="shaders\vertex_shader.vert" />

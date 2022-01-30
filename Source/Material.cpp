@@ -81,4 +81,31 @@ void Material::DrawImGui()
 		m_SpecularTexture->DrawImGui();
 
 	ImGui::Separator();
+	
+	// NORMAL MAP
+	ImGui::Text("NormalMap");
+
+	if (ImGui::Button("Select normal map..."))
+		ImGui::OpenPopup("select_normal_map");
+	ImGui::SameLine();
+	if (m_NormalMap != nullptr) ImGui::TextUnformatted(m_NormalMap->m_Name.c_str());
+	else ImGui::TextUnformatted("No texture selected");
+
+	if (ImGui::BeginPopup("select_normal_map"))
+	{
+		ImGui::Text("Texture");
+		ImGui::Separator();
+		if (ImGui::Selectable("None")) m_NormalMap = nullptr;
+		for (auto it = App->resources->m_Textures.begin(); it != App->resources->m_Textures.end(); ++it)
+		{
+			if (ImGui::Selectable(it->second->m_Name.c_str()))
+				m_NormalMap = it->second;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (m_NormalMap != nullptr)
+		m_NormalMap->DrawImGui();
+
+	ImGui::Separator();
 }

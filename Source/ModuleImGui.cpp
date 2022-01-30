@@ -231,6 +231,23 @@ update_status ModuleImGui::PostUpdate()
 	return UPDATE_CONTINUE;
 }
 
+void ModuleImGui::WrapMouseInWindow()
+{
+	int mouseX, mouseY;
+	SDL_GetMouseState(&mouseX, &mouseY);
+	float2 viewportSize = float2(ImGui::GetMainViewport()->Size.x, ImGui::GetMainViewport()->Size.y);
+	SDL_Window* window = App->window->GetWindow();
+
+	if (mouseX > viewportSize.x)
+		SDL_WarpMouseInWindow(window, 0, mouseY);
+	else if (mouseX < 0)
+		SDL_WarpMouseInWindow(window, viewportSize.x - 1, mouseY);
+	else if (mouseY > viewportSize.y)
+		SDL_WarpMouseInWindow(window, mouseX, 0);
+	else if (mouseY < 0)
+		SDL_WarpMouseInWindow(window, mouseX, viewportSize.y - 1);
+}
+
 void ModuleImGui::About(bool& show)
 {
 	if (ImGui::Begin("About", &show))
