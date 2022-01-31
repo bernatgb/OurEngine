@@ -4,6 +4,9 @@
 
 #include "SceneImporter.h"
 
+#include "Application.h"
+#include "ModuleImGui.h"
+
 #include "imgui.h"
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
@@ -60,9 +63,18 @@ void CTransform::DrawImGui(int index)
 {
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		float3 pos = m_Position;
+		float3 scale = m_Scale;
+
 		if (ImGui::DragFloat3("Position", &m_Position[0], 0.5f))
 		{
 			RecalculateModelMatrix();
+
+			App->imGui->WrapMouseInWindow();
+
+			// Controling changes
+			if (abs(pos.x - m_Position.x) > 50 || abs(pos.y - m_Position.y) > 50 || abs(pos.z - m_Position.z) > 50)
+				m_Position = pos;
 		}
 		if (ImGui::DragFloat3("Rotation", &m_RotationEuler[0], 5.0f))
 		{
@@ -75,6 +87,12 @@ void CTransform::DrawImGui(int index)
 		if (ImGui::DragFloat3("Scale", &m_Scale[0], 0.5f))
 		{
 			RecalculateModelMatrix();
+
+			App->imGui->WrapMouseInWindow();
+
+			// Controling changes
+			if (abs(scale.x - m_Scale.x) > 50 || abs(scale.y - m_Scale.y) > 50 || abs(scale.z - m_Scale.z) > 50)
+				m_Scale = scale;
 		}
 	}
 }
