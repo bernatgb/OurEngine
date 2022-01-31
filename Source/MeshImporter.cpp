@@ -16,6 +16,7 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	glBindBuffer(GL_ARRAY_BUFFER, ourMesh->m_Vbo);
 
 	unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3;
+	//unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3 + sizeof(float) * 3; For NormalMap
 	unsigned int buffer_size = vertex_size * ourMesh->m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
@@ -46,9 +47,9 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 		*(pointer++) = mesh->mNormals[i].y;
 		*(pointer++) = mesh->mNormals[i].z;
 
-		//*(pointer++) = mesh->mTangents[i].x;
-		//*(pointer++) = mesh->mTangents[i].y;
-		//*(pointer++) = mesh->mTangents[i].z;
+		*(pointer++) = mesh->mTangents[i].x;
+		*(pointer++) = mesh->mTangents[i].y; // For NormalMap
+		*(pointer++) = mesh->mTangents[i].z;
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -97,8 +98,8 @@ void importer::mesh::Import(const aiMesh* mesh, Mesh* ourMesh)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
+	glEnableVertexAttribArray(3); // For NormalMap
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3));
 
 	glBindVertexArray(0);
 	
@@ -206,6 +207,7 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	glBindBuffer(GL_ARRAY_BUFFER, ourMesh->m_Vbo);
 
 	unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3;
+	//unsigned int vertex_size = sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3 + sizeof(float) * 3; For NormalMap
 	unsigned int buffer_size = vertex_size * ourMesh->m_NumVertices;
 	glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_STATIC_DRAW);
 
@@ -249,8 +251,8 @@ void importer::mesh::Load(const char* fileBuffer, Mesh* ourMesh)
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
 
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2));
+	glEnableVertexAttribArray(3); // For NormalMap
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 3 + sizeof(float) * 2 + sizeof(float) * 3));
 
 	glBindVertexArray(0);
 

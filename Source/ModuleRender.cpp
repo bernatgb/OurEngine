@@ -127,7 +127,7 @@ bool ModuleRender::Init()
 
 	MY_LOG("Shaders: Creating program");
 	program = App->program->CreateProgram(".\\assets\\Shaders\\phongBRDFengine_SimpleVS.glsl", ".\\assets\\Shaders\\phongBRDFengine_SimplePS.glsl");
-	//program = App->program->CreateProgram(".\\assets\\Shaders\\phongBRDFandNormalMap_VS.glsl", ".\\assets\\Shaders\\phongBRDFandNormalMap_PS.glsl");
+	//program = App->program->CreateProgram(".\\assets\\Shaders\\phongBRDFandNormalMap_VS.glsl", ".\\assets\\Shaders\\phongBRDFandNormalMap_PS.glsl"); For NormalMap
 
 	MY_LOG("Framebuffer: Creating framebuffer");
 	//FBO
@@ -345,9 +345,9 @@ void ModuleRender::ActivateMaterial(Material* _material)
 	if (loc < 0) MY_LOG("Uniform location not found: shininessAlpha");
 	glUniform1i(loc, _material->m_ShininessAlpha);
 
-	//loc = glGetUniformLocation(program, "hasNormalMap");
-	//if (loc < 0) MY_LOG("Uniform location not found: hasNormalMap");
-	//glUniform1i(loc, _material->m_NormalMap != nullptr);
+	loc = glGetUniformLocation(program, "hasNormalMap");
+	if (loc < 0) MY_LOG("Uniform location not found: hasNormalMap"); // For NormalMap
+	glUniform1i(loc, _material->m_NormalMap != nullptr);
 
 	loc = glGetUniformLocation(program, "shininess");
 	if (loc < 0) MY_LOG("Uniform location not found: shininess");
@@ -380,8 +380,8 @@ void ModuleRender::ActivateMaterial(Material* _material)
 		glBindTexture(GL_TEXTURE_2D, _material->m_SpecularTexture->m_Texture);
 		glUniform1i(loc, 0);
 	}
-	/*
-	if (_material->m_NormalMap != nullptr)
+	
+	if (_material->m_NormalMap != nullptr) // For NormalMap
 	{
 		loc = glGetUniformLocation(program, "normalMap");
 		if (loc < 0) MY_LOG("Uniform location not found: normalMap");
@@ -389,7 +389,7 @@ void ModuleRender::ActivateMaterial(Material* _material)
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, _material->m_NormalMap->m_Texture);
 		glUniform1i(loc, 0);
-	}*/
+	}
 }
 
 CubeMap* ModuleRender::GetCubeMap()

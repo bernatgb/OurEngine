@@ -113,10 +113,15 @@ vec3 GetPhongBRDFSpot(Light light, vec3 Cs, vec3 N, vec3 V, float n, vec3 pos, v
 
 void main()
 {    
-	mat3 tbn = CreateTangentSpace(normalize(normal), normalize(tangent));
-	vec3 fragmentNormal = tbn * (texture(normalMap, uv0).xyz * 2.0 - 1.0);
+	vec3 N;
 
-    vec3 N = normalize(fragmentNormal);
+	if (hasNormalMap)
+		mat3 tbn = CreateTangentSpace(normalize(normal), normalize(tangent));
+		vec3 fragmentNormal = tbn * (texture(normalMap, uv0).xyz * 2.0 - 1.0);
+		N = normalize(fragmentNormal);
+	else
+		N = normalize(normal);
+		
     vec3 V = normalize(camPos - position);
     
     vec3 Ca = ambientColor;

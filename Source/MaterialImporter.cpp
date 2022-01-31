@@ -198,7 +198,7 @@ void importer::material::Import(const aiMaterial* material, Material* ourMateria
 	else
 		MY_LOG("MaterialImporter: No specular texture");
 	
-	if (material->GetTexture(aiTextureType_HEIGHT, 0, &file) == AI_SUCCESS)
+	if (material->GetTexture(aiTextureType_HEIGHT, 0, &file) == AI_SUCCESS) // For NormalMap
 	{
 		ourMaterial->m_NormalMap = new Texture();
 		bool loaded = importer::texture::Import(file.data, ourMaterial->m_NormalMap, fullPath);
@@ -221,7 +221,7 @@ int importer::material::Save(const Material* ourMaterial, char*& fileBuffer)
 		(ourMaterial->m_DiffuseTexture != nullptr ? ourMaterial->m_DiffuseTexture->m_GUID : 0),
 		(ourMaterial->m_SpecularTexture != nullptr ? ourMaterial->m_SpecularTexture->m_GUID : 0),
 		(ourMaterial->m_ShininessAlpha ? 1 : 0),
-	};
+	}; // Update for NormalMap
 
 	float values[7] = {
 		ourMaterial->m_DiffuseColor.x, ourMaterial->m_DiffuseColor.y, ourMaterial->m_DiffuseColor.z,
@@ -267,6 +267,7 @@ void importer::material::Load(const char* fileBuffer, Material* ourMaterial)
 	cursor += (bytes + 1);
 
 	unsigned int header[4];
+	//unsigned int header[5]; For NormalMap
 	bytes = sizeof(header);
 	memcpy(header, cursor, bytes);
 	cursor += bytes;
@@ -275,11 +276,14 @@ void importer::material::Load(const char* fileBuffer, Material* ourMaterial)
 	unsigned int m_DiffuseGUID = header[1];
 	unsigned int m_SpecularGUID = header[2];
 	ourMaterial->m_ShininessAlpha = header[3];
+	//unsigned int m_NormalMapGUID = header[4]; For NormalMap
 
 	if (m_DiffuseGUID != 0)
 		ourMaterial->m_DiffuseTexture = App->resources->m_Textures[m_DiffuseGUID];
 	if (m_SpecularGUID != 0)
 		ourMaterial->m_SpecularTexture = App->resources->m_Textures[m_SpecularGUID];
+	//if (m_NormalMapGUID != 0)
+	//	ourMaterial->m_NormalMap = App->resources->m_Textures[m_NormalMapGUID]; For NormalMap
 
 	float values[7];
 	bytes = sizeof(values);
