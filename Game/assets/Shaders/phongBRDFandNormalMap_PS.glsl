@@ -116,9 +116,11 @@ void main()
 	vec3 N;
 
 	if (hasNormalMap)
+	{
 		mat3 tbn = CreateTangentSpace(normalize(normal), normalize(tangent));
 		vec3 fragmentNormal = tbn * (texture(normalMap, uv0).xyz * 2.0 - 1.0);
 		N = normalize(fragmentNormal);
+	}
 	else
 		N = normalize(normal);
 		
